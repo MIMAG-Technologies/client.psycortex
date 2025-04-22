@@ -75,6 +75,12 @@ console.log(res);
 
   return (
     <div className="flex border-t border-primary-purple bg-[#f8f3fa] relative z-[1]">
+
+
+      <div className="h-full w-[200px]">
+        filters
+      </div>
+      <div className="grid lg:grid-cols-3 gap-6 p-6 w-full md:grid-cols-2 sm:grid-cols-1">
       {loading ? (
         <p>Loading...</p>
       ) : counsellor?.length === 0 ? (
@@ -84,7 +90,7 @@ console.log(res);
           <OneCounsellorCard {...oneCounsellor} key={oneCounsellor.id} />
         ))
       )}
-
+      </div>
         </div>
   )
 

@@ -22,24 +22,24 @@ export default function OneExpertCard({
   const halfStar = roundedRating % 1 !== 0;
 
   return (
-    <div className="w-[330px] h-[330px] p-2 border border-primary-purple rounded-[10px] bg-white flex flex-col gap-2 transition-all duration-200 ease-in-out hover:scale-[1.015] hover:shadow-[0_0_10px_#0000002d] sm:w-full sm:h-fit sm:z-0">
-      <div className="flex items-center gap-2 mb-2">
+    <div className="w-[330px] h-full p-4 border border-primary-purple rounded-[10px] bg-white flex flex-col gap-3 transition-all duration-200 ease-in-out hover:scale-[1.015] hover:shadow-[0_0_10px_#0000002d] sm:w-full sm:h-fit sm:z-0">
+      <div className="flex items-center gap-4 mb-3">
         <img
-          src={profileImage || "/assets/Images/user-dummy-img.png"}
+          src={profileImage || "/user-dummy-img.png"}
           alt={`${name}'s profile`}
-          className="aspect-square h-20 object-cover rounded-[10px]"
+          className="aspect-square h-24 object-cover rounded-[10px]"
         />
-        <div>
-          <h3 className="font-bold text-[20px]">{name}</h3>
-          <p>{yearsOfExperience}+ years of experience</p>
-          <p>Starts @ ₹{startingRate} for 50 minutes</p>
+        <div className="space-y-1">
+          <h3 className="font-bold text-2xl text-gray-900">{name}</h3>
+          <p className="text-base text-gray-700">{yearsOfExperience}+ years of experience</p>
+          <p className="text-base text-gray-700">Starts @ ₹{startingRate} for 50 minutes</p>
         </div>
       </div>
 
       <div className="flex gap-2 flex-wrap">
         {specialties.slice(0, 3).map((specialty, index) => (
           <span
-            className="border-[1.5px] border-primary-purple bg-[#f8f3fa] px-2 py-1 rounded-[7px]"
+            className="border-[1.5px] border-primary-purple bg-[#f8f3fa] px-2 py-1.5 rounded-[7px] text-sm font-medium"
             key={index}
           >
             {specialty}
@@ -47,7 +47,7 @@ export default function OneExpertCard({
         ))}
       </div>
 
-      <div className="text-sm">
+      <div className="text-base text-gray-700">
         <strong>Languages: </strong>
         {languages.map((lang, index) => (
           <span key={lang.language}>
@@ -57,22 +57,22 @@ export default function OneExpertCard({
         ))}
       </div>
 
-      <div className="flex gap-1 items-center">
-        <strong>Rating: </strong>
+      <div className="flex gap-2 items-center">
+        <strong className="text-gray-900">Rating: </strong>
         <div className="flex items-center">
           {[...Array(fullStars)].map((_, index) => (
-            <FaStar key={`full-${index}`} className="text-yellow-500" />
+            <FaStar key={`full-${index}`} className="text-yellow-500 text-lg" />
           ))}
-          {halfStar && <FaStarHalfAlt className="text-yellow-500" />}
+          {halfStar && <FaStarHalfAlt className="text-yellow-500 text-lg" />}
           {[...Array(5 - fullStars - (halfStar ? 1 : 0))].map((_, index) => (
-            <FaRegStar key={`empty-${index}`} className="text-gray-300" />
+            <FaRegStar key={`empty-${index}`} className="text-gray-300 text-lg" />
           ))}
         </div>
       </div>
 
       <Link
         href={`/experts/${id}`}
-        className="w-full py-2 bg-indigo-500 text-white border-none rounded-[10px] cursor-pointer text-center mt-auto sm:mt-5"
+        className="w-full py-3 bg-indigo-500 text-white text-base font-medium border-none rounded-[10px] cursor-pointer text-center mt-auto hover:bg-indigo-600 transition-colors duration-200 sm:mt-5"
       >
         Book Appointment
       </Link>

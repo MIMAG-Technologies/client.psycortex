@@ -2,6 +2,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthStateHandler from "../components/AuthStateHandler";
+import { ToastContainer } from "react-toastify";
 
 
 export default function RootLayout({
@@ -21,6 +22,18 @@ export default function RootLayout({
       </head>
       <body
       >
+        <ToastContainer
+          position="top-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         <AuthProvider>
           <AuthStateHandler>
             <Navbar />

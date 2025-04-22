@@ -8,6 +8,7 @@ import TestCard from '@/components/test/TestCard';
 import TestDetailsModal from '@/components/test/TestDetailsModal';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 export default function Tests() {
   const [tests, setTests] = useState<TestDetails[]>([]);
@@ -17,6 +18,7 @@ export default function Tests() {
   const [selectedTest, setSelectedTest] = useState<TestDetails | null>(null);
   const [showModal, setShowModal] = useState(false);
   const { userAge, user } = useAuth();
+  const router = useRouter()
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -42,6 +44,8 @@ export default function Tests() {
     const res = await bookTest(user?.uid, testSlug, amount)
     if (res) {
       toast.success('Test Purchase Successfully');
+      router.push('/profile/tests');
+      
     }
     else {
       toast.error('Error while purchase in test , please try again later!')
