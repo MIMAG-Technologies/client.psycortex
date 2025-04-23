@@ -10,4 +10,11 @@ export type question = {
 export type assesmentData = {
   pages: number;
   questions: question[];
+  testInfo?: {
+    name: string;
+    description: string;
+    instructions: string;
+    estimated_time: string;
+    total_questions: number;
+  };
 };

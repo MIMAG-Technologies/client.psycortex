@@ -112,7 +112,7 @@ export default function TestsPage() {
                       </div>
                     </div>
                     <Link 
-                      href={`/tests/take/${test.testSlug}?bookingId=${test.bookingId}`}
+                      href={`/assesment?slug=${test.testSlug}`}
                       className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
                     >
                       Start Test <FaArrowRight className="ml-2" />
@@ -191,14 +191,6 @@ export default function TestsPage() {
                         )}
                       </div>
                     </div>
-                    {test.status === 'completed' && test.responseId && (
-                      <Link 
-                        href={`/tests/results/${test.responseId}`}
-                        className="bg-gray-100 text-gray-800 px-4 py-2 rounded flex items-center"
-                      >
-                        View Results <FaArrowRight className="ml-2" />
-                      </Link>
-                    )}
                   </div>
                 </div>
               ))}

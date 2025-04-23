@@ -1,8 +1,8 @@
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthStateHandler from "../components/AuthStateHandler";
 import { ToastContainer } from "react-toastify";
+import ClientNavbarWrapper from "@/components/ClientNavbarWrapper";
 
 
 export default function RootLayout({
@@ -36,7 +36,7 @@ export default function RootLayout({
         />
         <AuthProvider>
           <AuthStateHandler>
-            <Navbar />
+            <ClientNavbarWrapper />
             <main className="pt-16 min-h-screen">
               {children}
             </main>
