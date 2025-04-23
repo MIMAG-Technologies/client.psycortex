@@ -153,7 +153,7 @@ export default function SummarySection({
   if (loading) {
     return (
       <div className="flex justify-center items-center py-10">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
       </div>
     );
   }
@@ -165,7 +165,7 @@ export default function SummarySection({
         <SummaryCard 
           title="Total Sessions" 
           value={stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}
-          icon={<FaCalendarAlt className="text-indigo-500" />}
+          icon={<FaCalendarAlt className="text-[#642494]" />}
           description="Total sessions across all types"
         />
         <SummaryCard 
@@ -226,12 +226,12 @@ export default function SummarySection({
                       p-2 h-10 relative
                       ${!isCurrentMonth(date) ? 'text-gray-400' : 'text-gray-800'} 
                       ${isToday(date) ? 'font-bold' : ''} 
-                      ${isSelected(date) ? 'bg-indigo-100' : 'hover:bg-gray-100'}
+                      ${isSelected(date) ? 'bg-[#642494]/10' : 'hover:bg-gray-100'}
                     `}
                   >
                     {date.getDate()}
                     {hasEvent(date) && (
-                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-[#642494] rounded-full"></span>
                     )}
                   </button>
                 ))}
@@ -291,7 +291,7 @@ function SummaryCard({
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex items-center">
-        <div className="p-3 rounded-full bg-indigo-50 mr-4">
+        <div className="p-3 rounded-full bg-[#642494]/10 mr-4">
           {icon}
         </div>
         <div>
@@ -299,7 +299,7 @@ function SummaryCard({
           <p className="text-gray-500 text-sm">{description}</p>
         </div>
       </div>
-      <div className="text-3xl font-bold text-indigo-600 mt-2">{value}</div>
+      <div className="text-3xl font-bold text-[#642494] mt-2">{value}</div>
     </div>
   );
 }
@@ -363,7 +363,7 @@ function ReferredTestCard({ test }: { test: ReferredTest }) {
             {test.payment.currency} {test.payment.amount}
           </span>
           <button 
-            className="mt-2 px-4 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors text-sm"
+            className="mt-2 px-4 py-1 bg-[#642494] text-white rounded hover:bg-[#4e1c72] transition-colors text-sm"
           >
             Pay Now
           </button>

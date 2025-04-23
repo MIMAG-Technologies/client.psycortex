@@ -17,7 +17,7 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
             <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex justify-between items-start">
-                        <h2 className="text-2xl font-bold text-indigo-800">{test.name}</h2>
+                        <h2 className="text-2xl font-bold text-[#642494]">{test.name}</h2>
                         <button
                             onClick={onClose}
                             className="text-gray-500 hover:text-gray-700"
@@ -53,11 +53,11 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                             <h3 className="font-semibold text-gray-800 mb-2">Test Details</h3>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="flex items-center">
-                                    <FaClock className="mr-2 text-indigo-600" />
+                                    <FaClock className="mr-2 text-[#642494]" />
                                     <span>{test.details.durationMinutes} minutes</span>
                                 </div>
                                 <div className="flex items-center">
-                                    <FaListAlt className="mr-2 text-indigo-600" />
+                                    <FaListAlt className="mr-2 text-[#642494]" />
                                     <span>{test.details.totalQuestions} questions</span>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                                     {test.benefits.map((benefit, index) => (
                                         <span
                                             key={index}
-                                            className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-md text-sm"
+                                            className="px-3 py-1 bg-[#642494]/10 text-[#642494] rounded-md text-sm"
                                         >
                                             {benefit}
                                         </span>
@@ -89,7 +89,7 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                                 </li>
                                 <li>
                                     By purchasing, you agree to our
-                                    <a href="https://psycortex.in/psycortex/returnpolicy" target="_blank" className="text-indigo-600 hover:text-indigo-800 ml-1">
+                                    <a href="https://psycortex.in/psycortex/returnpolicy" target="_blank" className="text-[#642494] hover:text-[#4e1c72] ml-1">
                                         refund policy
                                     </a>
                                 </li>
@@ -103,7 +103,7 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                                 <div className="flex items-center">
                                     {test.pricing.discount ? (
                                         <>
-                                            <span className="text-2xl font-bold text-indigo-700">
+                                            <span className="text-2xl font-bold text-[#642494]">
                                                 {test.pricing.currency} {test.pricing.amount}
                                             </span>
                                             <span className="text-gray-500 line-through ml-2">
@@ -111,18 +111,18 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                                             </span>
                                         </>
                                     ) : (
-                                        <span className="text-2xl font-bold text-indigo-700">
+                                        <span className="text-2xl font-bold text-[#642494]">
                                             {test.pricing.currency} {test.pricing.amount}
                                         </span>
                                     )}
                                 </div>
                             </div>
                             {
-                                isLoggedIn ? <button className="bg-indigo-600 cursor-pointer text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors" onClick={()=>{
+                                isLoggedIn ? <button className="bg-[#642494] cursor-pointer text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors" onClick={()=>{
                                     booktest(test.slug,test.pricing.amount)
                                 }}>
                                     Pay Now
-                                </button> : <Link href={'/login'} className="bg-indigo-600 cursor-pointer text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors">Login to proceed</Link>
+                                </button> : <Link href={'/login'} className="bg-[#642494] cursor-pointer text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors">Login to proceed</Link>
                             }
 
                         </div>

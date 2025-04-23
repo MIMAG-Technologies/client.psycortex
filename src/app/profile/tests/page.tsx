@@ -53,7 +53,7 @@ export default function TestsPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-10">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-800"></div>
       </div>
     );
   }
@@ -65,21 +65,21 @@ export default function TestsPage() {
       {/* Section Selection Bar */}
       <div className="flex mb-6 border-b">
         <button 
-          className={`px-4 py-2 font-medium flex items-center gap-2 ${activeSection === 'active' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-600'}`}
+          className={`px-4 py-2 font-medium flex items-center gap-2 ${activeSection === 'active' ? 'border-b-2 border-purple-800 text-purple-800' : 'text-gray-600'}`}
           onClick={() => setActiveSection('active')}
         >
           <FaClipboardCheck />
           Active Tests
         </button>
         <button 
-          className={`px-4 py-2 font-medium flex items-center gap-2 ${activeSection === 'referred' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-600'}`}
+          className={`px-4 py-2 font-medium flex items-center gap-2 ${activeSection === 'referred' ? 'border-b-2 border-purple-800 text-purple-800' : 'text-gray-600'}`}
           onClick={() => setActiveSection('referred')}
         >
           <FaUserMd />
           Referred Tests
         </button>
         <button 
-          className={`px-4 py-2 font-medium flex items-center gap-2 ${activeSection === 'history' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-600'}`}
+          className={`px-4 py-2 font-medium flex items-center gap-2 ${activeSection === 'history' ? 'border-b-2 border-purple-800 text-purple-800' : 'text-gray-600'}`}
           onClick={() => setActiveSection('history')}
         >
           <FaCalendarAlt />
@@ -113,7 +113,7 @@ export default function TestsPage() {
                     </div>
                     <Link 
                       href={`/assesment?slug=${test.testSlug}`}
-                      className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
+                      className="bg-purple-800 text-white px-4 py-2 rounded flex items-center"
                     >
                       Start Test <FaArrowRight className="ml-2" />
                     </Link>

@@ -119,8 +119,8 @@ function TabButton({
       <div
         className={`flex items-center py-3 px-6 focus:outline-none transition-colors cursor-pointer ${
           active
-            ? "border-b-2 border-indigo-500 text-indigo-600"
-            : "text-gray-600 hover:text-indigo-500"
+            ? "border-b-2 border-purple-700 text-purple-800"
+            : "text-gray-600 hover:text-purple-500"
         }`}
       >
         <span className="mr-2">{icon}</span>

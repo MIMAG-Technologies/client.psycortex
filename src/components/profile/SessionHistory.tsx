@@ -138,7 +138,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
             )}
             {activeMode === 'video' && (
               isJoinable ? (
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded">Join Now</button>
+                <button className="bg-[#642494] text-white px-4 py-2 rounded">Join Now</button>
               ) : isExpired ? (
                 <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded" disabled>Session Expired</button>
               ) : (
@@ -147,7 +147,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
             )}
             {activeMode === 'chat' && (
               isJoinable ? (
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded">Join Now</button>
+                <button className="bg-[#642494] text-white px-4 py-2 rounded">Join Now</button>
               ) : isExpired ? (
                 <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded" disabled>Session Expired</button>
               ) : (
@@ -163,7 +163,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
       </div>
     );
   }
@@ -182,10 +182,10 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
     <div className="bg-white">
       <h2 className="text-2xl font-semibold mb-6">Session History</h2>
       <div className="flex justify-around w-full mb-6">
-        <button onClick={() => setActiveMode('call')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'call' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaPhoneAlt/> Call</button>
-        <button onClick={() => setActiveMode('chat')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'chat' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaComments/> Chat</button>
-        <button onClick={() => setActiveMode('video')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'video' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaVideo/> Video</button>
-        <button onClick={() => setActiveMode('in_person')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'in_person' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaUserFriends/> In-Person</button>
+        <button onClick={() => setActiveMode('call')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'call' ? 'bg-[#642494] text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaPhoneAlt/> Call</button>
+        <button onClick={() => setActiveMode('chat')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'chat' ? 'bg-[#642494] text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaComments/> Chat</button>
+        <button onClick={() => setActiveMode('video')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'video' ? 'bg-[#642494] text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaVideo/> Video</button>
+        <button onClick={() => setActiveMode('in_person')} className={`px-4 py-2 mx-1 flex justify-center gap-1 items-center w-1/4 ${activeMode === 'in_person' ? 'bg-[#642494] text-white' : 'bg-gray-200 text-gray-700'} rounded`}> <FaUserFriends/> In-Person</button>
       </div>
       {sessions.length === 0 ? (
         <div className="text-center text-gray-500 py-8">

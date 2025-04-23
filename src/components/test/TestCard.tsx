@@ -31,8 +31,8 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                     />
                 </div>
             ) : (
-                <div className="h-48 bg-indigo-100 flex items-center justify-center">
-                    <FaClipboardList className="text-5xl text-indigo-300" />
+                <div className="h-48 bg-[#642494]/10 flex items-center justify-center">
+                    <FaClipboardList className="text-5xl text-[#642494]/50" />
                 </div>
             )}
 
@@ -61,13 +61,13 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                                 {test.benefits.slice(0, 2).map((benefit, index) => (
                                     <span
                                         key={index}
-                                        className="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md text-xs"
+                                        className="px-2 py-1 bg-[#642494]/10 text-[#642494] rounded-md text-xs"
                                     >
                                         {truncateText(benefit, 30)}
                                     </span>
                                 ))}
                                 {test.benefits.length > 2 && (
-                                    <span className="text-indigo-600 text-xs flex items-center">
+                                    <span className="text-[#642494] text-xs flex items-center">
                                         +{test.benefits.length - 2} more
                                     </span>
                                 )}
@@ -88,7 +88,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                         <div className="flex items-center">
                             {test.pricing.discount ? (
                                 <>
-                                    <span className="font-bold text-indigo-700">
+                                    <span className="font-bold text-[#642494]">
                                         {test.pricing.currency} {test.pricing.amount}
                                     </span>
                                     <span className="text-gray-500 line-through text-sm ml-1">
@@ -96,7 +96,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                                     </span>
                                 </>
                             ) : (
-                                <span className="font-bold text-indigo-700">
+                                <span className="font-bold text-[#642494]">
                                     {test.pricing.currency} {test.pricing.amount}
                                 </span>
                             )}
@@ -105,7 +105,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                     <button
                         onClick={isValidAge ? onTakeTest : () => { }}
                         disabled={!isValidAge}
-                        className={`text-white px-4 py-2 rounded-md transition-colors ${isValidAge ? 'cursor-pointer bg-indigo-600' : 'cursor-not-allowed bg-gray-400'}`}
+                        className={`text-white px-4 py-2 rounded-md transition-colors ${isValidAge ? 'cursor-pointer bg-[#642494]' : 'cursor-not-allowed bg-gray-400'}`}
                     >
                         Take Test
                     </button>

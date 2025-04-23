@@ -73,7 +73,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="text-gray-700 hover:text-indigo-600 focus:outline-none"
+              className="text-gray-700 hover:text-[#642494] focus:outline-none"
             >
               {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
@@ -118,8 +118,8 @@ const NavLink = ({
       onClick={onClick}
       className={`flex items-center space-x-1 px-3 py-2 rounded-md text-1xl font-medium transition-colors ${
         active 
-          ? "text-indigo-700 hover:text-indigo-800" 
-          : "text-gray-700 hover:text-indigo-600"
+          ? "text-[#642494] hover:text-[#4e1c72]" 
+          : "text-gray-700 hover:text-[#642494]"
       }`}
     >
       <span className="text-lg">{icon}</span>
@@ -148,8 +148,8 @@ const MobileNavLink = ({
       onClick={onClick}
       className={`flex items-center space-x-2 px-3 py-3 rounded-md text-base font-medium w-full ${
         active 
-          ? "bg-indigo-50 text-indigo-700" 
-          : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+          ? "bg-[#642494]/10 text-[#642494]" 
+          : "text-gray-700 hover:bg-gray-50 hover:text-[#642494]"
       }`}
     >
       <span className="text-lg">{icon}</span>

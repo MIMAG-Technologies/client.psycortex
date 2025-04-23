@@ -67,7 +67,7 @@ export default function Tests() {
     <div className="container mx-auto px-6 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-indigo-800 mb-2">Psychological Tests</h1>
+        <h1 className="text-3xl font-bold text-purple-800 mb-2">Psychological Tests</h1>
         <p className="text-gray-600">
           Discover professional psychological tests to help understand your mental health better
         </p>
@@ -87,7 +87,7 @@ export default function Tests() {
         </div>
         <div className="flex">
           <button
-            className={`px-6 py-2 rounded-l-md flex items-center gap-2 ${testType === 'indian' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'
+            className={`px-6 py-2 rounded-l-md flex items-center gap-2 ${testType === 'indian' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             onClick={() => setTestType('indian')}
           >
@@ -95,7 +95,7 @@ export default function Tests() {
             <span>Indian Tests</span>
           </button>
           <button
-            className={`px-6 py-2 rounded-r-md flex items-center gap-2 ${testType === 'global' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'
+            className={`px-6 py-2 rounded-r-md flex items-center gap-2 ${testType === 'global' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             onClick={() => setTestType('global')}
           >

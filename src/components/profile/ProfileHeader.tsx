@@ -22,7 +22,7 @@ export default function ProfileHeader({ user, logout }: ProfileHeaderProps) {
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <div className="flex flex-col md:flex-row items-center md:items-start">
         {/* Profile Avatar */}
-        <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-indigo-100 flex items-center justify-center mb-4 md:mb-0 md:mr-8 overflow-hidden shadow-lg border-4 border-white">
+        <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-[#642494]/10 flex items-center justify-center mb-4 md:mb-0 md:mr-8 overflow-hidden shadow-lg border-4 border-white">
           {user.personalInfo.profileImage ? (
             <img
               src={user.personalInfo.profileImage}
@@ -32,7 +32,7 @@ export default function ProfileHeader({ user, logout }: ProfileHeaderProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <FaUser className="text-indigo-600 text-5xl" />
+            <FaUser className="text-[#642494] text-5xl" />
           )}
         </div>
 
@@ -43,22 +43,22 @@ export default function ProfileHeader({ user, logout }: ProfileHeaderProps) {
           </h1>
           <div className="text-gray-500 flex flex-col space-y-1">
             <div className="flex items-center justify-center md:justify-start">
-              <FaEnvelope className="text-indigo-500 mr-2" />
+              <FaEnvelope className="text-[#642494] mr-2" />
               <span>{user.personalInfo.email}</span>
             </div>
             
             <div className="flex items-center justify-center md:justify-start">
-              <FaPhone className="text-indigo-500 mr-2" />
+              <FaPhone className="text-[#642494] mr-2" />
               <span>{user.personalInfo.phone}</span>
             </div>
             
             <div className="flex items-center justify-center md:justify-start">
-              <FaBirthdayCake className="text-indigo-500 mr-2" />
+              <FaBirthdayCake className="text-[#642494] mr-2" />
               <span>{user.personalInfo.dateOfBirth}</span>
             </div>
             
             <div className="flex items-center justify-center md:justify-start">
-              <FaVenusMars className="text-indigo-500 mr-2" />
+              <FaVenusMars className="text-[#642494] mr-2" />
               <span className="capitalize">{user.personalInfo.gender}</span>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function ProfileHeader({ user, logout }: ProfileHeaderProps) {
               user.stats.call.total + 
               user.stats.offline.total
             } 
-            color="bg-indigo-100 text-indigo-700"
+            color="bg-[#642494]/10 text-[#642494]"
           />
           <StatBadge 
             label="Upcoming" 
