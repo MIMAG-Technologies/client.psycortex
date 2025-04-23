@@ -6,6 +6,7 @@ export type BaseCounsellor = {
   personalInfo: {
     name: string;
     profileImage: string;
+    gender:string;
   };
   professionalInfo: {
     title: string;
@@ -42,7 +43,8 @@ export const getAllCounsellors = async () => {
         id: expert.id,
         personalInfo: {
           name: expert.personalInfo.name,
-          profileImage: expert.personalInfo.profileImage
+          profileImage: expert.personalInfo.profileImage,
+          gender:expert.personalInfo.gender
         },
         professionalInfo: {
           title: expert.professionalInfo.title,
