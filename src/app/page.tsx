@@ -1,66 +1,181 @@
-import { FaHeartbeat, FaUserMd, FaClipboardList } from "react-icons/fa";
-import Link from "next/link";
+'use client';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { FaHeartbeat, FaUserMd, FaClipboardList, FaChevronRight, FaStar, FaArrowRight } from 'react-icons/fa';
+import { MdOutlineScreenSearchDesktop } from 'react-icons/md';
+import { getAllTests } from '@/utils/test';
+import { getAllCounsellors } from '@/utils/experts';
+import { TestDetails } from '@/types/test';
+import { BaseCounsellor } from '@/utils/experts';
+import TestCard from '@/components/test/TestCard';
+import OneExpertCard from '@/components/experts/OneExpertCard';
+import Footer from '@/components/Footer';
 
 export default function Home() {
+  const [topTests, setTopTests] = useState<TestDetails[]>([]);
+  const [topExperts, setTopExperts] = useState<BaseCounsellor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [tests, experts] = await Promise.all([
+          getAllTests(),
+          getAllCounsellors()
+        ]);
+        
+        setTopTests(tests.slice(0, 3));
+        setTopExperts(experts.slice(0, 3));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-indigo-700">Welcome to Psycortex</h1>
-        <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-8">
-          Expert mental health services and assessments to help you on your journey to wellness.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Link 
-            href="/experts" 
-            className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-          >
-            Meet Our Experts
-          </Link>
-          <Link 
-            href="/tests" 
-            className="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
-          >
-            Take a Test
-          </Link>
+      <section className="bg-gray-100 text-black py-20 px-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Your Mental Health Journey Begins Here
+              </h1>
+              <p className="text-lg md:text-xl mb-8 opacity-90">
+                Access expert mental health services, personalized assessments, and resources designed to support your well-being.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Link 
+                  href="/tests" 
+                  className="px-6 py-3 bg-white text-[#642494] rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                >
+                  Take a Test <FaArrowRight size={14} />
+                </Link>
+                <Link 
+                  href="/experts" 
+                  className="px-6 py-3 border border-[#642494] text-[#642494] rounded-full font-medium hover:bg-white/10 transition-colors"
+                >
+                  Meet Our Experts
+                </Link>
+              </div>
+            </div>
+            <div className="flex justify-center lg:justify-end">
+              <div className="w-full max-w-md">
+                <img 
+                  src="/hero.png" 
+                  alt="Mental Health Journey"
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-10 text-gray-800">Our Services</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <FeatureCard 
-            icon={<FaHeartbeat className="text-indigo-600 text-4xl" />}
-            title="Mental Wellness"
-            description="Comprehensive support for your mental health journey with personalized care plans."
-          />
-          <FeatureCard 
-            icon={<FaUserMd className="text-indigo-600 text-4xl" />}
-            title="Expert Consultations"
-            description="Connect with certified mental health professionals for guidance and treatment."
-          />
-          <FeatureCard 
-            icon={<FaClipboardList className="text-indigo-600 text-4xl" />}
-            title="Assessment Tests"
-            description="Scientifically validated tests to help understand your mental health needs."
-          />
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Our Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <FeatureCard 
+              icon={<FaHeartbeat className="text-[#642494] text-3xl" />}
+              title="Mental Wellness"
+              description="Personalized support for your mental health journey."
+            />
+            <FeatureCard 
+              icon={<FaUserMd className="text-[#642494] text-3xl" />}
+              title="Expert Consultations"
+              description="Connect with certified mental health professionals."
+            />
+            <FeatureCard 
+              icon={<FaClipboardList className="text-[#642494] text-3xl" />}
+              title="Assessment Tests"
+              description="Scientifically validated tests for mental health needs."
+            />
+            <FeatureCard 
+              icon={<MdOutlineScreenSearchDesktop className="text-[#642494] text-3xl" />}
+              title="Online Sessions"
+              description="Convenient and private therapy from anywhere."
+            />
+          </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-indigo-50 rounded-xl p-8 md:p-12 text-center">
-        <h2 className="text-3xl font-bold mb-4 text-indigo-800">Ready to Start Your Journey?</h2>
-        <p className="text-lg mb-6 text-gray-700 max-w-2xl mx-auto">
-          Take the first step towards better mental health today.
-        </p>
-        <Link 
-          href="/login" 
-          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors inline-block"
-        >
-          Get Started
-        </Link>
+      {/* Top Tests Section */}
+      <section className="py-16 px-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex justify-between items-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-800">Featured Tests</h2>
+            <Link 
+              href="/tests" 
+              className="text-[#642494] font-medium flex items-center gap-1 hover:underline"
+            >
+              View All <FaChevronRight size={12} />
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {topTests.map((test) => (
+                <TestCard 
+                  key={test.slug}
+                  test={test}
+                  userAge={null}
+                  onTakeTest={() => window.location.href = `/tests?test=${test.slug}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </section>
+
+      {/* Top Experts Section */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex justify-between items-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-800">Our Experts</h2>
+            <Link 
+              href="/experts" 
+              className="text-[#642494] font-medium flex items-center gap-1 hover:underline"
+            >
+              View All <FaChevronRight size={12} />
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {topExperts.map((expert) => (
+                <OneExpertCard 
+                  key={expert.id}
+                  {...expert}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+
+<Footer/>
     </div>
   );
 }
@@ -68,9 +183,9 @@ export default function Home() {
 // Feature Card Component
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-center">
+    <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow text-center">
       <div className="mb-4 flex justify-center">{icon}</div>
-      <h3 className="text-xl font-semibold mb-3 text-gray-800">{title}</h3>
+      <h3 className="text-xl font-semibold mb-2 text-gray-800">{title}</h3>
       <p className="text-gray-600">{description}</p>
     </div>
   );

@@ -1,8 +1,11 @@
+"use client"
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthStateHandler from "../components/AuthStateHandler";
 import { ToastContainer } from "react-toastify";
 import ClientNavbarWrapper from "@/components/ClientNavbarWrapper";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 
 export default function RootLayout({
@@ -10,6 +13,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [pathname]);
+  
   return (
     <html lang="en">
       <head>
