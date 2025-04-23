@@ -5,17 +5,18 @@ import { FaCalendarAlt, FaClock, FaVideo, FaUser, FaFileAlt } from "react-icons/
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 import { bookSession } from "@/utils/session";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   userData: {
     name: string;
-    id:string;
+    id: string;
   };
   counsellorData: {
     name: string;
-    id:string;
+    id: string;
   };
   bookingData: {
     mode: string;
@@ -35,6 +36,7 @@ const BookingModal = ({
   bookingData,
 }: BookingModalProps) => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
@@ -73,18 +75,31 @@ const BookingModal = ({
         return mode;
     }
   };
-  
-const handlebooking = async()=>{
-    const res = await bookSession(bookingData.mode as "chat" | "video" , {
-        user_id:userData.id,
-        counsellor_id:counsellorData.id,
-        scheduled_at:bookingData.date + bookingData.time
-    })
 
-    if(res){
+  const router = useRouter();
+
+  const handlebooking = async () => {
+    setIsLoading(true);
+    try {
+      const res = await bookSession(bookingData.mode as "chat" | "video", {
+        user_id: userData.id,
+        counsellor_id: counsellorData.id,
+        scheduled_at: bookingData.date + bookingData.time
+      });
+
+      if (res) {
         toast.success("Booking Successfully");
+        router.push('/profile/sessions');
+      } else {
+        toast.error("Booking Failed");
+      }
+    } catch (error) {
+      toast.error("An error occurred while booking");
+    } finally {
+      setIsLoading(false);
     }
-}
+  }
+
   return (
     <div
       className="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4"
@@ -102,12 +117,12 @@ const handlebooking = async()=>{
               <p className="text-gray-600">Client:</p>
               <p className="font-semibold">{userData.name}</p>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <p className="text-gray-600">Counsellor:</p>
               <p className="font-semibold">{counsellorData.name}</p>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2 text-gray-600">
                 <FaCalendarAlt />
@@ -115,7 +130,7 @@ const handlebooking = async()=>{
               </div>
               <p className="font-semibold">{bookingData.date}</p>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2 text-gray-600">
                 <FaClock />
@@ -123,7 +138,7 @@ const handlebooking = async()=>{
               </div>
               <p className="font-semibold">{bookingData.time}</p>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2 text-gray-600">
                 {renderModeIcon()}
@@ -131,7 +146,7 @@ const handlebooking = async()=>{
               </div>
               <p className="font-semibold">{formatModeName(bookingData.mode)}</p>
             </div>
-            
+
             <div className="flex justify-between items-center text-lg font-bold text-purple-800">
               <p>Total:</p>
               <p>{bookingData.currency} {bookingData.price}</p>
@@ -153,7 +168,7 @@ const handlebooking = async()=>{
                 <li>By proceeding with the payment, you agree to these terms.</li>
               </ul>
             </div>
-            
+
             <div className="flex items-center mb-4">
               <input
                 type="checkbox"
@@ -173,19 +188,27 @@ const handlebooking = async()=>{
             <button
               className="flex-1 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300"
               onClick={onClose}
+              disabled={isLoading}
             >
               Cancel
             </button>
             <button
               className={`flex-1 py-2 rounded-lg font-medium text-white ${
-                isTermsAccepted 
-                  ? "bg-purple-700 hover:bg-purple-800" 
+                isTermsAccepted && !isLoading
+                  ? "bg-purple-700 hover:bg-purple-800"
                   : "bg-purple-300 cursor-not-allowed"
-              }`}
-              disabled={!isTermsAccepted}
-              
+              } relative`}
+              disabled={!isTermsAccepted || isLoading}
+              onClick={handlebooking}
             >
-              Pay {bookingData.currency} {bookingData.price}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span className="ml-2">Processing...</span>
+                </div>
+              ) : (
+                `Pay ${bookingData.currency} ${bookingData.price}`
+              )}
             </button>
           </div>
         </div>

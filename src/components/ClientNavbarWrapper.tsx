@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 
 export default function ClientNavbarWrapper() {
   const pathname = usePathname();
-  const showNavbar = !pathname.startsWith('/assesment');
+  const showNavbar = !pathname.startsWith('/assesment') && !pathname.startsWith("/chatsession");
   
   return showNavbar ? <Navbar /> : null;
 } 

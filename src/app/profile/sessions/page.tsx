@@ -2,8 +2,6 @@
 
 import { useAuth } from "@/context/AuthContext";
 import SessionHistory from "@/components/profile/SessionHistory";
-import { extractUserSessionHistory } from "@/utils/user";
-
 export default function SessionsPage() {
   const { user } = useAuth();
 
