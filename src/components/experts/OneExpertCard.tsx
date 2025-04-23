@@ -92,7 +92,7 @@ export default function OneExpertCard({
             </div>
             
             {/* Communication modes */}
-            <div className="flex  gap-2 mt-3">
+            <div className="flex  gap-2 mt-3 overflow-hidden">
               {communicationModes.includes('chat') && (
                 <div className="rounded-full text-gray-700 flex items-center gap-1 text-[12px]">
                   <BiChat /> CHAT

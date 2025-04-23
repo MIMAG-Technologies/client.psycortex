@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import BookingModal from "./BookingModal";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 
 export default function OneExpertBookingCompoent(props: {
   id: string;
@@ -79,6 +80,11 @@ export default function OneExpertBookingCompoent(props: {
       return;
     }
     
+    // Don't open modal for call or in_person modes
+    if (selectedMode === 'call' || selectedMode === 'in_person') {
+      return;
+    }
+    
     // Open the modal instead of just logging
     setIsModalOpen(true);
   };
@@ -108,6 +114,89 @@ export default function OneExpertBookingCompoent(props: {
   const {me} = useAuth();
 
   const router = useRouter();
+
+  const renderSessionContent = () => {
+    if (selectedMode === 'call') {
+      return (
+        <div className="border border-[#642494]/20 rounded-lg p-4 mt-4 bg-[#642494]/5 text-center">
+          <FaPhone className="text-[#642494] text-2xl mx-auto mb-2" />
+          <h3 className="font-medium text-[#642494] mb-2">Download our app to book a call session</h3>
+          <p className="text-gray-600 text-sm">
+            Call sessions are only available through our mobile application.
+          </p>
+        </div>
+      );
+    } else if (selectedMode === 'in_person') {
+      return (
+        <div className="border border-[#642494]/20 rounded-lg p-4 mt-4 bg-[#642494]/5 text-center">
+          <FaMapMarkerAlt className="text-[#642494] text-2xl mx-auto mb-2" />
+          <h3 className="font-medium text-[#642494] mb-2">Book Offline (In-Person) Appointment</h3>
+          <p className="text-gray-600 text-sm mb-2">
+            Offline appointments can only be booked by the PsyCortex team. Please call our support to schedule your session.
+          </p>
+          <p className="font-medium text-[#642494]">+91 8767027078</p>
+        </div>
+      );
+    } else {
+      return (
+        <>
+          {/* Days List */}
+          <div className="w-full grid grid-cols-7 gap-[5px] mb-6">
+            {counsellorSchedule.map((day) => {
+              const isWorkingDay = day.is_working_day;
+              return (
+                <button
+                  key={day.date}
+                  disabled={!isWorkingDay}
+                  className={`flex flex-col items-center justify-center h-16 rounded-md text-sm ${
+                    selectedDayIndex === day.date
+                      ? "bg-[#642494] text-white"
+                      : "bg-[#f8f3fa] text-[#642494]"
+                  } ${!isWorkingDay ? "cursor-not-allowed opacity-50" : ""}`}
+                  onClick={() => setSelectedDayIndex(day.date)}
+                >
+                  <span>{day.day.substring(0, 3)}</span>
+                  <span>{new Date(day.date).getDate()}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Time Slots */}
+          <div>
+            <h3 className="text-gray-700 font-medium mb-2">Available Slots</h3>
+            <div className="grid grid-cols-4 gap-2">
+              {counsellorSchedule
+                .find((day) => day.date === selectedDayIndex)
+                ?.slots.length ? (
+                counsellorSchedule
+                  .find((day) => day.date === selectedDayIndex)
+                  ?.slots.map((slot, index) => (
+                    <button
+                      key={index}
+                      disabled={!slot.is_available}
+                      className={`w-full py-2 px-3 rounded-lg text-sm ${
+                        selectedTimeSlot === slot.time
+                          ? "bg-[#642494] text-white"
+                          : "bg-[#f8f3fa] text-[#642494]"
+                      } ${!slot.is_available ? "cursor-not-allowed opacity-50" : ""}`}
+                      onClick={() => setSelectedTimeSlot(slot.time)}
+                    >
+                      {new Date(`2000-01-01T${slot.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
+                    </button>
+                  ))
+              ) : (
+                <div className="col-span-4 text-center py-4 text-gray-500">
+                  No slots available
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      );
+    }
+  };
+
   return (
     <>
       <div className={className}>
@@ -129,71 +218,22 @@ export default function OneExpertBookingCompoent(props: {
             {selectedRate?.price || "N/A"}
           </span>
         </div>
-      
 
-        {/* Days List */}
-        <div className="w-full grid grid-cols-7 gap-[5px] mb-6">
-          {counsellorSchedule.map((day) => {
-            const isWorkingDay = day.is_working_day;
-            return (
-              <button
-                key={day.date}
-                disabled={!isWorkingDay}
-                className={`flex flex-col items-center justify-center h-16 rounded-md text-sm ${
-                  selectedDayIndex === day.date
-                    ? "bg-[#2d1041] text-white"
-                    : "bg-[#f8f3fa] text-[#2d1041]"
-                } ${!isWorkingDay ? "cursor-not-allowed opacity-50" : ""}`}
-                onClick={() => setSelectedDayIndex(day.date)}
-              >
-                <span>{day.day.substring(0, 3)}</span>
-                <span>{new Date(day.date).getDate()}</span>
-              </button>
-            );
-          })}
-        </div>
 
-        {/* Time Slots */}
-        <div>
-          <h3 className="text-gray-700 font-medium mb-2">Available Slots</h3>
-          <div className="grid grid-cols-4 gap-2">
-            {counsellorSchedule
-              .find((day) => day.date === selectedDayIndex)
-              ?.slots.length ? (
-              counsellorSchedule
-                .find((day) => day.date === selectedDayIndex)
-                ?.slots.map((slot, index) => (
-                  <button
-                    key={index}
-                    disabled={!slot.is_available}
-                    className={`w-full py-2 px-3 rounded-lg text-sm ${
-                      selectedTimeSlot === slot.time
-                        ? "bg-[#2d1041] text-white"
-                        : "bg-[#f8f3fa] text-[#2d1041]"
-                    } ${!slot.is_available ? "cursor-not-allowed opacity-50" : ""}`}
-                    onClick={() => setSelectedTimeSlot(slot.time)}
-                  >
-                    {new Date(`2000-01-01T${slot.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
-                  </button>
-                ))
-            ) : (
-              <div className="col-span-4 text-center py-4 text-gray-500">
-                No slots available
-              </div>
-            )}
-          </div>
-        </div>
+        {renderSessionContent()}
 
         {/* Continue Button */}
-        <button
-          onClick={me === null ?()=>{
-            router.push('/login')
-          } : handleBooking}
-          className="w-full bg-[#2d1041] text-white py-3 rounded-lg font-semibold hover:bg-[#2d1041] transition mt-6"
-        >
-          {me === null ? 'Login to Continue' :'Continue Booking'}
-          
-        </button>
+        {(selectedMode !== 'call' && selectedMode !== 'in_person') && (
+          <button
+            onClick={me === null ? () => {
+              router.push('/login')
+            } : handleBooking}
+            disabled={!selectedTimeSlot}
+            className={`w-full bg-[#642494] text-white py-3 rounded-lg font-semibold hover:bg-[#4e1c72] transition mt-6 ${!selectedTimeSlot ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {me === null ? 'Login to Continue' : 'Continue Booking'}
+          </button>
+        )}
       </div>
       
       {/* Booking Modal */}

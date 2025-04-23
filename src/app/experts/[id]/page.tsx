@@ -38,7 +38,7 @@ const OneExpertPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const name = counsellor?.personalInfo?.name || "Counsellor";
   const title = counsellor?.professionalInfo?.title || "Mental Health Professional";
   const yearsOfExperience = counsellor?.professionalInfo?.yearsOfExperience || 0;
-  const profileImage = counsellor?.personalInfo?.profileImage || "/assets/Images/user-dummy-img.png";
+  const profileImage = counsellor?.personalInfo?.profileImage || "/user-dummy-img.png";
   const biography = counsellor?.personalInfo?.biography || "No biography available";
   const education = counsellor?.professionalInfo?.education || [];
   const licenses = counsellor?.professionalInfo?.licenses || [];
@@ -53,7 +53,7 @@ const OneExpertPage = ({ params }: { params: Promise<{ id: string }> }) => {
         <div>
           <div className="flex p-4 gap-5 border-2 border-gray-300 rounded-lg flex-wrap">
             <img
-              src={profileImage}
+              src={profileImage || "/user-dummy-img.png"}
               alt={name}
               className="aspect-square h-[150px] object-cover rounded-md"
             />
