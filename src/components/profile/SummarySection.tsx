@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { FaCalendarAlt, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaUserMd } from "react-icons/fa";
-import { HistoryItem, ReferredTest } from "@/utils/userTypes";
+import { HistoryItem } from "@/utils/userTypes";
+import { getAllUserTestData } from "@/utils/test";
+import { ReferredTest } from "@/types/test";
 
 interface SummarySectionProps {
   userId: string;
   stats: any;
   extractUserSessionHistory: (userId: string) => Promise<HistoryItem[]>;
-  getReferredTests: (userId: string) => Promise<ReferredTest[]>;
 }
 
 export default function SummarySection({ 
   userId, 
   stats, 
-  extractUserSessionHistory,
-  getReferredTests 
+  extractUserSessionHistory, 
 }: SummarySectionProps) {
   const [sessionHistory, setSessionHistory] = useState<HistoryItem[]>([]);
   const [referredTests, setReferredTests] = useState<ReferredTest[]>([]);
@@ -32,11 +32,11 @@ export default function SummarySection({
         setLoading(true);
         const [history, tests] = await Promise.all([
           extractUserSessionHistory(userId),
-          getReferredTests(userId)
+          getAllUserTestData(userId)
         ]);
         
         setSessionHistory(history);
-        setReferredTests(tests.filter(test => test.payment.status === "pending"));
+        setReferredTests(tests.referredTests.filter(test => test.payment.status === "pending"));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -45,7 +45,7 @@ export default function SummarySection({
     };
     
     fetchData();
-  }, [userId, extractUserSessionHistory, getReferredTests]);
+  }, [userId, extractUserSessionHistory]);
 
   // Update date events when selected date changes
   useEffect(() => {
@@ -350,7 +350,7 @@ function ReferredTestCard({ test }: { test: ReferredTest }) {
     <div className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
       <div className="flex justify-between">
         <div>
-          <h4 className="font-medium text-gray-800">{test.test.title}</h4>
+          <h4 className="font-medium text-gray-800">{test.test.name}</h4>
           <p className="text-sm text-gray-600 mt-1">
             Referred by: {test.referredBy.name}
           </p>
