@@ -14,7 +14,10 @@ export const bookSession = async (
     if (mode == "chat") {
       await axios.post(`${baseUrl}/sessions/book_chat_session.php`, data);
     } else {
-      // await axios.post(`${baseUrl}`)
+      await axios.post(`${baseUrl}/sessions/book_session.php`, {
+        ...data,
+        notes: "Initial consultation session",
+      });
     }
     return true;
   } catch (error) {
