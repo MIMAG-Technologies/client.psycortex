@@ -1,13 +1,12 @@
-"use client"
+"use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { use } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   FaGraduationCap,
   FaCommentDots,
   FaGem,
   FaCheckCircle,
-  FaVideo,
   FaUserFriends,
   FaDollarSign,
 } from "react-icons/fa";
@@ -15,24 +14,51 @@ import { CounsellorDetails, getOneCounsellor } from "@/utils/experts";
 import OneExpertBookingCompoent from "@/components/experts/OneExpertBookingCompoent";
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 
-const OneExpertPage = ({ params }: { params: Promise<{ id: string }> }) => {
-  const { id } = use(params);
+const ExpertProfilePage = () => {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const [counsellor, setCounsellor] = useState<CounsellorDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCounsellor = async () => {
-      if (!id || typeof id !== "string") return;
+      if (!id) {
+        setError("Expert ID is required");
+        setLoading(false);
+        return;
+      }
+      
       try {
+        setLoading(true);
         const res = await getOneCounsellor(id);
         setCounsellor(res);
       } catch (error) {
         console.error("Error fetching counsellor details:", error);
+        setError("Failed to load expert information");
+      } finally {
+        setLoading(false);
       }
     };
+    
     fetchCounsellor();
   }, [id]);
 
-  if (!counsellor) return <div className="text-center mt-10">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
+      </div>
+    );
+  }
+  
+  if (error || !id) {
+    return <div className="text-center mt-10 text-red-600">{error || "Expert ID is required"}</div>;
+  }
+
+  if (!counsellor) {
+    return <div className="text-center mt-10">Expert information not available</div>;
+  }
 
   // Safe access with fallbacks for potentially missing data
   const name = counsellor?.personalInfo?.name || "Counsellor";
@@ -226,4 +252,4 @@ const OneExpertPage = ({ params }: { params: Promise<{ id: string }> }) => {
   );
 };
 
-export default OneExpertPage;
+export default ExpertProfilePage; 

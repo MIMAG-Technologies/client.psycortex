@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from "react";
 import { getCounsellotSchedule, ScheduleType } from "@/utils/experts";
 import { toast } from "react-toastify";
@@ -218,7 +219,6 @@ export default function OneExpertBookingCompoent(props: {
             {selectedRate?.price || "N/A"}
           </span>
         </div>
-
 
         {renderSessionContent()}
 

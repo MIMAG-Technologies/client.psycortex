@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getExpertDetails } from "@/utils/experts";
+import { getOneCounsellor } from "@/utils/experts";
 import { FaCalendarAlt, FaClock, FaUserMd, FaVideo, FaPhone } from "react-icons/fa";
 import Link from "next/link";
 
@@ -35,7 +35,7 @@ export default function BookingConfirmation() {
     // Fetch expert details
     const fetchExpertDetails = async () => {
       try {
-        const data = await getExpertDetails(expertId);
+        const data = await getOneCounsellor(expertId);
         setExpert(data);
       } catch (error) {
         console.error("Error fetching expert details:", error);
@@ -72,7 +72,7 @@ export default function BookingConfirmation() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
       </div>
     );
   }
@@ -177,14 +177,14 @@ export default function BookingConfirmation() {
               
               <div className="flex justify-end space-x-4">
                 <Link
-                  href={`/experts/${expertId}`}
+                  href={`/expert/profile?id=${expertId}`}
                   className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
                   Back
                 </Link>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  className="px-6 py-2 bg-[#642494] text-white rounded-md hover:bg-[#4e1c72]"
                 >
                   Confirm Booking
                 </button>
@@ -199,7 +199,7 @@ export default function BookingConfirmation() {
               {expert && (
                 <div className="space-y-4">
                   <div className="flex items-start">
-                    <FaUserMd className="text-indigo-600 mt-1 mr-3" />
+                    <FaUserMd className="text-[#642494] mt-1 mr-3" />
                     <div>
                       <p className="font-medium">Expert</p>
                       <p>{expert.name}</p>
@@ -208,7 +208,7 @@ export default function BookingConfirmation() {
                   </div>
                   
                   <div className="flex items-start">
-                    <FaCalendarAlt className="text-indigo-600 mt-1 mr-3" />
+                    <FaCalendarAlt className="text-[#642494] mt-1 mr-3" />
                     <div>
                       <p className="font-medium">Date</p>
                       <p>{formatDate(date as string)}</p>
@@ -216,7 +216,7 @@ export default function BookingConfirmation() {
                   </div>
                   
                   <div className="flex items-start">
-                    <FaClock className="text-indigo-600 mt-1 mr-3" />
+                    <FaClock className="text-[#642494] mt-1 mr-3" />
                     <div>
                       <p className="font-medium">Time</p>
                       <p>{timeSlot}</p>
@@ -224,7 +224,7 @@ export default function BookingConfirmation() {
                   </div>
                   
                   <div className="flex items-start">
-                    <div className="text-indigo-600 mt-1 mr-3">
+                    <div className="text-[#642494] mt-1 mr-3">
                       {formData.communicationPreference === 'video' ? (
                         <FaVideo />
                       ) : formData.communicationPreference === 'phone' ? (
@@ -241,7 +241,7 @@ export default function BookingConfirmation() {
                   
                   <div className="border-t border-gray-200 pt-4 mt-4">
                     <p className="font-medium">Price</p>
-                    <p className="text-xl font-bold text-indigo-700">
+                    <p className="text-xl font-bold text-[#642494]">
                       ${expert.sessionPricing.rates.find((r: any) => r.sessionType === sessionType)?.price || 'N/A'}
                     </p>
                   </div>

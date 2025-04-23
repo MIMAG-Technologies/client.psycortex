@@ -193,8 +193,8 @@ export default function OneExpertCard({
 
       {/* View Profile Button */}
       <Link 
-        href={`/experts/${id}`}
-        className="block py-4 bg-purple-800 text-white text-center font-semibold hover:bg-purple-900 transition-colors mx-4 mt-3 rounded-xl"
+        href={`/expert/profile?id=${id}`}
+        className="block py-4 bg-[#642494] text-white text-center font-semibold hover:bg-[#4e1c72] transition-colors mx-4 mt-3 rounded-xl"
       >
         View Profile
       </Link>
