@@ -1,6 +1,7 @@
 "use client"
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { TestProvider } from "@/context/TestContext";
 import AuthStateHandler from "../components/AuthStateHandler";
 import { ToastContainer } from "react-toastify";
 import ClientNavbarWrapper from "@/components/ClientNavbarWrapper";
@@ -45,12 +46,14 @@ export default function RootLayout({
           theme="light"
         />
         <AuthProvider>
-          <AuthStateHandler>
-            <ClientNavbarWrapper />
-            <main className="pt-16 min-h-screen">
-              {children}
-            </main>
-          </AuthStateHandler>
+          <TestProvider>
+            <AuthStateHandler>
+              <ClientNavbarWrapper />
+              <main className="pt-16 min-h-screen">
+                {children}
+              </main>
+            </AuthStateHandler>
+          </TestProvider>
         </AuthProvider>
       </body>
     </html>

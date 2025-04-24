@@ -9,6 +9,7 @@ import TestDetailsModal from '@/components/test/TestDetailsModal';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Tests() {
   const [tests, setTests] = useState<TestDetails[]>([]);
@@ -51,6 +52,15 @@ export default function Tests() {
       toast.error('Error while purchase in test , please try again later!')
     }
   }
+
+  const handleTakeTest = (testSlug: string) => {
+    const test = tests.find(t => t.slug === testSlug);
+    if (test) {
+      setSelectedTest(test);
+      setShowModal(true);
+    }
+  };
+
   // Filter tests based on search term, test type, and age requirements
   const filteredTests = tests.filter((test) => {
     const matchesSearch = test.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,6 +82,7 @@ export default function Tests() {
           Discover professional psychological tests to help understand your mental health better
         </p>
       </div>
+      
 
       {/* Search and Filter */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -123,10 +134,7 @@ export default function Tests() {
               key={test.slug}
               test={test}
               userAge={userAge}
-              onTakeTest={() => {
-                setSelectedTest(test);
-                setShowModal(true);
-              }}
+              onTakeTest={handleTakeTest}
             />
           ))}
         </div>

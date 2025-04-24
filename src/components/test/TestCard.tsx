@@ -6,7 +6,7 @@ import { FaClock, FaListAlt, FaClipboardList, FaExclamationCircle, FaInfoCircle 
 interface TestCardProps {
     test: TestDetails;
     userAge: number | null;
-    onTakeTest: () => void;
+    onTakeTest: (testSlug: string) => void;
 }
 
 export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
@@ -103,7 +103,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                         </div>
                     </div>
                     <button
-                        onClick={isValidAge ? onTakeTest : () => { }}
+                        onClick={isValidAge ? () => onTakeTest(test.slug) : () => { }}
                         disabled={!isValidAge}
                         className={`text-white px-4 py-2 rounded-md transition-colors ${isValidAge ? 'cursor-pointer bg-[#642494]' : 'cursor-not-allowed bg-gray-400'}`}
                     >

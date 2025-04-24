@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { useTests } from "@/context/TestContext";
 import { ActiveTest, HistoryTest, ReferredTest } from "@/types/test";
 import { getAllUserTestData } from "@/utils/test";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { FaClipboardCheck } from "react-icons/fa6";
 
 export default function TestsPage() {
   const { user } = useAuth();
+  const { testsData, isLoading: testsLoading } = useTests();
   const [activeTests, setActiveTests] = useState<ActiveTest[]>([]);
   const [testHistory, setTestHistory] = useState<HistoryTest[]>([]);
   const [referredTests, setReferredTests] = useState<ReferredTest[]>([]);
@@ -50,7 +52,11 @@ export default function TestsPage() {
     });
   };
 
-  if (loading) {
+  const getTestName = (slug: string): string => {
+    return testsData[slug]?.name || slug.replace(/-/g, ' ');
+  };
+
+  if (loading || testsLoading) {
     return (
       <div className="flex justify-center items-center py-10">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-800"></div>
@@ -100,7 +106,7 @@ export default function TestsPage() {
                 <div key={test.bookingId} className="border rounded-lg p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="font-medium capitalize">{test.testSlug.replace(/-/g, ' ')}</h3>
+                      <h3 className="font-medium capitalize">{getTestName(test.testSlug)}</h3>
                       <div className="flex items-center text-sm text-gray-600 mt-1">
                         <FaCalendarAlt className="mr-1" />
                         <span>
@@ -112,7 +118,7 @@ export default function TestsPage() {
                       </div>
                     </div>
                     <Link 
-                      href={`/assesment?slug=${test.testSlug}`}
+                      href={`/test-preparation?slug=${test.testSlug}`}
                       className="bg-purple-800 text-white px-4 py-2 rounded flex items-center"
                     >
                       Start Test <FaArrowRight className="ml-2" />
@@ -138,7 +144,7 @@ export default function TestsPage() {
                 <div key={test.bookingId} className="border rounded-lg p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-medium capitalize">{test.test.name || test.testSlug.replace(/-/g, ' ')}</h3>
+                      <h3 className="font-medium capitalize">{test.test?.name || getTestName(test.testSlug)}</h3>
                       <div className="flex items-center text-sm text-gray-600 mt-1">
                         <FaUserMd className="mr-1" />
                         <span>Referred by: {test.referredBy.name}</span>
@@ -148,7 +154,7 @@ export default function TestsPage() {
                         <span>Status: {test.status}</span>
                       </div>
                     </div>
-                    {test.test.imageUrl && (
+                    {test.test?.imageUrl && (
                       <img 
                         src={test.test.imageUrl} 
                         alt={test.test.name} 
@@ -176,7 +182,7 @@ export default function TestsPage() {
                 <div key={test.bookingId} className="border rounded-lg p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="font-medium capitalize">{test.testSlug.replace(/-/g, ' ')}</h3>
+                      <h3 className="font-medium capitalize">{getTestName(test.testSlug)}</h3>
                       <div className="flex items-center text-sm text-gray-600 mt-1">
                         {test.status === 'completed' ? (
                           <>

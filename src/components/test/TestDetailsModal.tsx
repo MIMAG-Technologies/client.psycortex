@@ -118,13 +118,15 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                                 </div>
                             </div>
                             {
-                                isLoggedIn ? <button className="bg-[#642494] cursor-pointer text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors" onClick={()=>{
-                                    booktest(test.slug,test.pricing.amount)
+                                isLoggedIn ? 
+                                <button className="bg-[#642494] cursor-pointer text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors" onClick={()=>{
+                                    booktest(test.slug, test.pricing.amount);
                                 }}>
                                     Pay Now
-                                </button> : <Link href={'/login'} className="bg-[#642494] cursor-pointer text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors">Login to proceed</Link>
+                                </button>
+                                : 
+                                <Link href={'/login'} className="bg-[#642494] cursor-pointer text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors">Login to proceed</Link>
                             }
-
                         </div>
                     </div>
                 </div>

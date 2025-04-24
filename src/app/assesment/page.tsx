@@ -4,7 +4,11 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getQuestions, submitAssesment } from '@/utils/assesments';
 import { assesmentData, question } from '@/types/assesments';
 import { useAuth } from '@/context/AuthContext';
+import { useTests } from '@/context/TestContext';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
+import { FaSignInAlt, FaExclamationCircle } from 'react-icons/fa';
+import { getAllUserTestData } from '@/utils/test';
 
 export default function AssessmentPage() {
   const searchParams = useSearchParams();
@@ -18,25 +22,55 @@ export default function AssessmentPage() {
   
   const [userResponses, setUserResponses] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+  const [isValidTest, setIsValidTest] = useState<boolean>(false);
+  
+  const { user, isLoading: authLoading } = useAuth();
+  const { testsData, isLoading: testsLoading } = useTests();
 
-  const fetchTestData = async () => {
-    if (!slug) return;
-    setIsLoading(true);
-    try {
-      const data = await getQuestions(slug);
-      setAssessmentData(data);
-    } catch (error) {
-      console.error("Error fetching assessment data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Validate test access and fetch test data
   useEffect(() => {
-    if (slug) {
-      fetchTestData();
+    const validateAndFetchTest = async () => {
+      if (!slug) {
+        setError('Test not specified');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!user) {
+        setError('You need to be logged in to take this test');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // First check if the user has access to this test
+        const userData = await getAllUserTestData(user.uid);
+        const isTestActive = userData.activeTests.some(test => test.testSlug === slug);
+        
+        if (!isTestActive) {
+          setError('This test is not in your active tests list');
+          setIsLoading(false);
+          return;
+        }
+
+        setIsValidTest(true);
+        
+        // Fetch test questions
+        const data = await getQuestions(slug);
+        setAssessmentData(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching assessment data:", error);
+        setError('Failed to load test data. Please try again later.');
+        setIsLoading(false);
+      }
+    };
+
+    if (!authLoading && !testsLoading) {
+      validateAndFetchTest();
     }
-  }, [slug]);
+  }, [slug, user, authLoading, testsLoading]);
 
   const handleOptionSelect = (questionNumber: string, optionValue: string) => {
     setUserResponses(prev => ({
@@ -54,34 +88,94 @@ export default function AssessmentPage() {
     if (!assessmentData?.questions.length) return false;
     return assessmentData.questions.length === Object.keys(userResponses).length;
   };
-const {user} = useAuth();
+
   const handleSubmit = async () => {
     if(!user?.uid || !slug){
-        toast.error("Please Login Before Submittin the test!");
+        toast.error("Please Login Before Submitting the test!");
         return;
     }
+    
+    if (!isAllQuestionsAnswered()) {
+      toast.warning("Please answer all questions before submitting.");
+      return;
+    }
+    
     const res = await submitAssesment({
-        user_id:user?.uid,
-        test_slug:slug,
-        answers:userResponses
-    })
+        user_id: user.uid,
+        test_slug: slug,
+        answers: userResponses
+    });
 
     if(res){
         router.replace('/assessment-complete');
     }
     else{
-        toast.error("Error in submitting your responce")
+        toast.error("Error in submitting your response");
     }
   };
 
   const goBack = () => {
-    router.back();
+    router.push('/test-preparation?slug=' + slug);
   };
 
-  if (isLoading) {
+  const getTestName = (): string => {
+    if (!slug) return 'ASSESSMENT';
+    return testsData[slug]?.name || slug.toUpperCase().replace(/-/g, ' ');
+  };
+
+  // Loading state
+  if (authLoading || testsLoading || (isLoading && !error)) {
     return (
       <div className="flex justify-center items-center h-screen bg-white">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#642494]"></div>
+      </div>
+    );
+  }
+
+  // Not logged in
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <FaSignInAlt className="text-6xl text-[#642494] mx-auto mb-6" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Login Required</h1>
+          <p className="text-gray-600 mb-6">
+            You need to be logged in to take this test. Please login to continue.
+          </p>
+          <Link
+            href={`/login?redirect=/assesment?slug=${slug}`}
+            className="inline-block bg-[#642494] text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors"
+          >
+            Login to Proceed
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <FaExclamationCircle className="text-6xl text-red-500 mx-auto mb-6" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Oops! There's an issue</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="flex justify-center gap-4">
+            <Link
+              href="/profile/tests"
+              className="inline-block bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 transition-colors"
+            >
+              Go to My Tests
+            </Link>
+            <Link
+              href="/tests"
+              className="inline-block bg-[#642494] text-white px-6 py-2 rounded-md hover:bg-[#4e1c72] transition-colors"
+            >
+              Explore Tests
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -97,10 +191,6 @@ const {user} = useAuth();
     );
   }
 
-  const formattedTestName = slug
-    ? slug.toUpperCase().replace(/-/g, ' ')
-    : 'ASSESSMENT';
-
   return (
     <div className="bg-white min-h-screen">
       {/* Header with Back Button and Test Name */}
@@ -115,7 +205,7 @@ const {user} = useAuth();
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-xl font-medium text-center flex-grow truncate">{formattedTestName}</h1>
+          <h1 className="text-xl font-medium text-center flex-grow truncate">{getTestName()}</h1>
         </div>
               <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mt-4">
                   <div className="w-full md:w-2/3">
@@ -129,17 +219,13 @@ const {user} = useAuth();
                   </div>
                   <button
                       onClick={handleSubmit}
-                      className="hidden md:block mt-4 md:mt-0 px-6 py-2 bg-[#0b7960] text-white rounded-full font-medium hover:bg-teal-700 transition-colors"
+                      disabled={!isAllQuestionsAnswered()}
+                      className={`hidden md:block mt-4 md:mt-0 px-6 py-2 ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'} text-white rounded-full font-medium transition-colors`}
                   >
                       Submit
                   </button>
               </div>
       </div>
-
-      {/* Progress Tracker
-      <div className="fixed top-16 left-0 right-0 z-10 bg-[#642494] text-white px-4 pb-4">
-      
-      </div> */}
 
       {/* Questions List */}
       <div className="container mx-auto px-4 pt-24 pb-20 max-w-5xl">
@@ -180,7 +266,7 @@ const {user} = useAuth();
         <button
           onClick={handleSubmit}
           disabled={!isAllQuestionsAnswered()}
-                  className="w-full py-3 text-white bg-[#0b7960] font-medium rounded-full"
+          className={`w-full py-3 text-white font-medium rounded-full ${isAllQuestionsAnswered() ? 'bg-[#0b7960]' : 'bg-gray-400 cursor-not-allowed'}`}
         >
           Submit
         </button>
