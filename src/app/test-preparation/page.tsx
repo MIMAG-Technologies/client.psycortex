@@ -50,14 +50,26 @@ export default function TestPreparationPage() {
           return;
         }
 
-        // Fetch test information
-        const testData = await getQuestions(testSlug);
-        setTestData(testData);
+        try {
+          // Fetch test information
+          const testData = await getQuestions(testSlug, user);
+          
+          if (testData && (testData.questions.length > 0 || testData.testInfo)) {
+            setTestData(testData);
+          } else {
+            setError('No data available for this test');
+          }
+        } catch (questionsError: any) {
+          console.error('Error fetching test questions:', questionsError);
+          setError(`Failed to load test questions: ${questionsError.message || 'Unknown error'}`);
+          setChecking(false);
+          return;
+        }
         
         setChecking(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error checking test availability:', error);
-        setError('Failed to load test data. Please try again later.');
+        setError(`Failed to load test data: ${error.message || 'Unknown error'}`);
         setChecking(false);
       }
     };
@@ -69,7 +81,7 @@ export default function TestPreparationPage() {
 
   const startTest = () => {
     if (!testSlug || !user) return;
-    router.push(`/assesment?slug=${testSlug}`);
+    router.push(`/assesment?slug=${testSlug}&fromPrep=true`);
   };
 
   const getTestName = (): string => {

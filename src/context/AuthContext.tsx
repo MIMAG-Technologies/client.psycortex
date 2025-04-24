@@ -16,7 +16,7 @@ import {
 import { auth } from "@/firebase/firebaseConfig";
 import axios from "axios";
 
-type Me = {
+ export type Me = {
   id: string;
   personalInfo: {
     name: string;

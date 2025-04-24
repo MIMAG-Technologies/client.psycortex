@@ -42,7 +42,7 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-20 flex justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
       </div>
     );
   }
@@ -52,45 +52,47 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Profile Header */}
-        <ProfileHeader user={me} logout={logout} />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Profile Header */}
+          <ProfileHeader user={me} logout={logout} />
 
-        {/* Profile Tabs */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="border-b flex flex-wrap">
-            <TabButton 
-              onClick={()=>{
-                setActiveTab("summary")
-              }}
-              href="/profile"
-              active={activeTab === "summary"} 
-              icon={<FaUser />}
-              label="Summary"
-            />
-            <TabButton 
-              onClick={()=>{
-                setActiveTab("sessions")
-              }}
-              href="/profile/sessions"
-              active={activeTab === "sessions"} 
-              icon={<FaCalendarAlt />}
-              label="Session History"
-            />
-            <TabButton 
-              onClick={()=>{
-                setActiveTab("tests")
-              }}
-              href="/profile/tests"
-              active={activeTab === "tests"} 
-              icon={<FaFileAlt />}
-              label="Test Results"
-            />
-          </div>
+          {/* Profile Tabs */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="border-b flex flex-wrap bg-gradient-to-r from-[#642494]/5 to-[#642494]/10">
+              <TabButton 
+                onClick={()=>{
+                  setActiveTab("summary")
+                }}
+                href="/profile"
+                active={activeTab === "summary"} 
+                icon={<FaUser />}
+                label="Summary"
+              />
+              <TabButton 
+                onClick={()=>{
+                  setActiveTab("sessions")
+                }}
+                href="/profile/sessions"
+                active={activeTab === "sessions"} 
+                icon={<FaCalendarAlt />}
+                label="Session History"
+              />
+              <TabButton 
+                onClick={()=>{
+                  setActiveTab("tests")
+                }}
+                href="/profile/tests"
+                active={activeTab === "tests"} 
+                icon={<FaFileAlt />}
+                label="Test Results"
+              />
+            </div>
 
-          <div className="p-6">
-            {children}
+            <div className="p-6">
+              {children}
+            </div>
           </div>
         </div>
       </div>
@@ -103,24 +105,22 @@ function TabButton({
   href,
   active, 
   icon, 
-  label ,
+  label,
   onClick
 }: { 
   href: string;
   active: boolean; 
   icon: React.ReactNode; 
-  label: string ;
-    onClick: () => void;
+  label: string;
+  onClick: () => void;
 }) {
   return (
-    <Link href={href}
-    onClick={onClick} 
-    >
+    <Link href={href} onClick={onClick}>
       <div
-        className={`flex items-center py-3 px-6 focus:outline-none transition-colors cursor-pointer ${
+        className={`flex items-center py-4 px-6 focus:outline-none transition-all cursor-pointer ${
           active
-            ? "border-b-2 border-purple-700 text-purple-800"
-            : "text-gray-600 hover:text-purple-500"
+            ? "border-b-2 border-[#642494] text-[#642494] font-semibold bg-white"
+            : "text-gray-600 hover:text-[#642494] hover:bg-white/50"
         }`}
       >
         <span className="mr-2">{icon}</span>

@@ -78,8 +78,18 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+    <div className="min-h-screen relative flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#642494]/10 to-[#642494]/30 z-0">
+        <div className="absolute inset-0 bg-pattern opacity-10"></div>
+      </div>
+      
+      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8 z-10 backdrop-blur-sm bg-white/95">
+        <div className="flex justify-center mb-6">
+          <div className="h-16 w-16 bg-[#642494]/10 flex items-center justify-center rounded-full">
+            <FaUser className="text-[#642494] text-3xl" />
+          </div>
+        </div>
+        
         {isResettingPassword ? (
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Reset Password</h1>
         ) : (
@@ -101,7 +111,7 @@ export default function Login() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#642494]"
                   placeholder="Your full name"
                   required={!isLogin}
                 />
@@ -120,7 +130,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#642494]"
                 placeholder="Your email address"
                 required
               />
@@ -139,7 +149,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#642494]"
                   placeholder="Your password"
                   required={!isResettingPassword}
                 />
@@ -160,7 +170,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-[#642494] text-white py-2 rounded-md hover:bg-[#4e1c72] transition-colors"
+            className="w-full bg-[#642494] text-white py-3 rounded-md hover:bg-[#4e1c72] transition-colors shadow-md"
             disabled={loading}
           >
             {loading ? (
@@ -196,7 +206,7 @@ export default function Login() {
               <div className="mt-6">
                 <button
                   onClick={handleGoogleLogin}
-                  className="w-full flex items-center justify-center bg-white border border-gray-300 rounded-md py-2 px-4 hover:bg-gray-50"
+                  className="w-full flex items-center justify-center bg-white border border-gray-300 rounded-md py-3 px-4 hover:bg-gray-50 shadow-sm"
                   disabled={loading}
                 >
                   <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -218,7 +228,7 @@ export default function Login() {
                   Don't have an account?{" "}
                   <button 
                     onClick={() => setIsLogin(false)} 
-                    className="text-[#642494] hover:underline"
+                    className="text-[#642494] hover:underline font-medium"
                   >
                     Sign up
                   </button>
@@ -228,7 +238,7 @@ export default function Login() {
                   Already have an account?{" "}
                   <button 
                     onClick={() => setIsLogin(true)} 
-                    className="text-[#642494] hover:underline"
+                    className="text-[#642494] hover:underline font-medium"
                   >
                     Login
                   </button>
@@ -242,14 +252,14 @@ export default function Login() {
           {isResettingPassword ? (
             <button 
               onClick={() => setIsResettingPassword(false)} 
-              className="text-[#642494] hover:underline text-sm"
+              className="text-[#642494] hover:underline text-sm font-medium"
             >
               Back to login
             </button>
           ) : (
             <button 
               onClick={() => setIsResettingPassword(true)} 
-              className="text-[#642494] hover:underline text-sm"
+              className="text-[#642494] hover:underline text-sm font-medium"
             >
               Forgot password?
             </button>

@@ -14,6 +14,7 @@ export default function AssessmentPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const slug = searchParams.get('slug');
+  const fromPrep = searchParams.get('fromPrep');
   
   const [assessmentData, setAssessmentData] = useState<assesmentData | null>({
     pages: 0,
@@ -25,7 +26,7 @@ export default function AssessmentPage() {
   const [error, setError] = useState<string>('');
   const [isValidTest, setIsValidTest] = useState<boolean>(false);
   
-  const { user, isLoading: authLoading } = useAuth();
+  const { me, isLoading: authLoading } = useAuth();
   const { testsData, isLoading: testsLoading } = useTests();
 
   // Validate test access and fetch test data
@@ -36,8 +37,14 @@ export default function AssessmentPage() {
         setIsLoading(false);
         return;
       }
+      
+      if (!fromPrep) {
+        setError('You must access this test through the preparation page');
+        setIsLoading(false);
+        return;
+      }
 
-      if (!user) {
+      if (!me) {
         setError('You need to be logged in to take this test');
         setIsLoading(false);
         return;
@@ -45,7 +52,7 @@ export default function AssessmentPage() {
 
       try {
         // First check if the user has access to this test
-        const userData = await getAllUserTestData(user.uid);
+        const userData = await getAllUserTestData(me.id);
         const isTestActive = userData.activeTests.some(test => test.testSlug === slug);
         
         if (!isTestActive) {
@@ -56,13 +63,23 @@ export default function AssessmentPage() {
 
         setIsValidTest(true);
         
-        // Fetch test questions
-        const data = await getQuestions(slug);
-        setAssessmentData(data);
+        try {
+          // Fetch test questions
+          const data = await getQuestions(slug, me);
+          if (!data || !data.questions || data.questions.length === 0) {
+            setError('No questions available for this test');
+          } else {
+            setAssessmentData(data);
+          }
+        } catch (questionsError: any) {
+          console.error("Error fetching test questions:", questionsError);
+          setError(`Failed to load test questions: ${questionsError.message || 'Unknown error'}`);
+        }
+        
         setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching assessment data:", error);
-        setError('Failed to load test data. Please try again later.');
+      } catch (error: any) {
+        console.error("Error in validateAndFetchTest:", error);
+        setError(`Failed to load test data: ${error.message || 'Unknown error'}`);
         setIsLoading(false);
       }
     };
@@ -70,7 +87,7 @@ export default function AssessmentPage() {
     if (!authLoading && !testsLoading) {
       validateAndFetchTest();
     }
-  }, [slug, user, authLoading, testsLoading]);
+  }, [slug, fromPrep, me, authLoading, testsLoading]);
 
   const handleOptionSelect = (questionNumber: string, optionValue: string) => {
     setUserResponses(prev => ({
@@ -90,18 +107,36 @@ export default function AssessmentPage() {
   };
 
   const handleSubmit = async () => {
-    if(!user?.uid || !slug){
+    if(!me?.id || !slug){
         toast.error("Please Login Before Submitting the test!");
         return;
     }
     
     if (!isAllQuestionsAnswered()) {
-      toast.warning("Please answer all questions before submitting.");
+      toast.error("You must answer all questions before submitting.");
+      
+      // Find first unanswered question and scroll to it
+      const firstUnansweredIndex = assessmentData?.questions.findIndex(
+        q => !userResponses[q.question_number]
+      );
+      
+      if (firstUnansweredIndex !== undefined && firstUnansweredIndex >= 0) {
+        const questionElement = document.getElementById(`question-${firstUnansweredIndex}`);
+        if (questionElement) {
+          questionElement.scrollIntoView({ behavior: 'smooth' });
+          // Focus on the unanswered question without animation
+          questionElement.style.border = '2px solid #ef4444';
+          setTimeout(() => {
+            questionElement.style.border = '';
+          }, 2000);
+        }
+      }
+      
       return;
     }
     
     const res = await submitAssesment({
-        user_id: user.uid,
+        user_id: me.id,
         test_slug: slug,
         answers: userResponses
     });
@@ -133,7 +168,7 @@ export default function AssessmentPage() {
   }
 
   // Not logged in
-  if (!user) {
+  if (!me) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
@@ -219,7 +254,6 @@ export default function AssessmentPage() {
                   </div>
                   <button
                       onClick={handleSubmit}
-                      disabled={!isAllQuestionsAnswered()}
                       className={`hidden md:block mt-4 md:mt-0 px-6 py-2 ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'} text-white rounded-full font-medium transition-colors`}
                   >
                       Submit
@@ -231,10 +265,18 @@ export default function AssessmentPage() {
       <div className="container mx-auto px-4 pt-24 pb-20 max-w-5xl">
         <div className="space-y-4">
           {assessmentData.questions.map((question, qIndex) => (
-            <div key={qIndex} className="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+            <div 
+              key={qIndex} 
+              id={`question-${qIndex}`}
+              className={`bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm transition-all duration-300 ${
+                !userResponses[question.question_number] ? 'relative' : ''
+              }`}
+            >
               <div className="flex items-center">
-                <div className="flex-shrink-0 bg-gray-200 rounded-full w-12 h-12 flex items-center justify-center mr-4">
-                  <span className="text-gray-600 font-medium text-lg">{qIndex + 1}</span>
+                <div className={`flex-shrink-0 rounded-full w-12 h-12 flex items-center justify-center mr-4 ${
+                  userResponses[question.question_number] ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
+                }`}>
+                  <span className="font-medium text-lg">{qIndex + 1}</span>
                 </div>
                 <p className="text-gray-800 font-medium text-xl">
                   {question.question_text}
@@ -265,10 +307,9 @@ export default function AssessmentPage() {
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-white md:hidden">
         <button
           onClick={handleSubmit}
-          disabled={!isAllQuestionsAnswered()}
-          className={`w-full py-3 text-white font-medium rounded-full ${isAllQuestionsAnswered() ? 'bg-[#0b7960]' : 'bg-gray-400 cursor-not-allowed'}`}
+          className={`w-full py-3 text-white font-medium rounded-full ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-red-500 hover:bg-red-600'}`}
         >
-          Submit
+          {isAllQuestionsAnswered() ? 'Submit' : 'Answer All Questions to Submit'}
         </button>
       </div>
     </div>

@@ -1,5 +1,17 @@
+import { Me } from "@/context/AuthContext";
 import { assesmentData, question } from "@/types/assesments";
 import axios from "axios";
+
+// Define a more flexible user type for the functions
+type UserData = {
+  id?: string;
+  uid?: string;
+  personalInfo?: {
+    gender?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+};
 
 const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -35,32 +47,55 @@ const assesmentType = (slug: string) => {
   }
 };
 
-const get_VLD_Questions = async (slug: string) => {
+const get_VLD_Questions = async (slug: string, userData?: UserData) => {
   try {
-    const res = await axios.get(
-      `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}&page=1`
-    );
+    // Get gender from different user objects
+    const gender = userData?.personalInfo?.gender;
+    const genderParam = slug === "sas" && gender ? `&gender=${gender}` : '';
+    
+    const url = `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}${genderParam}`;
+    console.log("Fetching from URL:", url);
+    
+    const res = await axios.get(url);
+    console.log("Response data structure:", JSON.stringify(res.data).substring(0, 200) + "...");
+    
     const noOfPages: number = 1;
-    let QuestionsList: any[] = res.data.questions;
+    let QuestionsList: any[] = [];
+    
+    // Handle different response structures
+    if (res.data.questions) {
+      QuestionsList = res.data.questions;
+    } else if (res.data.data?.questions) {
+      QuestionsList = res.data.data.questions;
+    } else {
+      console.error("Unexpected response structure:", res.data);
+      throw new Error("Unexpected response structure: questions array not found");
+    }
+    
     let questions: question[] = QuestionsList.map((question: any) => {
       return {
-        question_number: question.id,
-        question_text: question.text,
-        options: question.options.map((option: any) => {
-          return {
-            value: option.value,
-            text: option.text,
-          };
-        }),
+        question_number: question.id || question.question_number,
+        question_text: question.text || question.question_text,
+        options: Array.isArray(question.options) 
+          ? question.options.map((option: any) => {
+              return {
+                value: option.value,
+                text: slug !== "sas" ? option.text : (option.label || option.text),
+              };
+            })
+          : []
       };
     });
+    
     const assesmentData: assesmentData = {
-      testInfo: res.data.test_info,
+      testInfo: res.data.test_info || res.data.data?.test_info,
       pages: noOfPages,
       questions: questions,
     };
     return assesmentData;
   } catch (error) {
+    console.error("Error in get_VLD_Questions:", error);
+    console.error("For test slug:", slug);
     throw new Error("Error in fetching Questions of " + slug + ":" + error);
   }
 };
@@ -185,7 +220,7 @@ const defaultresponce: assesmentData = {
   questions: [],
 };
 
-export const getQuestions = async (slug: string) => {
+export const getQuestions = async (slug: string, userData?: UserData) => {
   try {
     const typeOfAssesment = assesmentType(slug);
     if (typeOfAssesment === "vl" || typeOfAssesment === "vt") {
@@ -199,7 +234,7 @@ export const getQuestions = async (slug: string) => {
       const res = await get_AD5_OC_YN_Questions(slug);
       return res;
     } else if (typeOfAssesment === "vld") {
-      const res = await get_VLD_Questions(slug);
+      const res = await get_VLD_Questions(slug, userData);
       return res;
     } else {
       console.log("Not Implemented yet");

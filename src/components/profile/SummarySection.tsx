@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaCalendarAlt, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaUserMd } from "react-icons/fa";
+import { FaCalendarAlt, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaUserMd, FaClock, FaAngleRight } from "react-icons/fa";
 import { HistoryItem } from "@/utils/userTypes";
 import { getAllUserTestData } from "@/utils/test";
 import { ReferredTest } from "@/types/test";
@@ -159,51 +159,83 @@ export default function SummarySection({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Welcome Banner */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#642494] to-[#8a35c9] rounded-2xl shadow-lg">
+        <div className="absolute right-0 top-0 w-48 h-48 opacity-10">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#FFFFFF" d="M42.7,-62.9C55.9,-54.8,67.4,-42.5,73.5,-27.9C79.6,-13.3,80.3,3.6,75.2,18.3C70.1,33,59.1,45.7,45.9,54.9C32.6,64.1,16.3,69.9,0.1,69.8C-16.2,69.6,-32.3,63.5,-45,53.4C-57.7,43.2,-66.9,28.9,-71.2,12.7C-75.5,-3.5,-74.9,-21.7,-67.1,-35.9C-59.3,-50.1,-44.3,-60.2,-29.4,-67.6C-14.5,-75,-7.3,-79.6,4,-83.5C15.2,-87.5,30.5,-90.8,42.7,-62.9Z" transform="translate(100 100)" />
+          </svg>
+        </div>
+        <div className="relative p-6 md:p-8 text-white z-10">
+          <h1 className="text-3xl font-bold mb-2">Welcome to Your Dashboard</h1>
+          <p className="opacity-80 mb-4">Stay up to date with your mental health journey</p>
+          
+          <div className="flex flex-wrap gap-4 mt-4">
+            <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-2xl">{stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}</div>
+              <div className="text-sm text-white/80">Total Sessions</div>
+            </div>
+            <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-2xl">{stats.tests.completed}</div>
+              <div className="text-sm text-white/80">Tests Completed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SummaryCard 
           title="Total Sessions" 
           value={stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}
-          icon={<FaCalendarAlt className="text-[#642494]" />}
+          icon={<FaCalendarAlt className="text-white" />}
           description="Total sessions across all types"
+          color="bg-gradient-to-br from-blue-500 to-blue-600"
+          textColor="text-white"
         />
         <SummaryCard 
           title="Completed Tests" 
           value={stats.tests.completed} 
-          icon={<FaClipboardCheck className="text-green-500" />}
+          icon={<FaClipboardCheck className="text-white" />}
           description="Tests you have completed"
+          color="bg-gradient-to-br from-green-500 to-green-600"
+          textColor="text-white"
         />
         <SummaryCard 
           title="Pending Referrals" 
           value={referredTests.length} 
-          icon={<FaExclamationCircle className="text-yellow-500" />}
+          icon={<FaExclamationCircle className="text-white" />}
           description="Tests referred to you that need payment"
+          color="bg-gradient-to-br from-yellow-500 to-yellow-600"
+          textColor="text-white"
         />
       </div>
       
       {/* Calendar and Events */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="col-span-1 lg:col-span-2">
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-lg font-semibold mb-4">Your Calendar</h3>
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="bg-gradient-to-r from-[#642494]/90 to-[#642494] p-4 text-white">
+              <h3 className="text-lg font-semibold">Your Calendar</h3>
+            </div>
             
             {/* Calendar */}
-            <div className="rounded-lg border border-gray-200">
+            <div className="rounded-lg border-0">
               {/* Calendar Header */}
               <div className="flex justify-between items-center p-4 border-b">
                 <button 
                   onClick={prevMonth} 
-                  className="p-2 rounded-full hover:bg-gray-100"
+                  className="p-2 rounded-full hover:bg-[#642494]/10 text-[#642494] transition-colors"
                 >
-                  <FaChevronLeft className="text-gray-500" />
+                  <FaChevronLeft />
                 </button>
-                <h4 className="font-medium">{formatMonth(currentMonth)}</h4>
+                <h4 className="font-medium text-gray-800">{formatMonth(currentMonth)}</h4>
                 <button 
                   onClick={nextMonth} 
-                  className="p-2 rounded-full hover:bg-gray-100"
+                  className="p-2 rounded-full hover:bg-[#642494]/10 text-[#642494] transition-colors"
                 >
-                  <FaChevronRight className="text-gray-500" />
+                  <FaChevronRight />
                 </button>
               </div>
               
@@ -223,14 +255,20 @@ export default function SummarySection({
                     key={index} 
                     onClick={() => setSelectedDate(date)}
                     className={`
-                      p-2 h-10 relative
+                      p-2 h-11 relative
                       ${!isCurrentMonth(date) ? 'text-gray-400' : 'text-gray-800'} 
                       ${isToday(date) ? 'font-bold' : ''} 
-                      ${isSelected(date) ? 'bg-[#642494]/10' : 'hover:bg-gray-100'}
+                      ${isSelected(date) 
+                        ? 'bg-[#642494] text-white rounded-full mx-1.5 my-0.5' 
+                        : (hasEvent(date) && isCurrentMonth(date))
+                          ? 'hover:bg-[#642494]/10 text-[#642494] font-semibold'
+                          : 'hover:bg-gray-100'
+                      }
+                      transition-colors
                     `}
                   >
                     {date.getDate()}
-                    {hasEvent(date) && (
+                    {hasEvent(date) && !isSelected(date) && (
                       <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-[#642494] rounded-full"></span>
                     )}
                   </button>
@@ -241,34 +279,43 @@ export default function SummarySection({
         </div>
         
         <div>
-          <div className="bg-white rounded-lg shadow p-4 h-full">
-            <h3 className="text-lg font-semibold mb-4">
-              Events on {selectedDate.toLocaleDateString()}
-            </h3>
+          <div className="bg-white rounded-xl shadow-md overflow-hidden h-full">
+            <div className="bg-gradient-to-r from-[#642494]/90 to-[#642494] p-4 text-white">
+              <h3 className="text-lg font-semibold">
+                Events on {selectedDate.toLocaleDateString()}
+              </h3>
+            </div>
             
-            {dateEvents.length > 0 ? (
-              <div className="space-y-3">
-                {dateEvents.map((event, index) => (
-                  <EventCard key={index} event={event} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-gray-500 text-center py-10">
-                No events scheduled for this date
-              </div>
-            )}
+            <div className="p-4">
+              {dateEvents.length > 0 ? (
+                <div className="space-y-3">
+                  {dateEvents.map((event, index) => (
+                    <EventCard key={index} event={event} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <FaClock className="mx-auto text-3xl text-gray-300 mb-3" />
+                  <p>No events scheduled for this day</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
       
       {/* Referred Tests */}
       {referredTests.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-4">
-          <h3 className="text-lg font-semibold mb-4">Referred Tests Requiring Payment</h3>
-          <div className="space-y-4">
-            {referredTests.map((test) => (
-              <ReferredTestCard key={test.bookingId} test={test} />
-            ))}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="bg-gradient-to-r from-[#642494]/90 to-[#642494] p-4 text-white">
+            <h3 className="text-lg font-semibold">Tests Referred to You</h3>
+          </div>
+          <div className="p-4">
+            <div className="space-y-3">
+              {referredTests.map((test, index) => (
+                <ReferredTestCard key={index} test={test} />
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -276,99 +323,103 @@ export default function SummarySection({
   );
 }
 
-// Summary Card Component
 function SummaryCard({ 
   title, 
   value, 
   icon, 
-  description 
+  description,
+  color,
+  textColor
 }: { 
   title: string; 
   value: number; 
   icon: React.ReactNode; 
   description: string;
+  color: string;
+  textColor: string;
 }) {
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <div className="flex items-center">
-        <div className="p-3 rounded-full bg-[#642494]/10 mr-4">
-          {icon}
+    <div className={`rounded-xl shadow-md overflow-hidden ${color}`}>
+      <div className="p-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className={`text-lg font-semibold ${textColor}`}>{title}</h3>
+            <p className={`text-sm mt-1 ${textColor} opacity-80`}>{description}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-white/20">
+            {icon}
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-          <p className="text-gray-500 text-sm">{description}</p>
-        </div>
+        <div className={`text-3xl font-bold mt-4 ${textColor}`}>{value}</div>
       </div>
-      <div className="text-3xl font-bold text-[#642494] mt-2">{value}</div>
     </div>
   );
 }
 
-// Event Card Component
 function EventCard({ event }: { event: HistoryItem }) {
   const getEventColor = () => {
     switch (event.mode) {
-      case 'call': return 'bg-green-100 text-green-800';
-      case 'chat': return 'bg-blue-100 text-blue-800';
-      case 'video': return 'bg-purple-100 text-purple-800';
-      case 'in_person': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'call':
+        return 'border-blue-500 bg-blue-50';
+      case 'chat':
+        return 'border-green-500 bg-green-50';
+      case 'video':
+        return 'border-purple-500 bg-purple-50';
+      case 'in_person':
+        return 'border-orange-500 bg-orange-50';
+      default:
+        return 'border-gray-500 bg-gray-50';
     }
   };
-  
+
   const getEventTitle = () => {
     switch (event.mode) {
-      case 'call': return 'Call Session';
-      case 'chat': return 'Chat Session';
-      case 'video': return 'Video Session';
-      case 'in_person': return 'In-Person Session';
-      default: return 'Session';
+      case 'call':
+        return 'Phone Session';
+      case 'chat':
+        return 'Chat Session';
+      case 'video':
+        return 'Video Session';
+      case 'in_person':
+        return 'In-person Session';
+      default:
+        return 'Session';
     }
   };
 
-  const eventTime = new Date(event.date).toLocaleTimeString([], { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
-
   return (
-    <div className="p-3 rounded-lg border border-gray-200 hover:shadow transition-shadow">
-      <div className="flex justify-between items-center">
-        <span className={`px-2 py-1 rounded text-xs font-medium ${getEventColor()}`}>
-          {getEventTitle()} 
-        </span>
-          <FaUserMd/> {event.counsellorName}
-        <span className="text-sm text-gray-500">{eventTime}</span>
+    <div className={`border-l-4 rounded-r-lg p-3 ${getEventColor()} transition-transform hover:scale-[1.02]`}>
+      <div className="flex justify-between items-start">
+        <div>
+          <h4 className="font-medium">{getEventTitle()}</h4>
+          <p className="text-sm text-gray-600">
+            {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+        <div className="text-xs px-2 py-1 bg-white/70 rounded text-gray-700 backdrop-blur-sm">
+          Scheduled
+        </div>
+      </div>
+      <div className="mt-2 flex items-center text-sm text-gray-600">
+        <FaUserMd className="mr-1" /> {event.counsellorName}
       </div>
     </div>
   );
 }
 
-// Referred Test Card Component
 function ReferredTestCard({ test }: { test: ReferredTest }) {
   return (
-    <div className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
-      <div className="flex justify-between">
-        <div>
-          <h4 className="font-medium text-gray-800">{test.test.name}</h4>
-          <p className="text-sm text-gray-600 mt-1">
-            Referred by: {test.referredBy.name}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            Expires: {new Date(test.expiryDate).toLocaleDateString()}
-          </p>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold text-lg">
-            {test.payment.currency} {test.payment.amount}
-          </span>
-          <button 
-            className="mt-2 px-4 py-1 bg-[#642494] text-white rounded hover:bg-[#4e1c72] transition-colors text-sm"
-          >
-            Pay Now
-          </button>
-        </div>
+    <div className="border border-yellow-200 bg-yellow-50 rounded-lg p-4 flex justify-between items-center transition-colors hover:bg-yellow-100">
+      <div>
+        <h4 className="font-medium text-gray-800">{test.test.name}</h4>
+        <p className="text-sm text-gray-600">Referred by: {test.referredBy?.name || 'Unknown Expert'}</p>
       </div>
+      <a 
+        href={`/test-payment?test=${test.test.slug}&ref=${test.bookingId}`}
+        className="flex items-center text-[#642494] hover:underline font-medium text-sm"
+      >
+        Make Payment <FaAngleRight className="ml-1" />
+      </a>
     </div>
   );
 } 
