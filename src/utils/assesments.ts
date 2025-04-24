@@ -252,7 +252,22 @@ export const submitAssesment = async (data: {
   answers: any;
 }) => {
   try {
-    await axios.post(`${baseUrl}/${data.test_slug}/b_submit_answers.php`, data);
+    // Check if the test is VLD type and transform answers if needed
+    const testType = assesmentType(data.test_slug);
+    let requestData = { ...data };
+    
+    if (testType === "vld") {
+      // Transform from object format to array format for VLD tests
+      if (!Array.isArray(data.answers)) {
+        const answersArray = Object.entries(data.answers).map(([key, value]) => ({
+          question_id: parseInt(key),
+          value: value
+        }));
+        requestData.answers = answersArray;
+      }
+    }
+    
+    await axios.post(`${baseUrl}/${data.test_slug}/b_submit_answers.php`, requestData);
     return true;
   } catch (error) {
     return false;

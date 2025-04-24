@@ -143,6 +143,8 @@ export default function TestsPage() {
                       </div>
                       <Link 
                         href={`/test-preparation?slug=${test.testSlug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center"
                       >
                         Start Test <FaArrowRight className="ml-2" />

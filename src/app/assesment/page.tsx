@@ -23,6 +23,7 @@ export default function AssessmentPage() {
   
   const [userResponses, setUserResponses] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isValidTest, setIsValidTest] = useState<boolean>(false);
   
@@ -135,17 +136,26 @@ export default function AssessmentPage() {
       return;
     }
     
-    const res = await submitAssesment({
+    setIsSubmitting(true);
+    
+    try {
+      const res = await submitAssesment({
         user_id: me.id,
         test_slug: slug,
         answers: userResponses
-    });
+      });
 
-    if(res){
+      if(res){
         router.replace('/assessment-complete');
-    }
-    else{
+      }
+      else{
         toast.error("Error in submitting your response");
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Error submitting assessment:", error);
+      toast.error("Error in submitting your response");
+      setIsSubmitting(false);
     }
   };
 
@@ -254,9 +264,18 @@ export default function AssessmentPage() {
                   </div>
                   <button
                       onClick={handleSubmit}
-                      className={`hidden md:block mt-4 md:mt-0 px-6 py-2 ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'} text-white rounded-full font-medium transition-colors`}
+                      disabled={!isAllQuestionsAnswered() || isSubmitting}
+                      className={`hidden md:block mt-4 md:mt-0 px-6 py-2 ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'} ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''} text-white rounded-full font-medium transition-colors`}
                   >
-                      Submit
+                      {isSubmitting ? (
+                        <span className="flex items-center justify-center">
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Submitting...
+                        </span>
+                      ) : 'Submit'}
                   </button>
               </div>
       </div>
@@ -307,9 +326,18 @@ export default function AssessmentPage() {
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-white md:hidden">
         <button
           onClick={handleSubmit}
-          className={`w-full py-3 text-white font-medium rounded-full ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-red-500 hover:bg-red-600'}`}
+          disabled={!isAllQuestionsAnswered() || isSubmitting}
+          className={`w-full py-3 text-white font-medium rounded-full ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-red-500 hover:bg-red-600'} ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
         >
-          {isAllQuestionsAnswered() ? 'Submit' : 'Answer All Questions to Submit'}
+          {isSubmitting ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Submitting...
+            </span>
+          ) : isAllQuestionsAnswered() ? 'Submit' : 'Answer All Questions to Submit'}
         </button>
       </div>
     </div>

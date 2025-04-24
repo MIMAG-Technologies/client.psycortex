@@ -34,3 +34,51 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+Marital - error
+
+AD5
+spiritual done
+aggression done
+suicidal-ideation-scale done
+
+vt with page
+
+happiness vt done
+
+vl with page
+
+wbs vl done
+ies  vl done
+rrs  vl done
+sis  vl done
+scs vl done
+
+
+vt without page
+
+schizophrenia  done
+scat  done
+academic  done
+pre-marital error no options
+sas  errpr 
+
+
+Options without Values
+bdi error
+
+
+Custom options
+bai done
+
+y/n
+adss done
+
+
+
+error 
+bdi error
+sas  errpr 
+Marital - error
+pre-marital error no options

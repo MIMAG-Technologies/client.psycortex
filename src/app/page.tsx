@@ -136,7 +136,7 @@ export default function Home() {
                   key={test.slug}
                   test={test}
                   userAge={null}
-                  onTakeTest={() => window.location.href = `/tests?test=${test.slug}`}
+                  onTakeTest={() => window.location.href = `/tests?opentest=${test.slug}`}
                 />
               ))}
             </div>
