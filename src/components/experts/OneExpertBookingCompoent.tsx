@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 import BookingModal from "./BookingModal";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { FaPhone, FaMapMarkerAlt } from "react-icons/fa";
+import { FaPhone, FaMapMarkerAlt, FaUserFriends, FaUser } from "react-icons/fa";
+import { Switch } from "@headlessui/react";
 
 export default function OneExpertBookingCompoent(props: {
   id: string;
@@ -30,6 +31,7 @@ export default function OneExpertBookingCompoent(props: {
     []
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCoupleCounselling, setIsCoupleCounselling] = useState(false);
   
   // Selected rate
   const selectedRate = rates.find(rate => rate.sessionType === selectedSessionType) || rates[0] || {
@@ -172,7 +174,16 @@ export default function OneExpertBookingCompoent(props: {
                 ?.slots.length ? (
                 counsellorSchedule
                   .find((day) => day.date === selectedDayIndex)
-                  ?.slots.map((slot, index) => (
+                  ?.slots
+                  // For couple counselling, we need consecutive slots
+                  .filter((slot, index, slots) => {
+                    if (!isCoupleCounselling) return slot.is_available;
+                    
+                    // For couple counselling (2 hours), check if there's another available slot after this one
+                    const nextSlot = slots[index + 1];
+                    return slot.is_available && nextSlot && nextSlot.is_available;
+                  })
+                  .map((slot, index) => (
                     <button
                       key={index}
                       disabled={!slot.is_available}
@@ -183,7 +194,13 @@ export default function OneExpertBookingCompoent(props: {
                       } ${!slot.is_available ? "cursor-not-allowed opacity-50" : ""}`}
                       onClick={() => setSelectedTimeSlot(slot.time)}
                     >
-                      {new Date(`2000-01-01T${slot.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
+                      <div className="flex items-center justify-center gap-1">
+                        {new Date(`2000-01-01T${slot.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
+                        {isCoupleCounselling && (
+                          <FaUserFriends size={12} className={`${selectedTimeSlot === slot.time ? "text-white" : "text-pink-600"}`} />
+                        )}
+                      </div>
+                      {isCoupleCounselling && <div className="text-xs mt-1">(90 mins)</div>}
                     </button>
                   ))
               ) : (
@@ -217,8 +234,44 @@ export default function OneExpertBookingCompoent(props: {
           <span className="text-xl font-semibold ml-4">
             {selectedRate?.currency || "₹"}
             {selectedRate?.price || "N/A"}
+            {isCoupleCounselling ? ' x2' : ''}
           </span>
         </div>
+
+        {/* Couple Counselling Toggle */}
+        {(selectedMode === 'video' || selectedMode === 'chat') && (
+          <div className="mb-4 border border-[#642494]/20 rounded-lg p-3 bg-[#f8f3fa] w-full">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 ">
+                {isCoupleCounselling ? 
+                  <FaUserFriends className="text-[#642494] text-xl" /> : 
+                  <FaUser className="text-[#642494] text-xl" />
+                }
+                <span className="text-gray-700 font-medium">
+                  {isCoupleCounselling ? 'Couple Counselling' : 'Individual Counselling'}
+                </span>
+              </div>
+              <Switch
+                checked={isCoupleCounselling}
+                onChange={setIsCoupleCounselling}
+                className={`${
+                  isCoupleCounselling ? 'bg-[#642494]' : 'bg-gray-300'
+                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#642494] focus:ring-offset-2`}
+              >
+                <span
+                  className={`${
+                    isCoupleCounselling ? 'translate-x-6' : 'translate-x-1'
+                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                />
+              </Switch>
+            </div>
+            {isCoupleCounselling && (
+              <p className="text-sm text-gray-600 mt-2">
+                Couple counselling sessions are 90 minutes long and charged at 2x the individual rate.
+              </p>
+            )}
+          </div>
+        )}
 
         {renderSessionContent()}
 
@@ -243,7 +296,6 @@ export default function OneExpertBookingCompoent(props: {
         userData={{
           name: me?.personalInfo.name || "User",
           id:me?.id || ""
-
         }}
         counsellorData={{
           name: counsellorName,
@@ -254,8 +306,9 @@ export default function OneExpertBookingCompoent(props: {
           date: formatDate(selectedDayIndex),
           time: formatTime(selectedTimeSlot),
           sessionType: selectedRate.sessionTitle || selectedSessionType,
-          price: selectedRate.price,
-          currency: selectedRate.currency
+          price: isCoupleCounselling ? selectedRate.price * 2 : selectedRate.price,
+          currency: selectedRate.currency,
+          isCouple: isCoupleCounselling
         }}
       />
     </>

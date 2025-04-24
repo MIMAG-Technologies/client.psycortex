@@ -246,6 +246,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
     const isUpcoming = timeRemaining > 0;
     const isJoinable = 'actions' in session && session.actions.canJoin;
     const isExpired = session.status === 'expired';
+    const isCouple = 'is_couple_session' in session && session.is_couple_session;
 
     return (
       <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors shadow-sm">
@@ -253,7 +254,15 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
           <div className="flex items-center">
             {session.counsellor && <img src={session.counsellor.image} alt={session.counsellor.name} className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-[#642494]/20" />}
             <div>
-              <h3 className="font-medium">{session.counsellor?.name}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium">{session.counsellor?.name}</h3>
+                {isCouple && (
+                  <div className="bg-pink-100 text-pink-800 text-xs px-2 py-0.5 rounded-full flex items-center">
+                    <FaUserFriends className="mr-1" size={12} />
+                    <span>Couple</span>
+                  </div>
+                )}
+              </div>
               <p className="text-sm text-gray-600">{formatDate(scheduledDate)} at {formatTime(scheduledDate)}</p>
               <div className="text-sm text-gray-500 mt-1 flex items-center">
                 <span className={`w-2 h-2 rounded-full mr-1.5 ${

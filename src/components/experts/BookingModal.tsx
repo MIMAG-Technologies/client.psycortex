@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaCalendarAlt, FaClock, FaVideo, FaUser, FaFileAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaVideo, FaUser, FaFileAlt, FaUserFriends } from "react-icons/fa";
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 import { bookSession } from "@/utils/session";
 import { toast } from "react-toastify";
@@ -25,6 +25,7 @@ interface BookingModalProps {
     sessionType: string;
     price: number;
     currency: string;
+    isCouple: boolean;
   };
 }
 
@@ -37,6 +38,7 @@ const BookingModal = ({
 }: BookingModalProps) => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   if (!isOpen) return null;
 
@@ -76,12 +78,10 @@ const BookingModal = ({
     }
   };
 
-  const router = useRouter();
-
   const handlebooking = async () => {
     setIsLoading(true);
     try {
-      const res = await bookSession(bookingData.mode as "chat" | "video", {
+      const res = await bookSession(bookingData.mode as "chat" | "video", bookingData.isCouple, {
         user_id: userData.id,
         counsellor_id: counsellorData.id,
         scheduled_at: bookingData.date + bookingData.time
@@ -146,6 +146,19 @@ const BookingModal = ({
               </div>
               <p className="font-semibold">{formatModeName(bookingData.mode)}</p>
             </div>
+
+            {bookingData.isCouple && (
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <FaUserFriends />
+                  <span>Session Type:</span>
+                </div>
+                <p className="font-semibold text-pink-600 flex items-center">
+                  <span className="mr-1">Couple Counselling</span>
+                  <FaUserFriends size={14} />
+                </p>
+              </div>
+            )}
 
             <div className="flex justify-between items-center text-lg font-bold text-purple-800">
               <p>Total:</p>
