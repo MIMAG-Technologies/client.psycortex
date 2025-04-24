@@ -415,7 +415,7 @@ function ReferredTestCard({ test }: { test: ReferredTest }) {
         <p className="text-sm text-gray-600">Referred by: {test.referredBy?.name || 'Unknown Expert'}</p>
       </div>
       <a 
-        href={`/test-payment?test=${test.test.slug}&ref=${test.bookingId}`}
+        href={`/tests?opentest=${test.test.slug}`}
         className="flex items-center text-[#642494] hover:underline font-medium text-sm"
       >
         Make Payment <FaAngleRight className="ml-1" />

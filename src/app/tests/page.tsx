@@ -8,7 +8,7 @@ import TestCard from '@/components/test/TestCard';
 import TestDetailsModal from '@/components/test/TestDetailsModal';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Tests() {
@@ -19,13 +19,24 @@ export default function Tests() {
   const [selectedTest, setSelectedTest] = useState<TestDetails | null>(null);
   const [showModal, setShowModal] = useState(false);
   const { userAge, user } = useAuth();
-  const router = useRouter()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchTests = async () => {
       try {
         const allTests = await getAllTests();
         setTests(allTests);
+        
+        // Check if opentest parameter exists
+        const openTestSlug = searchParams.get('opentest');
+        if (openTestSlug && allTests.length > 0) {
+          const testToOpen = allTests.find(t => t.slug === openTestSlug);
+          if (testToOpen) {
+            setSelectedTest(testToOpen);
+            setShowModal(true);
+          }
+        }
       } catch (error) {
         console.error('Error fetching tests:', error);
       } finally {
@@ -34,7 +45,7 @@ export default function Tests() {
     };
 
     fetchTests();
-  }, []);
+  }, [searchParams]);
 
   const booktest = async (testSlug: string,
     amount: number) => {

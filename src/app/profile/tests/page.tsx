@@ -184,7 +184,7 @@ export default function TestsPage() {
                         </div>
                         <div className="mt-4">
                           <Link 
-                            href={`/test-payment?test=${test.testSlug}&ref=${test.bookingId}`}
+                            href={`/tests?opentest=${test.testSlug}`}
                             className="text-[#642494] hover:underline font-medium flex items-center"
                           >
                             Make Payment <FaArrowRight className="ml-1.5 text-xs" />

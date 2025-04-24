@@ -26,7 +26,7 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl custom-scrollbar">
                 <div className="p-0">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-[#642494] to-[#8a35c9] p-6 text-white rounded-t-xl relative">
@@ -60,10 +60,6 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                             <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center">
                                 <FaListAlt className="mr-2" />
                                 <span>{test.details.totalQuestions} questions</span>
-                            </div>
-                            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center">
-                                <FaStar className="mr-2" />
-                                <span>4.8/5 Rating</span>
                             </div>
                         </div>
                     </div>
@@ -164,6 +160,32 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                     </div>
                 </div>
             </div>
+            
+            {/* Add global styles for custom scrollbar */}
+            <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: none;
+                }
+                
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background-color: rgba(100, 36, 148, 0.3);
+                    border-radius: 20px;
+                }
+                
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background-color: rgba(100, 36, 148, 0.5);
+                }
+                
+                /* For Firefox */
+                .custom-scrollbar {
+                    scrollbar-width: none;
+                    scrollbar-color: rgba(100, 36, 148, 0.3) transparent;
+                }
+            `}</style>
         </div>
     );
 } 
