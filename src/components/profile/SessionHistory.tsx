@@ -17,6 +17,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeMode, setActiveMode] = useState<'call' | 'chat' | 'video' | 'in_person'>('chat');
   const [error, setError] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<{[key: string]: string}>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -87,6 +88,111 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
     fetchSessions();
   }, [userId]);
 
+  useEffect(() => {
+    // Create countdown timers for upcoming sessions
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      
+      const allSessions = [...callSessions, ...chatSessions, ...videoSessions, ...offlineSessions];
+      const updatedCountdowns: {[key: string]: string} = {};
+      
+      let shouldReload = false;
+      
+      allSessions.forEach(session => {
+        const scheduledAt = 'scheduledAt' in session ? session.scheduledAt : session.scheduled_at;
+        const scheduledTime = new Date(scheduledAt).getTime();
+        const timeRemaining = scheduledTime - now;
+        
+        if (timeRemaining <= 0 && timeRemaining > -60000) { // Just became available in the last minute
+          shouldReload = true;
+        }
+        
+        if (timeRemaining > 0) {
+          const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+          
+          if (days > 0) {
+            updatedCountdowns[session.id] = `Join in ${days} day${days !== 1 ? 's' : ''}`;
+          } else if (hours > 0 || minutes > 0) {
+            updatedCountdowns[session.id] = `Join in ${hours}h ${minutes}m ${seconds}s`;
+          } else {
+            updatedCountdowns[session.id] = `Join in ${seconds}s`;
+          }
+        }
+      });
+      
+      setCountdown(updatedCountdowns);
+      
+      if (shouldReload) {
+        const fetchSessions = async () => {
+          setIsLoading(true);
+          try {
+            const [calls, chats, videos, offline] = await Promise.all([
+              getUserCallSessions(userId),
+              getUserChatSessions(userId),
+              getUserVideoSessions(userId),
+              getUserOfflineSessions(userId)
+            ]);
+            setCallSessions(calls.map(session => ({
+              ...session,
+              mode: 'call' as const,
+              counsellorId: session.counsellor.id,
+              counsellor: {
+                ...session.counsellor,
+                avatar: session.counsellor.image,
+                specialization: session.counsellor.title
+              },
+            })));
+            setChatSessions(chats.map(session => ({
+              ...session,
+              mode: 'chat' as const,
+              counsellorId: session.counsellor.id,
+              counsellor: {
+                ...session.counsellor,
+                avatar: session.counsellor.image,
+                specialization: session.counsellor.title
+              },
+              review: session.review ? { rating: session.review.rating, feedback: session.review.feedback } : null
+            })));
+            setVideoSessions(videos.map(session => ({
+              ...session,
+              mode: 'video',
+              counsellorId: session.counsellor.id,
+              counsellor: {
+                ...session.counsellor,
+                avatar: session.counsellor.image,
+                specialization: session.counsellor.title
+              },
+              review: session.review ? { rating: session.review.rating, comment: session.review.comment } : null
+            })));
+            setOfflineSessions(offline.map(session => ({
+              ...session,
+              mode: 'in_person',
+              counsellorId: session.counsellor ? session.counsellor.id : '',
+              counsellor: session.counsellor ? {
+                ...session.counsellor,
+                avatar: session.counsellor.image,
+                specialization: session.counsellor.title
+              } : undefined,
+              scheduledAt: session.scheduled_at || '',
+              duration: session.duration_minutes || 0
+            })));
+          } catch (err) {
+            console.error('Error fetching sessions:', err);
+            setError('Failed to load sessions. Please try again later.');
+          } finally {
+            setIsLoading(false);
+          }
+        };
+        fetchSessions();
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [callSessions, chatSessions, videoSessions, offlineSessions, userId]);
+
   const getModeIcon = (mode: string) => {
     switch (mode) {
       case 'video':
@@ -133,7 +239,11 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
 
   const renderSessionCard = (session: CallSession | ChatSession | VideoSession | OfflineSession) => {
     const scheduledDate = 'scheduledAt' in session ? session.scheduledAt : session.scheduled_at;
-    const isUpcoming = new Date(scheduledDate) > new Date();
+    const now = new Date().getTime();
+    const sessionTime = new Date(scheduledDate).getTime();
+    const timeRemaining = sessionTime - now;
+    
+    const isUpcoming = timeRemaining > 0;
     const isJoinable = 'actions' in session && session.actions.canJoin;
     const isExpired = session.status === 'expired';
 
@@ -175,7 +285,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
                 </button>
               ) : (
                 <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  Join in {Math.ceil((new Date(scheduledDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
+                  {countdown[session.id] || 'Upcoming'}
                 </button>
               )
             )}
@@ -193,7 +303,18 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
                 </button>
               ) : (
                 <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  Join in {Math.ceil((new Date(scheduledDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
+                  {countdown[session.id] || 'Upcoming'}
+                </button>
+              )
+            )}
+            {activeMode === 'in_person' && (
+              isExpired ? (
+                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
+                  Session Expired
+                </button>
+              ) : (
+                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
+                  {countdown[session.id] || 'Upcoming'}
                 </button>
               )
             )}

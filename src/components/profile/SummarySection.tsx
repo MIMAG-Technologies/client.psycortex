@@ -393,7 +393,7 @@ function EventCard({ event }: { event: HistoryItem }) {
         <div>
           <h4 className="font-medium">{getEventTitle()}</h4>
           <p className="text-sm text-gray-600">
-            {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()}
           </p>
         </div>
         <div className="text-xs px-2 py-1 bg-white/70 rounded text-gray-700 backdrop-blur-sm">
