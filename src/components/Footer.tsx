@@ -93,7 +93,7 @@ const Footer: React.FC = () => {
                         </Link>
                     </span>
                     <img
-                        src="/logo.png"
+                        src="https://psycortex.in/assets/Images/thebraintakeLogo.png"
                         alt="Psycortex Logo"
                         className="max-w-[100px] object-contain mt-2 self-center"
                     />

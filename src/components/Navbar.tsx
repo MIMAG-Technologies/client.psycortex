@@ -44,14 +44,11 @@ const Navbar = () => {
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center">
               <img
-                src="/logo.png"
+                src="https://psycortex.in/assets/Images/thebraintakeLogo.png"
                 alt="Psycortex Logo"
                 width={50}
                 height={50}
               />
-              {/* <span 
-                className="ml-2 text-3xl text-[#702d8a] font-bold"
-              >Psycortex</span> */}
             </Link>
           </div>
 
@@ -83,7 +80,7 @@ const Navbar = () => {
       <div className={`md:hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-60" : "max-h-0 overflow-hidden"}`}>
         <div className="px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg">
           <MobileNavLink href="/" icon={<FaHome />} label="Home" active={pathname === "/"} onClick={closeMenu} />
-          <MobileNavLink href="/expert/list" icon={<FaUserMd />} label="Experts" active={pathname === "/expert/list"} onClick={closeMenu} />
+          <MobileNavLink href="/experts" icon={<FaUserMd />} label="Experts" active={pathname === "/expert/list"} onClick={closeMenu} />
           <MobileNavLink href="/tests" icon={<FaClipboardList />} label="Tests" active={pathname === "/tests"} onClick={closeMenu} />
           {user ? (
             <MobileNavLink href="/profile" icon={<FaUser />} label="My Profile" active={pathname === "/profile"} onClick={closeMenu} />

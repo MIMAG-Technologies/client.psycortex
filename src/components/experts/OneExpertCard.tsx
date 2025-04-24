@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import { IoMdBriefcase, IoMdPerson } from "react-icons/io";
 import { BiChat, BiPhone, BiVideo, BiUser } from "react-icons/bi";
@@ -26,32 +26,78 @@ export default function OneExpertCard({
   const [currentSlide, setCurrentSlide] = useState(0);
   const totalSlides = 3;
   const slideTitles = ["Sessions (INR)", "Languages", "Specialties"];
-  const slideIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Auto-rotate slides every 3 seconds
-  useEffect(() => {
-    slideIntervalRef.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 3000);
-
-    return () => {
-      if (slideIntervalRef.current) {
-        clearInterval(slideIntervalRef.current);
-      }
-    };
-  }, []);
-
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
   // Handle dot indicator click
   const handleDotClick = (index: number) => {
-    setCurrentSlide(index);
-    // Reset the interval
-    if (slideIntervalRef.current) {
-      clearInterval(slideIntervalRef.current);
-      slideIntervalRef.current = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % totalSlides);
-      }, 3000);
+    if (scrollContainerRef.current) {
+      const containerWidth = scrollContainerRef.current.clientWidth;
+      scrollContainerRef.current.scrollTo({
+        left: containerWidth * index,
+        behavior: 'smooth'
+      });
     }
   };
+  
+  // Monitor scroll position to update current slide indicator
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const containerWidth = scrollContainerRef.current.clientWidth;
+      const scrollPosition = scrollContainerRef.current.scrollLeft;
+      const newSlide = Math.round(scrollPosition / containerWidth);
+      
+      if (newSlide !== currentSlide && newSlide < totalSlides) {
+        setCurrentSlide(newSlide);
+      }
+    }
+  };
+  
+  // Duplicate content for seemless infinite scrolling
+  const slideContents = [
+    // Pricing section
+    <div key="pricing" className="min-w-full p-4 shrink-0">
+      <h3 className="text-[16px] font-semibold mb-3">{slideTitles[0]}</h3>
+      <div className="space-y-2">
+        {rates.map((rate, index) => (
+          <div key={index} className="flex justify-between items-center">
+            <div className="flex items-center gap-2 text-green-600 text-[14px]">
+              {rate.sessionType === 'chat' && <BiChat className="text-green-600" />}
+              {rate.sessionType === 'call' && <BiPhone className="text-green-600" />}
+              {rate.sessionType === 'video' && <BiVideo className="text-green-600" />}
+              {rate.sessionType === 'offline' && <BiUser className="text-green-600" />}
+              <span>{rate.sessionType}</span>
+            </div>
+            <span className="text-purple-700 font-semibold text-[14px]">{rate.price}</span>
+          </div>
+        ))}
+      </div>
+    </div>,
+    
+    // Languages section
+    <div key="languages" className="min-w-full p-4 shrink-0">
+      <h3 className="text-[16px] font-semibold mb-3">{slideTitles[1]}</h3>
+      <div className="space-y-2">
+        {languages.map((lang, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <BsGlobe2 className="text-gray-600" />
+            <span className="text-[14px]">{lang.language}</span>
+          </div>
+        ))}
+      </div>
+    </div>,
+    
+    // Specialties section
+    <div key="specialties" className="min-w-full p-4 shrink-0">
+      <h3 className="text-[16px] font-semibold mb-3">{slideTitles[2]}</h3>
+      <div className="flex flex-wrap gap-2">
+        {specialties.map((specialty, index) => (
+          <span key={index} className="px-2 py-1 bg-gray-100 rounded-full text-gray-800 text-[14px]">
+            {specialty}
+          </span>
+        ))}
+      </div>
+    </div>
+  ];
 
   return (
     <div className="w-full rounded-2xl pb-4 overflow-hidden border border-purple-200 bg-white">
@@ -118,66 +164,28 @@ export default function OneExpertCard({
         </div>
       </div>
 
-      {/* Sliding sections */}
-      <div className="relative bg-gray-50 p-4 mx-4 rounded-xl mb-1" style={{ height: '180px' }}>
-        {/* Pricing Section */}
+      {/* Sliding sections - with horizontal scroll */}
+      <div className="mx-4 mb-1 overflow-hidden bg-gray-50 rounded-xl">
         <div 
-          className={`absolute top-0 left-0 w-full p-4 transition-opacity duration-500 ${
-            currentSlide === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto snap-x snap-mandatory select-none" 
+          style={{ 
+            height: '180px', 
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
+          onScroll={handleScroll}
         >
-          <h3 className="text-[16px] font-semibold mb-3">{slideTitles[0]}</h3>
-          <div className="space-y-2">
-            {rates.map((rate, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <div className="flex items-center gap-2 text-green-600 text-[14px]">
-                  {rate.sessionType === 'chat' && <BiChat className="text-green-600" />}
-                  {rate.sessionType === 'call' && <BiPhone className="text-green-600" />}
-                  {rate.sessionType === 'video' && <BiVideo className="text-green-600" />}
-                  {rate.sessionType === 'offline' && <BiUser className="text-green-600" />}
-                  <span >{rate.sessionType}</span>
-                </div>
-                <span className="text-purple-700 font-semibold text-[14px]">{rate.price}</span>
-              </div>
-            ))}
-          </div>
+          {slideContents.map((content, index) => (
+            <div key={index} className="snap-center min-w-full shrink-0">
+              {content}
+            </div>
+          ))}
         </div>
-
-        {/* Languages Section */}
-        <div 
-          className={`absolute top-0 left-0 w-full p-4 transition-opacity duration-500 ${
-            currentSlide === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
-        >
-          <h3 className="text-[16px] font-semibold mb-3">{slideTitles[1]}</h3>
-          <div className="space-y-2">
-            {languages.map((lang, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <BsGlobe2 className="text-gray-600" />
-                <span className="text-[14px]">{lang.language}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Specialties Section */}
-        <div 
-          className={`absolute top-0 left-0 w-full p-4 transition-opacity duration-500 ${
-            currentSlide === 2 ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
-        >
-          <h3 className="text-[16px] font-semibold mb-3">{slideTitles[2]}</h3>
-          <div className="flex flex-wrap gap-2">
-            {specialties.map((specialty, index) => (
-              <span key={index} className="px-2 py-1 bg-gray-100 rounded-full text-gray-800 text-[14px]">
-                {specialty}
-              </span>
-            ))}
-          </div>
-        </div>
-
+        
         {/* Slide indicators */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+        <div className="flex justify-center gap-2 py-2">
           {[...Array(totalSlides)].map((_, index) => (
             <button
               key={index}

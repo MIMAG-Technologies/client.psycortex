@@ -241,29 +241,32 @@ export default function OneExpertBookingCompoent(props: {
         {/* Couple Counselling Toggle */}
         {(selectedMode === 'video' || selectedMode === 'chat') && (
           <div className="mb-4 border border-[#642494]/20 rounded-lg p-3 bg-[#f8f3fa] w-full">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 ">
-                {isCoupleCounselling ? 
-                  <FaUserFriends className="text-[#642494] text-xl" /> : 
-                  <FaUser className="text-[#642494] text-xl" />
-                }
-                <span className="text-gray-700 font-medium">
-                  {isCoupleCounselling ? 'Couple Counselling' : 'Individual Counselling'}
-                </span>
+            <div className="flex flex-col space-y-2">
+              <span className="text-gray-700 font-medium">Session Type</span>
+              <div className="flex h-10 bg-gray-200 rounded-lg p-1">
+                <button
+                  onClick={() => setIsCoupleCounselling(false)}
+                  className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${
+                    !isCoupleCounselling 
+                      ? 'bg-[#642494] text-white shadow-md' 
+                      : 'bg-transparent text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  <FaUser className="mr-2" />
+                  <span>Individual</span>
+                </button>
+                <button
+                  onClick={() => setIsCoupleCounselling(true)}
+                  className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${
+                    isCoupleCounselling 
+                      ? 'bg-[#642494] text-white shadow-md' 
+                      : 'bg-transparent text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  <FaUserFriends className="mr-2" />
+                  <span>Couple</span>
+                </button>
               </div>
-              <Switch
-                checked={isCoupleCounselling}
-                onChange={setIsCoupleCounselling}
-                className={`${
-                  isCoupleCounselling ? 'bg-[#642494]' : 'bg-gray-300'
-                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#642494] focus:ring-offset-2`}
-              >
-                <span
-                  className={`${
-                    isCoupleCounselling ? 'translate-x-6' : 'translate-x-1'
-                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                />
-              </Switch>
             </div>
             {isCoupleCounselling && (
               <p className="text-sm text-gray-600 mt-2">
