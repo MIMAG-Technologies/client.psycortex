@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaCircle, FaVideo, FaPhoneAlt, FaComments, FaUserFriends, FaExternalLinkAlt } from 'react-icons/fa';
-import { CallSession, ChatSession, VideoSession, OfflineSession } from "@/utils/userTypes";
+import { CallSession, ChatSession as ImportedChatSession, VideoSession, OfflineSession } from "@/utils/userTypes";
 import { getUserCallSessions, getUserChatSessions, getUserVideoSessions, getUserOfflineSessions } from "@/utils/user";
 import { useRouter } from 'next/navigation';
 
@@ -29,7 +29,7 @@ interface SessionWithScheduled_at extends BaseSession {
   scheduled_at: string;
 }
 
-interface ChatSession extends SessionWithScheduledAt {
+interface LocalChatSession extends SessionWithScheduledAt {
   actions: {
     canJoin: boolean;
   };
@@ -38,7 +38,7 @@ interface ChatSession extends SessionWithScheduledAt {
 
 const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
   const [callSessions, setCallSessions] = useState<CallSession[]>([]);
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [chatSessions, setChatSessions] = useState<ImportedChatSession[]>([]);
   const [videoSessions, setVideoSessions] = useState<VideoSession[]>([]);
   const [offlineSessions, setOfflineSessions] = useState<OfflineSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -243,7 +243,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
     }
   };
 
-  const renderSessionCard = (session: CallSession | ChatSession | VideoSession | OfflineSession) => {
+  const renderSessionCard = (session: CallSession | ImportedChatSession | VideoSession | OfflineSession) => {
     const scheduledDate = 'scheduledAt' in session ? session.scheduledAt : session.scheduled_at;
     const now = new Date().getTime();
     const sessionTime = new Date(scheduledDate).getTime();
