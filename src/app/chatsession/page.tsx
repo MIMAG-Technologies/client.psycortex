@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ChatMessage, getChatMessages, sendChatMessage } from "@/utils/chatsession";
-import { FaPaperPlane, FaArrowLeft, FaTimes, FaUserFriends } from "react-icons/fa";
-import axios from "axios";
+import { ChatMessage, ChatSessionDetails, getChatMessages, sendChatMessage } from "@/utils/chatsession";
+import { FaPaperPlane, FaArrowLeft, FaUserFriends, FaChevronDown } from "react-icons/fa";
+import { useCounsellorContext } from "@/context/CounsellorContext";
+import { RiCheckDoubleFill } from "react-icons/ri";
 
 type Counsellor = {
   id: string;
@@ -16,72 +17,62 @@ type Counsellor = {
 
 export default function ChatSessionPage() {
   const { user } = useAuth();
+  const { counsellors } = useCounsellorContext();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const chatId = searchParams.get("id");
+  const sessionIdParam = searchParams.get("id");
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   
+  // Extract info from session ID: [actual chatId][startTime (2 digits)][isCouple (1 digit)]
+  const [chatId, setActualChatId] = useState<string>("");
+  const [startHour, setStartHour] = useState<number>(0);
+  const [isCouple, setIsCouple] = useState<boolean>(false);
+
+  // Messages and pagination
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messageLimit, setMessageLimit] = useState<number>(40);
+  const [sessionDetails, setSessionDetails] = useState<ChatSessionDetails | null>(null);
+  const [isSessionEnded, setIsSessionEnded] = useState<boolean>(false);
+
+  // UI state
   const [messageInput, setMessageInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [counsellor, setCounsellor] = useState<Counsellor | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
-  const [isCouple, setIsCouple] = useState<boolean>(false);
-  const [sessionData, setSessionData] = useState<any>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   
-  // Function to fetch session details
-  const fetchSessionDetails = async () => {
-    if (!chatId) return;
-    
-    try {
-      const response = await axios.get(
-        `${baseUrl}/sessions/get_chat_session.php?id=${chatId}`
-      );
-      const data = response.data.data;
-      setSessionData(data);
-      setIsCouple(data.is_couple_session === true);
+  useEffect(() => {
+    if (sessionIdParam) {
+      const sessionIdString = sessionIdParam.toString();
+      // Extract the last digit (isCouple flag)
+      const isCoupleFlag = sessionIdString.substring(sessionIdString.length - 1);
+      // Extract the 2nd and 3rd last digits (start hour)
+      const startTimeStr = sessionIdString.substring(sessionIdString.length - 3, sessionIdString.length - 1);
+      // Extract the actual chat ID (everything except the last 3 digits)
+      const actualChatId = sessionIdString.substring(0, sessionIdString.length - 3);
       
-      if (data.counsellor) {
-        setCounsellor({
-          id: data.counsellor.id,
-          name: data.counsellor.name,
-          profileImage: data.counsellor.image,
-          title: data.counsellor.title
-        });
-      }
-    } catch (err) {
-      console.error("Error fetching session details:", err);
-    }
-  };
-  
-  // Function to fetch counsellor details
-  const fetchCounsellorDetails = async (counsellorId: string) => {
-    try {
-      const response = await axios.get(
-        `${baseUrl}/counsellor/get_counsellor_details.php?counsellorId=${counsellorId}`
-      );
-      const data = response.data.data;
-      setCounsellor({
-        id: data.id,
-        name: data.personalInfo.name,
-        profileImage: data.personalInfo.profileImage,
-        title: data.professionalInfo.title
+      setIsCouple(isCoupleFlag === "1");
+      setStartHour(parseInt(startTimeStr, 10));
+      setActualChatId(actualChatId);
+      
+      console.log("Session ID details:", {
+        actualChatId,
+        startHour: parseInt(startTimeStr, 10),
+        isCouple: isCoupleFlag === "1"
       });
-    } catch (err) {
-      console.error("Error fetching counsellor details:", err);
     }
-  };
+  }, [sessionIdParam]);
   
   // Function to fetch messages
   const fetchMessages = async () => {
-    if (!chatId) return;
+    if (!chatId || isSessionEnded) return;
     
     try {
-      const fetchedMessages = await getChatMessages(chatId);
+      const response = await getChatMessages(chatId, messageLimit);
+      const { messages: fetchedMessages, details } = response;
       
       // Check if there are new messages by comparing lengths
       if (fetchedMessages.length > messages.length) {
@@ -90,12 +81,32 @@ export default function ChatSessionPage() {
           window.navigator.vibrate(100); // Vibrate for 100ms
         }
       }
+      
       setMessages(fetchedMessages);
+      setSessionDetails(details);
+      
+      // Check if session has ended
+      if (details.session_status !== 'ongoing') {
+        setIsSessionEnded(true);
+      }
+      
+      // Auto-increase limit if there are more messages
+      if (details.has_more) {
+        setMessageLimit(prevLimit => prevLimit + 10);
+      }
       
       // Extract counsellor ID from the first message from counsellor
       const counsellorMessage = fetchedMessages.find(msg => msg.is_counsellor);
-      if (counsellorMessage && !counsellor) {
-        fetchCounsellorDetails(counsellorMessage.sender_id);
+      if (counsellorMessage && !counsellor && counsellors.length > 0) {
+        const foundCounsellor = counsellors.find(c => c.id === counsellorMessage.sender_id);
+        if (foundCounsellor) {
+          setCounsellor({
+            id: foundCounsellor.id,
+            name: foundCounsellor.personalInfo.name,
+            profileImage: foundCounsellor.personalInfo.profileImage,
+            title: foundCounsellor.professionalInfo.title
+          });
+        }
       }
     } catch (err) {
       console.error("Error fetching messages:", err);
@@ -105,24 +116,32 @@ export default function ChatSessionPage() {
   
   // Function to calculate time remaining based on session duration
   const calculateTimeRemaining = () => {
-    if (!sessionData) return;
+    // If no startHour is set yet, return
+    if (startHour === undefined) return;
     
-    const now = new Date().getTime();
-    const startTime = sessionData.startedAt 
-      ? new Date(sessionData.startedAt).getTime() 
-      : new Date(sessionData.scheduledAt).getTime();
+    const now = new Date();
+    const today = new Date();
     
-    // Duration in milliseconds - 45 minutes for individual, 90 minutes for couple
-    const sessionDuration = isCouple ? 90 * 60 * 1000 : 45 * 60 * 1000;
-    const endTime = startTime + sessionDuration;
+    // Set the start time based on the startHour parameter
+    const startTime = new Date(today.setHours(startHour, 0, 0, 0));
+    
+    // If today's start time is in the future, it might be from yesterday
+    if (startTime > now) {
+      startTime.setDate(startTime.getDate() - 1);
+    }
+    
+    // Session duration: 45 minutes for regular, 90 minutes for couple
+    const sessionDurationMinutes = isCouple ? 90 : 45;
+    const endTime = new Date(startTime.getTime() + (sessionDurationMinutes * 60 * 1000));
     
     // If the session has ended
     if (now >= endTime) {
       setTimeRemaining("00:00");
+      setIsSessionEnded(true);
       return;
     }
     
-    const remainingMs = endTime - now;
+    const remainingMs = endTime.getTime() - now.getTime();
     const minutes = Math.floor(remainingMs / (1000 * 60));
     const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
     
@@ -131,41 +150,37 @@ export default function ChatSessionPage() {
     );
   };
   
-  // Initial data fetch
-  useEffect(() => {
-    if (chatId) {
-      fetchSessionDetails();
-    }
-  }, [chatId]);
-  
   // Update timer every second
   useEffect(() => {
-    if (!sessionData) return;
-    
     calculateTimeRemaining();
     const timerInterval = setInterval(() => {
       calculateTimeRemaining();
     }, 1000);
     
     return () => clearInterval(timerInterval);
-  }, [sessionData, isCouple]);
+  }, [startHour, isCouple]);
   
-  // Fetch messages on initial load and every 3 seconds
+  // Fetch messages on initial load and every 3 seconds if session is not ended
   useEffect(() => {
     if (!chatId || !user) return;
     
     fetchMessages();
     
-    const interval = setInterval(() => {
-      fetchMessages();
-    }, 3000);
-    
-    return () => clearInterval(interval);
-  }, [chatId, user]);
+    // Only set up the polling interval if the session is not ended
+    if (!isSessionEnded) {
+      const interval = setInterval(() => {
+        fetchMessages();
+      }, 3000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [chatId, user, counsellors, messageLimit, isSessionEnded]);
   
   // Scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
   
   // Handle sending a message
@@ -201,7 +216,7 @@ export default function ChatSessionPage() {
     router.back();
   };
   
-  if (!chatId) {
+  if (!sessionIdParam) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center p-8 bg-white rounded-lg shadow-md">
@@ -248,25 +263,22 @@ export default function ChatSessionPage() {
             </div>
           ) : (
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-[#f5edfb] animate-pulse mr-3"></div>
+              <div className="w-10 h-10 bg-gray-300 rounded-full animate-pulse mr-3"></div>
               <div>
-                <div className="h-5 w-32 bg-[#f5edfb] animate-pulse rounded"></div>
-                <div className="h-3 w-24 bg-[#f5edfb] animate-pulse rounded mt-1"></div>
+                <div className="h-4 bg-gray-300 rounded w-24 animate-pulse"></div>
+                <div className="h-3 bg-gray-300 rounded w-16 mt-1 animate-pulse"></div>
               </div>
             </div>
           )}
         </div>
         
         <div className="flex items-center">
-          <div className="bg-white text-[#642494] px-3 py-1 rounded-full font-medium text-sm mr-3">
-            Time Remaining: {timeRemaining}
+          <div className="text-sm bg-white text-purple-700 px-3 py-1 rounded-full font-mono font-medium mr-2">
+            {timeRemaining}
           </div>
-          <button 
-            onClick={handleBack}
-            className="p-2 hover:bg-[#4e1c73] rounded-full transition-colors"
-          >
-            <FaTimes />
-          </button>
+          <span className="text-xs font-medium mr-1 hidden md:inline">
+            {isCouple ? "(90 min session)" : "(45 min session)"}
+          </span>
         </div>
       </div>
       
@@ -326,12 +338,24 @@ export default function ChatSessionPage() {
                       </div>
                     )}
                     
-                    <span className="text-xs opacity-75 block mt-1 text-right">
-                      {new Date(msg.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
+                    <div className="flex justify-between items-center mt-1 text-xs opacity-75">
+                      <span>
+                        {new Date(msg.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      
+                      {!msg.is_counsellor && (
+                        <span className="ml-2 flex items-center">
+                          {msg.is_read === true ? (
+                            <RiCheckDoubleFill className="text-blue-500" size={12} />
+                          ) : (
+                              <RiCheckDoubleFill className="text-gray-300" size={12} />
+                          )}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   
                   {!msg.is_counsellor && (
@@ -361,13 +385,13 @@ export default function ChatSessionPage() {
             onChange={(e) => setMessageInput(e.target.value)}
             placeholder="Type your message here..."
             className="flex-1 p-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#642494] focus:border-transparent"
-            disabled={loading}
+            disabled={loading || (sessionDetails?.session_status !== 'ongoing') || isSessionEnded}
           />
           <button
             type="submit"
-            disabled={loading || !messageInput.trim()}
+            disabled={loading || !messageInput.trim() || (sessionDetails?.session_status !== 'ongoing') || isSessionEnded}
             className={`bg-[#642494] text-white p-3 rounded-r-lg flex items-center justify-center ${
-              loading || !messageInput.trim()
+              loading || !messageInput.trim() || (sessionDetails?.session_status !== 'ongoing') || isSessionEnded
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-[#4e1c73] transition-colors"
             }`}
@@ -375,6 +399,13 @@ export default function ChatSessionPage() {
             <FaPaperPlane className="text-lg" />
           </button>
         </form>
+        
+        {/* Session ended message */}
+        {(sessionDetails?.session_status !== 'ongoing' || isSessionEnded) && (
+          <div className="max-w-3xl mx-auto mt-2 bg-gray-100 text-gray-700 p-2 rounded-md text-center text-sm">
+            This session has ended. You cannot send more messages.
+          </div>
+        )}
         
         {/* Error display */}
         {error && (

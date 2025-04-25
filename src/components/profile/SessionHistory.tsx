@@ -5,8 +5,35 @@ import { FaCircle, FaVideo, FaPhoneAlt, FaComments, FaUserFriends, FaExternalLin
 import { CallSession, ChatSession, VideoSession, OfflineSession } from "@/utils/userTypes";
 import { getUserCallSessions, getUserChatSessions, getUserVideoSessions, getUserOfflineSessions } from "@/utils/user";
 import { useRouter } from 'next/navigation';
+
 interface SessionHistoryProps {
   userId: string;
+}
+
+// Define the types for each session mode
+interface BaseSession {
+  id: string;
+  status: string;
+  counsellor?: {
+    id: string;
+    name: string;
+    image: string;
+  };
+}
+
+interface SessionWithScheduledAt extends BaseSession {
+  scheduledAt: string;
+}
+
+interface SessionWithScheduled_at extends BaseSession {
+  scheduled_at: string;
+}
+
+interface ChatSession extends SessionWithScheduledAt {
+  actions: {
+    canJoin: boolean;
+  };
+  is_couple_session: boolean;
 }
 
 const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
@@ -191,7 +218,29 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
   };
 
   const handleJoinChatSession = (sessionId: string) => {
-    router.push(`/chatsession?id=${sessionId}`);
+    // For the chat session that exists in the state, find its scheduled time and isCouple status
+    const chatSession = chatSessions.find(s => s.id === sessionId);
+    
+    if (chatSession) {
+      // Extract the hour from scheduled time
+      const scheduledTime = chatSession.scheduledAt;
+      const scheduledHour = new Date(scheduledTime).getHours();
+      
+      // Format hour as 2 digits (00-23)
+      const formattedHour = scheduledHour.toString().padStart(2, '0');
+      
+      // Add isCouple flag (1 for true, 0 for false)
+      const isCouple = Boolean(chatSession.is_couple_session);
+      const isCoupleFlag = isCouple ? '1' : '0';
+      
+      // Create the encoded session ID with the format: [actual chatId][startTime (2 digits)][isCouple (1 digit)]
+      const encodedSessionId = `${sessionId}${formattedHour}${isCoupleFlag}`;
+      
+      router.push(`/chatsession?id=${encodedSessionId}`);
+    } else {
+      // Fallback to the original behavior if session not found
+      router.push(`/chatsession?id=${sessionId}`);
+    }
   };
 
   const renderSessionCard = (session: CallSession | ChatSession | VideoSession | OfflineSession) => {

@@ -3,39 +3,26 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaHeartbeat, FaUserMd, FaClipboardList, FaChevronRight, FaStar, FaArrowRight } from 'react-icons/fa';
 import { MdOutlineScreenSearchDesktop } from 'react-icons/md';
-import { getAllTests } from '@/utils/test';
 import { useCounsellorContext } from '@/context/CounsellorContext';
+import { useTests } from '@/context/TestContext';
 import { TestDetails } from '@/types/test';
 import TestCard from '@/components/test/TestCard';
 import OneExpertCard from '@/components/experts/OneExpertCard';
 import Footer from '@/components/Footer';
 
 export default function Home() {
-  const [topTests, setTopTests] = useState<TestDetails[]>([]);
-  const [loading, setLoading] = useState(true);
   const { counsellors, loading: counsellorsLoading } = useCounsellorContext();
+  const { tests, isLoading: testsLoading } = useTests();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const tests = await getAllTests();
-        setTopTests(tests.slice(0, 3));
-      } catch (error) {
-        console.error('Error fetching tests:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  // Get top 3 tests
+  const topTests = tests.slice(0, 3);
 
   // Get top 3 experts sorted by rating
   const topExperts = [...counsellors]
     .sort((a, b) => b.rating.average - a.rating.average)
     .slice(0, 3);
 
-  const isPageLoading = loading || counsellorsLoading;
+  const isPageLoading = testsLoading || counsellorsLoading;
 
   return (
     <div className="bg-white min-h-screen">
@@ -120,7 +107,7 @@ export default function Home() {
             </Link>
           </div>
 
-          {loading ? (
+          {testsLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
             </div>
@@ -169,8 +156,7 @@ export default function Home() {
         </div>
       </section>
 
-
-<Footer/>
+      <Footer/>
     </div>
   );
 }

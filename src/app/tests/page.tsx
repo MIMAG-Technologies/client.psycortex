@@ -1,19 +1,19 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { bookTest, getAllTests } from '@/utils/test';
+import { bookTest } from '@/utils/test';
 import { TestDetails } from '@/types/test';
 import { FaSearch, FaInfoCircle, FaGlobeAmericas, FaFlag } from 'react-icons/fa';
 import TestCard from '@/components/test/TestCard';
 import TestDetailsModal from '@/components/test/TestDetailsModal';
 import { useAuth } from '@/context/AuthContext';
+import { useTests } from '@/context/TestContext';
 import { toast } from 'react-toastify';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Tests() {
-  const [tests, setTests] = useState<TestDetails[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { tests, isLoading } = useTests();
   const [searchTerm, setSearchTerm] = useState('');
   const [testType, setTestType] = useState<'indian' | 'global'>('indian');
   const [selectedTest, setSelectedTest] = useState<TestDetails | null>(null);
@@ -23,32 +23,18 @@ export default function Tests() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const fetchTests = async () => {
-      try {
-        const allTests = await getAllTests();
-        setTests(allTests);
-        
-        // Check if opentest parameter exists
-        const openTestSlug = searchParams.get('opentest');
-        if (openTestSlug && allTests.length > 0) {
-          const testToOpen = allTests.find(t => t.slug === openTestSlug);
-          if (testToOpen) {
-            setSelectedTest(testToOpen);
-            setShowModal(true);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching tests:', error);
-      } finally {
-        setLoading(false);
+    // Check if opentest parameter exists
+    const openTestSlug = searchParams.get('opentest');
+    if (openTestSlug && tests.length > 0) {
+      const testToOpen = tests.find(t => t.slug === openTestSlug);
+      if (testToOpen) {
+        setSelectedTest(testToOpen);
+        setShowModal(true);
       }
-    };
+    }
+  }, [searchParams, tests]);
 
-    fetchTests();
-  }, [searchParams]);
-
-  const booktest = async (testSlug: string,
-    amount: number) => {
+  const booktest = async (testSlug: string, amount: number) => {
     if (!user?.uid) {
       toast.error('Login to Purchase Test')
       return;
@@ -128,7 +114,7 @@ export default function Tests() {
       </div>
 
       {/* Loading state */}
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
         </div>
