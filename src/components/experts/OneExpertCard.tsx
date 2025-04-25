@@ -89,9 +89,9 @@ export default function OneExpertCard({
     // Specialties section
     <div key="specialties" className="min-w-full p-4 shrink-0">
       <h3 className="text-[16px] font-semibold mb-3">{slideTitles[2]}</h3>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 overflow-auto">
         {specialties.map((specialty, index) => (
-          <span key={index} className="px-2 py-1 bg-gray-100 rounded-full text-gray-800 text-[14px]">
+          <span key={index} className="px-2 py-1 bg-gray-100 rounded-full text-gray-800 text-[12px] whitespace-normal break-words">
             {specialty}
           </span>
         ))}
@@ -100,22 +100,22 @@ export default function OneExpertCard({
   ];
 
   return (
-    <div className="w-full rounded-2xl pb-4 overflow-hidden border border-purple-200 bg-white">
+    <div className="w-full rounded-2xl flex flex-col h-full border border-purple-200 bg-white">
       {/* Top section with image, name, title, and rating */}
       <div className="p-4">
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           {/* Profile Image */}
           <img
             src={profileImage || "/user-dummy-img.png"}
             alt={`${name}'s profile`}
-            className="w-20 h-20 rounded-xl object-cover"
+            className="w-20 h-20 rounded-xl object-cover mx-auto sm:mx-0"
           />
           
           {/* Name, Title and Rating */}
           <div className="flex-1">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-[18px] font-semibold text-gray-800 flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start">
+              <div className="text-center sm:text-left">
+                <h3 className="text-[18px] font-semibold text-gray-800 flex items-center gap-2 justify-center sm:justify-start">
                   {name} | <FaStar className="text-yellow-400 text-[14px]" />
                   <span className="font-normal">
                      {rating.average.toFixed(1)}
@@ -126,7 +126,7 @@ export default function OneExpertCard({
             </div>
             
             {/* Experience and sessions */}
-            <div className="flex items-center gap-6 mt-2 text-gray-600">
+            <div className="flex items-center justify-center sm:justify-start gap-6 mt-2 text-gray-600">
               <div className="flex items-center gap-1 text-[14px]">
                 <IoMdBriefcase className="text-gray-500" />
                 <span>{yearsOfExperience}+ yrs</span>
@@ -137,26 +137,26 @@ export default function OneExpertCard({
               </div>
             </div>
             
-            {/* Communication modes */}
-            <div className="flex  gap-2 mt-3 overflow-hidden">
+            {/* Communication modes with colored circles */}
+            <div className="flex justify-center sm:justify-start gap-2 mt-3">
               {communicationModes.includes('chat') && (
-                <div className="rounded-full text-gray-700 flex items-center gap-1 text-[12px]">
-                  <BiChat /> CHAT
+                <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                  <BiChat size={14} className="text-blue-500" />
                 </div>
               )}
               {communicationModes.includes('call') && (
-                <div className="rounded-full text-gray-700 flex items-center gap-1 text-[12px]">
-                  <BiPhone /> CALL
+                <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                  <BiPhone size={14} className="text-green-500" />
                 </div>
               )}
               {communicationModes.includes('video') && (
-                <div className="rounded-full text-gray-700 flex items-center gap-1 text-[12px]">
-                  <BiVideo /> VIDEO
+                <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
+                  <BiVideo size={14} className="text-purple-500" />
                 </div>
               )}
               {communicationModes.includes('in_person') && (
-                <div className="rounded-full text-gray-700 flex items-center gap-1 text-[12px]">
-                  <BiUser /> IN-PERSON
+                <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center">
+                  <BiUser size={14} className="text-orange-500" />
                 </div>
               )}
             </div>
@@ -165,7 +165,7 @@ export default function OneExpertCard({
       </div>
 
       {/* Sliding sections - with horizontal scroll */}
-      <div className="mx-4 mb-1 overflow-hidden bg-gray-50 rounded-xl">
+      <div className="mx-4 mb-1 overflow-hidden bg-gray-50 rounded-xl flex-grow">
         <div 
           ref={scrollContainerRef}
           className="flex overflow-x-auto snap-x snap-mandatory select-none" 
@@ -199,13 +199,15 @@ export default function OneExpertCard({
         </div>
       </div>
 
-      {/* View Profile Button */}
-      <Link 
-        href={`/expert/profile?id=${id}`}
-        className="block py-4 bg-[#642494] text-white text-center font-semibold hover:bg-[#4e1c72] transition-colors mx-4 mt-3 rounded-xl"
-      >
-        View Profile
-      </Link>
+      {/* View Profile Button - always at bottom */}
+      <div className="mt-6 px-4 pb-4">
+        <Link 
+          href={`/expert/profile?id=${id}`}
+          className="block py-4 bg-[#642494] text-white text-center font-semibold hover:bg-[#4e1c72] transition-colors rounded-xl"
+        >
+          View Profile
+        </Link>
+      </div>
     </div>
   );
 }

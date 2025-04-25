@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ChatMessage, getChatMessages, sendChatMessage } from "@/utils/chatsession";
-import { FaPaperPlane, FaArrowLeft, FaTimes } from "react-icons/fa";
+import { FaPaperPlane, FaArrowLeft, FaTimes, FaUserFriends } from "react-icons/fa";
 import axios from "axios";
 
 type Counsellor = {
@@ -27,9 +27,36 @@ export default function ChatSessionPage() {
   const [error, setError] = useState("");
   const [counsellor, setCounsellor] = useState<Counsellor | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [isCouple, setIsCouple] = useState<boolean>(false);
+  const [sessionData, setSessionData] = useState<any>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Function to fetch session details
+  const fetchSessionDetails = async () => {
+    if (!chatId) return;
+    
+    try {
+      const response = await axios.get(
+        `${baseUrl}/sessions/get_chat_session.php?id=${chatId}`
+      );
+      const data = response.data.data;
+      setSessionData(data);
+      setIsCouple(data.is_couple_session === true);
+      
+      if (data.counsellor) {
+        setCounsellor({
+          id: data.counsellor.id,
+          name: data.counsellor.name,
+          profileImage: data.counsellor.image,
+          title: data.counsellor.title
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching session details:", err);
+    }
+  };
   
   // Function to fetch counsellor details
   const fetchCounsellorDetails = async (counsellorId: string) => {
@@ -63,7 +90,6 @@ export default function ChatSessionPage() {
           window.navigator.vibrate(100); // Vibrate for 100ms
         }
       }
-      
       setMessages(fetchedMessages);
       
       // Extract counsellor ID from the first message from counsellor
@@ -77,33 +103,52 @@ export default function ChatSessionPage() {
     }
   };
   
-  // Function to calculate time remaining until the 45th minute of the current hour
+  // Function to calculate time remaining based on session duration
   const calculateTimeRemaining = () => {
-    const now = new Date();
-    const targetMinute = 45;
+    if (!sessionData) return;
     
-    // If we've already passed the 45th minute, there's no time remaining for this hour's session
-    if (now.getMinutes() >= targetMinute) {
+    const now = new Date().getTime();
+    const startTime = sessionData.startedAt 
+      ? new Date(sessionData.startedAt).getTime() 
+      : new Date(sessionData.scheduledAt).getTime();
+    
+    // Duration in milliseconds - 45 minutes for individual, 90 minutes for couple
+    const sessionDuration = isCouple ? 90 * 60 * 1000 : 45 * 60 * 1000;
+    const endTime = startTime + sessionDuration;
+    
+    // If the session has ended
+    if (now >= endTime) {
       setTimeRemaining("00:00");
       return;
     }
     
-    const minutesRemaining = targetMinute - now.getMinutes() - 1;
-    const secondsRemaining = 60 - now.getSeconds();
+    const remainingMs = endTime - now;
+    const minutes = Math.floor(remainingMs / (1000 * 60));
+    const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
     
     setTimeRemaining(
-      `${minutesRemaining.toString().padStart(2, '0')}:${secondsRemaining.toString().padStart(2, '0')}`
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     );
   };
   
+  // Initial data fetch
+  useEffect(() => {
+    if (chatId) {
+      fetchSessionDetails();
+    }
+  }, [chatId]);
+  
   // Update timer every second
   useEffect(() => {
+    if (!sessionData) return;
+    
+    calculateTimeRemaining();
     const timerInterval = setInterval(() => {
       calculateTimeRemaining();
     }, 1000);
     
     return () => clearInterval(timerInterval);
-  }, []);
+  }, [sessionData, isCouple]);
   
   // Fetch messages on initial load and every 3 seconds
   useEffect(() => {
@@ -189,7 +234,15 @@ export default function ChatSessionPage() {
                 />
               </div>
               <div>
-                <h1 className="text-lg font-semibold">{counsellor.name}</h1>
+                <h1 className="text-lg font-semibold flex items-center gap-2">
+                  {counsellor.name}
+                  {isCouple && (
+                    <div className="bg-pink-100 text-pink-800 text-xs px-2 py-0.5 rounded-full flex items-center">
+                      <FaUserFriends className="mr-1" size={12} />
+                      <span>Couple</span>
+                    </div>
+                  )}
+                </h1>
                 <p className="text-xs opacity-90">{counsellor.title || "Counsellor"}</p>
               </div>
             </div>

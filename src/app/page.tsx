@@ -4,30 +4,24 @@ import Link from 'next/link';
 import { FaHeartbeat, FaUserMd, FaClipboardList, FaChevronRight, FaStar, FaArrowRight } from 'react-icons/fa';
 import { MdOutlineScreenSearchDesktop } from 'react-icons/md';
 import { getAllTests } from '@/utils/test';
-import { getAllCounsellors } from '@/utils/experts';
+import { useCounsellorContext } from '@/context/CounsellorContext';
 import { TestDetails } from '@/types/test';
-import { BaseCounsellor } from '@/utils/experts';
 import TestCard from '@/components/test/TestCard';
 import OneExpertCard from '@/components/experts/OneExpertCard';
 import Footer from '@/components/Footer';
 
 export default function Home() {
   const [topTests, setTopTests] = useState<TestDetails[]>([]);
-  const [topExperts, setTopExperts] = useState<BaseCounsellor[]>([]);
   const [loading, setLoading] = useState(true);
+  const { counsellors, loading: counsellorsLoading } = useCounsellorContext();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [tests, experts] = await Promise.all([
-          getAllTests(),
-          getAllCounsellors()
-        ]);
-        
+        const tests = await getAllTests();
         setTopTests(tests.slice(0, 3));
-        setTopExperts(experts.slice(0, 3));
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching tests:', error);
       } finally {
         setLoading(false);
       }
@@ -36,11 +30,12 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const truncateText = (text: string, maxLength: number) => {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
-  };
+  // Get top 3 experts sorted by rating
+  const topExperts = [...counsellors]
+    .sort((a, b) => b.rating.average - a.rating.average)
+    .slice(0, 3);
+
+  const isPageLoading = loading || counsellorsLoading;
 
   return (
     <div className="bg-white min-h-screen">
@@ -157,7 +152,7 @@ export default function Home() {
             </Link>
           </div>
 
-          {loading ? (
+          {isPageLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#642494]"></div>
             </div>

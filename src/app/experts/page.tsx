@@ -10,12 +10,12 @@ import "rc-slider/assets/index.css";
 
 import {
   BaseCounsellor,
-  getAllCounsellors,
   getFilters,
 } from "@/utils/experts";
+import { useCounsellorContext } from "@/context/CounsellorContext";
 
 export default function AllExpertsPage() {
-  const [counsellors, setCounsellors] = useState<BaseCounsellor[]>([]);
+  const { counsellors, loading: counsellorsLoading } = useCounsellorContext();
   const [filteredCounsellors, setFilteredCounsellors] = useState<BaseCounsellor[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -56,6 +56,7 @@ export default function AllExpertsPage() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchFilters = async () => {
+    setLoading(true);
     try {
       const res = await getFilters();
       setFilters({
@@ -71,19 +72,6 @@ export default function AllExpertsPage() {
       }));
     } catch (error) {
       console.error("Error fetching filters:", error);
-    }
-  };
-
-  const fetchCounsellors = async () => {
-    setLoading(true);
-    try {
-      const res = await getAllCounsellors();
-      console.log(res);
-      
-      setCounsellors(res);
-      setFilteredCounsellors(res);
-    } catch (error) {
-      console.error("Error fetching counsellors:", error);
     } finally {
       setLoading(false);
     }
@@ -91,8 +79,14 @@ export default function AllExpertsPage() {
 
   useEffect(() => {
     fetchFilters();
-    fetchCounsellors();
   }, []);
+
+  // Initialize filtered counsellors when counsellors are loaded
+  useEffect(() => {
+    if (counsellors.length > 0) {
+      setFilteredCounsellors(counsellors);
+    }
+  }, [counsellors]);
 
   // Toggle expanded sections
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -549,7 +543,7 @@ export default function AllExpertsPage() {
             </p>
           </div>
 
-          {loading ? (
+          {loading || counsellorsLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
             </div>

@@ -2,6 +2,7 @@
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { TestProvider } from "@/context/TestContext";
+import { CounsellorProvider } from "@/context/CounsellorContext";
 import AuthStateHandler from "../components/AuthStateHandler";
 import { ToastContainer } from "react-toastify";
 import ClientNavbarWrapper from "@/components/ClientNavbarWrapper";
@@ -47,12 +48,14 @@ export default function RootLayout({
         />
         <AuthProvider>
           <TestProvider>
-            <AuthStateHandler>
-              <ClientNavbarWrapper />
-              <main className="pt-16 min-h-screen">
-                {children}
-              </main>
-            </AuthStateHandler>
+            <CounsellorProvider>
+              <AuthStateHandler>
+                <ClientNavbarWrapper />
+                <main className="pt-16 min-h-screen">
+                  {children}
+                </main>
+              </AuthStateHandler>
+            </CounsellorProvider>
           </TestProvider>
         </AuthProvider>
       </body>

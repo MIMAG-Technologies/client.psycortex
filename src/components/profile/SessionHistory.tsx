@@ -96,15 +96,17 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
       const allSessions = [...callSessions, ...chatSessions, ...videoSessions, ...offlineSessions];
       const updatedCountdowns: {[key: string]: string} = {};
       
-      let shouldReload = false;
+      let readySessionIds: string[] = [];
       
       allSessions.forEach(session => {
         const scheduledAt = 'scheduledAt' in session ? session.scheduledAt : session.scheduled_at;
         const scheduledTime = new Date(scheduledAt).getTime();
         const timeRemaining = scheduledTime - now;
         
-        if (timeRemaining <= 0 && timeRemaining > -60000) { // Just became available in the last minute
-          shouldReload = true;
+        // Check if the session just became ready (within last 5 seconds)
+        if (timeRemaining <= 0 && timeRemaining > -5000 && 
+            ('actions' in session && !session.actions?.canJoin)) {
+          readySessionIds.push(session.id);
         }
         
         if (timeRemaining > 0) {
@@ -113,85 +115,40 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
           const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
           
+          // More than 24 hours
           if (days > 0) {
             updatedCountdowns[session.id] = `Join in ${days} day${days !== 1 ? 's' : ''}`;
-          } else if (hours > 0 || minutes > 0) {
-            updatedCountdowns[session.id] = `Join in ${hours}h ${minutes}m ${seconds}s`;
-          } else {
-            updatedCountdowns[session.id] = `Join in ${seconds}s`;
+          } 
+          // Between 1 and 24 hours
+          else if (hours > 0 && minutes >= 0) {
+            updatedCountdowns[session.id] = `Join in ${hours} hour${hours !== 1 ? 's' : ''}`;
+          } 
+          // Between 10 minutes and 1 hour
+          else if (minutes >= 10) {
+            updatedCountdowns[session.id] = `Join in ${minutes} min`;
+          } 
+          // Less than 10 minutes
+          else {
+            updatedCountdowns[session.id] = `Join in ${minutes}m ${seconds}s`;
           }
+        } else {
+          // If time has expired but we haven't reloaded yet, show it's ready
+          updatedCountdowns[session.id] = 'Session Ready';
         }
       });
       
       setCountdown(updatedCountdowns);
       
-      if (shouldReload) {
-        const fetchSessions = async () => {
-          setIsLoading(true);
-          try {
-            const [calls, chats, videos, offline] = await Promise.all([
-              getUserCallSessions(userId),
-              getUserChatSessions(userId),
-              getUserVideoSessions(userId),
-              getUserOfflineSessions(userId)
-            ]);
-            setCallSessions(calls.map(session => ({
-              ...session,
-              mode: 'call' as const,
-              counsellorId: session.counsellor.id,
-              counsellor: {
-                ...session.counsellor,
-                avatar: session.counsellor.image,
-                specialization: session.counsellor.title
-              },
-            })));
-            setChatSessions(chats.map(session => ({
-              ...session,
-              mode: 'chat' as const,
-              counsellorId: session.counsellor.id,
-              counsellor: {
-                ...session.counsellor,
-                avatar: session.counsellor.image,
-                specialization: session.counsellor.title
-              },
-              review: session.review ? { rating: session.review.rating, feedback: session.review.feedback } : null
-            })));
-            setVideoSessions(videos.map(session => ({
-              ...session,
-              mode: 'video',
-              counsellorId: session.counsellor.id,
-              counsellor: {
-                ...session.counsellor,
-                avatar: session.counsellor.image,
-                specialization: session.counsellor.title
-              },
-              review: session.review ? { rating: session.review.rating, comment: session.review.comment } : null
-            })));
-            setOfflineSessions(offline.map(session => ({
-              ...session,
-              mode: 'in_person',
-              counsellorId: session.counsellor ? session.counsellor.id : '',
-              counsellor: session.counsellor ? {
-                ...session.counsellor,
-                avatar: session.counsellor.image,
-                specialization: session.counsellor.title
-              } : undefined,
-              scheduledAt: session.scheduled_at || '',
-              duration: session.duration_minutes || 0
-            })));
-          } catch (err) {
-            console.error('Error fetching sessions:', err);
-            setError('Failed to load sessions. Please try again later.');
-          } finally {
-            setIsLoading(false);
-          }
-        };
-        fetchSessions();
+      // Only reload once when sessions become ready
+      if (readySessionIds.length > 0) {
+        // Full page reload is simpler and ensures everything is in sync
+        window.location.reload();
+        return; // Stop execution after triggering reload
       }
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [callSessions, chatSessions, videoSessions, offlineSessions, userId]);
+  }, [callSessions, chatSessions, videoSessions, offlineSessions]);
 
   const getModeIcon = (mode: string) => {
     switch (mode) {
@@ -259,7 +216,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
                 {isCouple && (
                   <div className="bg-pink-100 text-pink-800 text-xs px-2 py-0.5 rounded-full flex items-center">
                     <FaUserFriends className="mr-1" size={12} />
-                    <span>Couple</span>
+                    <span>Couple ({isCouple ? '90min' : '45min'})</span>
                   </div>
                 )}
               </div>
@@ -292,6 +249,13 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
                 <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
                   Session Expired
                 </button>
+              ) : timeRemaining <= 0 ? (
+                <button 
+                  onClick={() => handleJoinVideoSession(session as VideoSession)} 
+                  className="bg-[#642494] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#4e1c72] transition-colors flex items-center justify-center"
+                >
+                  <FaExternalLinkAlt className="mr-2" /> Join Meeting
+                </button>
               ) : (
                 <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
                   {countdown[session.id] || 'Upcoming'}
@@ -309,6 +273,13 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
               ) : isExpired ? (
                 <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
                   Session Expired
+                </button>
+              ) : timeRemaining <= 0 ? (
+                <button 
+                  onClick={() => handleJoinChatSession(session.id)} 
+                  className="bg-[#642494] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#4e1c72] transition-colors flex items-center justify-center"
+                >
+                  <FaComments className="mr-2" /> Join Chat
                 </button>
               ) : (
                 <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
