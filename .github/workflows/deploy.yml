@@ -31,9 +31,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci
       
-      # - name: Lint
-      #   run: npm run lint || true
-      
       - name: Build
         run: next build || true
         
@@ -63,7 +60,10 @@ jobs:
             
             # Set PATH explicitly
             export PATH="/usr/local/bin:$PATH"
-            
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            nvm use 20
+
             # Now run your commands
             cd ./NewAppointments/client.psycortex/
             git pull origin main
