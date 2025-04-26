@@ -255,13 +255,19 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
     const isCouple = 'is_couple_session' in session && session.is_couple_session;
 
     return (
-      <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors shadow-sm">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center">
-            {session.counsellor && <img src={session.counsellor.image} alt={session.counsellor.name} className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-[#642494]/20" />}
+      <div className="border rounded-lg p-4 sm:p-5 hover:bg-gray-50 transition-all shadow-sm hover:shadow-md">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+          <div className="flex items-start">
+            {session.counsellor && (
+              <img 
+                src={session.counsellor.image} 
+                alt={session.counsellor.name} 
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full mr-3 object-cover border-2 border-[#642494]/20 flex-shrink-0" 
+              />
+            )}
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium">{session.counsellor?.name}</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-medium text-sm sm:text-base text-gray-800">{session.counsellor?.name}</h3>
                 {isCouple && (
                   <div className="bg-pink-100 text-pink-800 text-xs px-2 py-0.5 rounded-full flex items-center">
                     <FaUserFriends className="mr-1" size={12} />
@@ -269,45 +275,51 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
                   </div>
                 )}
               </div>
-              <p className="text-sm text-gray-600">{formatDate(scheduledDate)} at {formatTime(scheduledDate)}</p>
-              <div className="text-sm text-gray-500 mt-1 flex items-center">
-                <span className={`w-2 h-2 rounded-full mr-1.5 ${
+              <p className="text-xs sm:text-sm text-gray-600 mt-0.5">{formatDate(scheduledDate)} at {formatTime(scheduledDate)}</p>
+              <div className="text-xs sm:text-sm mt-1.5 flex items-center">
+                <span className={`w-2.5 h-2.5 rounded-full mr-1.5 ${
                   session.status === 'scheduled' ? 'bg-green-500' : 
                   session.status === 'expired' ? 'bg-red-500' : 
                   session.status === 'completed' ? 'bg-blue-500' : 'bg-gray-500'
                 }`}></span>
-                {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                <span className={`font-medium ${
+                  session.status === 'scheduled' ? 'text-green-700' : 
+                  session.status === 'expired' ? 'text-red-700' : 
+                  session.status === 'completed' ? 'text-blue-700' : 'text-gray-700'
+                }`}>
+                  {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                </span>
               </div>
             </div>
           </div>
-          <div className="text-right">
+          <div className="sm:text-right mt-2 sm:mt-0 w-full sm:w-auto self-end sm:self-center">
             {activeMode === 'call' && (
-              <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 transition-colors flex items-center justify-center" disabled>
-                Download our app to access this feature
+              <button className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:bg-gray-300 transition-colors flex items-center justify-center text-xs sm:text-sm" disabled>
+                <FaPhoneAlt className="mr-1.5" /> Download app to access
               </button>
             )}
             {activeMode === 'video' && (
               isJoinable ? (
                 <button 
                   onClick={() => 'meetLink' in session ? handleJoinVideoSession(session as VideoSession) : null}
-                  className="bg-[#642494] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#4e1c72] transition-colors flex items-center justify-center"
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-purple-700 hover:to-purple-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
-                  <FaExternalLinkAlt className="mr-2" /> Join Meeting
+                  <FaExternalLinkAlt className="mr-1.5" /> Join Meeting
                 </button>
               ) : isExpired ? (
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  Session Expired
+                <button className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm flex items-center justify-center text-xs sm:text-sm" disabled>
+                  <FaVideo className="mr-1.5" /> Session Expired
                 </button>
               ) : timeRemaining <= 0 ? (
                 <button 
                   onClick={() => handleJoinVideoSession(session as VideoSession)} 
-                  className="bg-[#642494] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#4e1c72] transition-colors flex items-center justify-center"
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-purple-700 hover:to-purple-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
-                  <FaExternalLinkAlt className="mr-2" /> Join Meeting
+                  <FaExternalLinkAlt className="mr-1.5" /> Join Meeting
                 </button>
               ) : (
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  {countdown[session.id] || 'Upcoming'}
+                <button className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm flex items-center justify-center text-xs sm:text-sm" disabled>
+                  <FaVideo className="mr-1.5" /> {countdown[session.id] || 'Upcoming'}
                 </button>
               )
             )}
@@ -315,35 +327,35 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
               isJoinable ? (
                 <button 
                   onClick={() => handleJoinChatSession(session.id)} 
-                  className="bg-[#642494] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#4e1c72] transition-colors flex items-center justify-center"
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-blue-700 hover:to-blue-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
-                  <FaComments className="mr-2" /> Join Chat
+                  <FaComments className="mr-1.5" /> Join Chat
                 </button>
               ) : isExpired ? (
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  Session Expired
+                <button className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm flex items-center justify-center text-xs sm:text-sm" disabled>
+                  <FaComments className="mr-1.5" /> Session Expired
                 </button>
               ) : timeRemaining <= 0 ? (
                 <button 
                   onClick={() => handleJoinChatSession(session.id)} 
-                  className="bg-[#642494] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#4e1c72] transition-colors flex items-center justify-center"
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-blue-700 hover:to-blue-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
-                  <FaComments className="mr-2" /> Join Chat
+                  <FaComments className="mr-1.5" /> Join Chat
                 </button>
               ) : (
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  {countdown[session.id] || 'Upcoming'}
+                <button className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm flex items-center justify-center text-xs sm:text-sm" disabled>
+                  <FaComments className="mr-1.5" /> {countdown[session.id] || 'Upcoming'}
                 </button>
               )
             )}
             {activeMode === 'in_person' && (
               isExpired ? (
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  Session Expired
+                <button className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm flex items-center justify-center text-xs sm:text-sm" disabled>
+                  <FaUserFriends className="mr-1.5" /> Session Expired
                 </button>
               ) : (
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm flex items-center justify-center" disabled>
-                  {countdown[session.id] || 'Upcoming'}
+                <button className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm flex items-center justify-center text-xs sm:text-sm" disabled>
+                  <FaUserFriends className="mr-1.5" /> {countdown[session.id] || 'Upcoming'}
                 </button>
               )
             )}
@@ -363,7 +375,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
 
   if (error) {
     return (
-      <div className="text-center text-red-500 p-4">
+      <div className="text-center text-red-500 p-4 bg-red-50 rounded-lg border border-red-200 shadow-sm">
         <p>{error}</p>
       </div>
     );
@@ -373,60 +385,60 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="bg-gradient-to-r from-[#642494]/90 to-[#642494] p-4 text-white">
+      <div className="bg-gradient-to-r from-[#642494]/90 to-[#642494] p-4 sm:p-5 text-white">
         <h2 className="text-xl font-semibold">Session History</h2>
       </div>
       
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="flex flex-wrap justify-around w-full mb-6 gap-2">
           <button 
             onClick={() => setActiveMode('chat')} 
-            className={`px-4 py-2 flex justify-center gap-1 items-center flex-1 ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
               activeMode === 'chat' 
                 ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-colors`}
+            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaComments/> Chat
+            <FaComments className="text-xs sm:text-sm md:text-base"/> Chat
           </button>
           <button 
             onClick={() => setActiveMode('video')} 
-            className={`px-4 py-2 flex justify-center gap-1 items-center flex-1 ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
               activeMode === 'video' 
                 ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-colors`}
+            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaVideo/> Video
+            <FaVideo className="text-xs sm:text-sm md:text-base"/> Video
           </button>
           <button 
             onClick={() => setActiveMode('in_person')} 
-            className={`px-4 py-2 flex justify-center gap-1 items-center flex-1 ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
               activeMode === 'in_person' 
                 ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-colors`}
+            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaUserFriends/> In-Person
+            <FaUserFriends className="text-xs sm:text-sm md:text-base"/> In-Person
           </button>
           <button 
             onClick={() => setActiveMode('call')} 
-            className={`px-4 py-2 flex justify-center gap-1 items-center flex-1 ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
               activeMode === 'call' 
                 ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-colors`}
+            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaPhoneAlt/> Call
+            <FaPhoneAlt className="text-xs sm:text-sm md:text-base"/> Call
           </button>
         </div>
         
         {sessions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center justify-center text-gray-500 py-10 my-2 bg-gray-50 rounded-lg">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-2xl">
               {getModeIcon(activeMode)}
             </div>
-            <p>No {activeMode.replace('_', ' ')} sessions found</p>
+            <p className="text-gray-600">No {activeMode.replace('_', ' ')} sessions found</p>
           </div>
         ) : (
           <div className="space-y-4">

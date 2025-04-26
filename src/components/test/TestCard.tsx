@@ -21,25 +21,26 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                     true;
 
     return (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all hover:translate-y-[-4px]">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 hover:translate-y-[-4px] border border-gray-100">
             {test.imageUrl ? (
-                <div className="h-48 overflow-hidden">
+                <div className="h-52 overflow-hidden relative">
                     <img
                         src={test.imageUrl}
                         alt={test.name}
                         className="w-full h-full object-cover"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                 </div>
             ) : (
-                <div className="h-48 bg-gradient-to-br from-[#642494]/5 to-[#642494]/20 flex items-center justify-center">
-                    <FaClipboardList className="text-5xl text-[#642494]/70" />
+                <div className="h-52 bg-gradient-to-br from-[#642494]/5 to-[#642494]/20 flex items-center justify-center">
+                    <FaClipboardList className="text-6xl text-[#642494]/70" />
                 </div>
             )}
 
-            <div className="p-6 flex flex-col h-[calc(100%-12rem)]">
+            <div className="p-6 flex flex-col h-[calc(100%-13rem)] relative">
                 <div className="flex justify-between items-start mb-2">
                     <h2 className="text-xl font-semibold text-gray-800">{test.name}</h2>
-                    <div className="flex items-center justify-center bg-[#642494]/10 text-[#642494] rounded-full w-8 h-8">
+                    <div className="flex items-center justify-center bg-[#642494]/10 text-[#642494] rounded-full w-8 h-8 hover:bg-[#642494]/20 transition-colors cursor-pointer">
                         <FaInfoCircle />
                     </div>
                 </div>
@@ -49,11 +50,11 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                 </p>
 
                 <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center text-gray-700 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                    <div className="flex items-center text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
                         <FaClock className="mr-1.5 text-[#642494]" />
                         <span>{test.details.durationMinutes} min</span>
                     </div>
-                    <div className="flex items-center text-gray-700 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                    <div className="flex items-center text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
                         <FaListAlt className="mr-1.5 text-[#642494]" />
                         <span>{test.details.totalQuestions} Q</span>
                     </div>
@@ -67,7 +68,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                                 {test.benefits.slice(0, 2).map((benefit, index) => (
                                     <span
                                         key={index}
-                                        className="px-2 py-1 bg-[#642494]/10 text-[#642494] rounded-full text-xs font-medium"
+                                        className="px-3 py-1.5 bg-[#642494]/10 text-[#642494] rounded-full text-xs font-medium shadow-sm"
                                     >
                                         {truncateText(benefit, 30)}
                                     </span>
@@ -82,7 +83,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                     }
                 </div>
                 {!isValidAge && userAge !== null && (
-                    <div className="flex items-center text-orange-500 text-sm mb-3 bg-orange-50 p-2 rounded-lg">
+                    <div className="flex items-center text-orange-500 text-sm mb-3 bg-orange-50 p-3 rounded-lg shadow-sm">
                         <FaExclamationCircle className="mr-1.5" />
                         <span>Age not eligible for this test</span>
                     </div>
@@ -90,7 +91,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
 
                 <div className="border-t pt-4 mt-2 flex justify-between items-center">
                     <div>
-                        <span className="text-gray-500 text-sm">Price:</span>
+                        <span className="text-gray-500 text-sm font-medium">Price:</span>
                         <div className="flex items-center">
                             {test.pricing.discount ? (
                                 <>
@@ -111,9 +112,9 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                     <button
                         onClick={isValidAge ? () => onTakeTest(test.slug) : () => { }}
                         disabled={!isValidAge}
-                        className={`flex items-center px-4 py-2 rounded-lg transition-all ${
+                        className={`flex items-center px-5 py-2.5 rounded-lg transition-all ${
                             isValidAge 
-                                ? 'cursor-pointer bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white shadow-sm hover:shadow-md' 
+                                ? 'cursor-pointer bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white shadow-md hover:shadow-lg' 
                                 : 'cursor-not-allowed bg-gray-300 text-gray-500'
                         }`}
                     >

@@ -142,19 +142,19 @@ export default function OneExpertCard({
     <div className="w-full rounded-2xl flex flex-col h-full border border-purple-200 bg-white">
       {/* Top section with image, name, title, and rating */}
       <div className="p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-row gap-4">
           {/* Profile Image */}
           <img
             src={profileImage || "/user-dummy-img.png"}
             alt={`${name}'s profile`}
-            className="w-20 h-20 rounded-xl object-cover mx-auto sm:mx-0"
+            className="w-20 h-20 rounded-xl object-cover"
           />
           
           {/* Name, Title and Rating */}
           <div className="flex-1">
-            <div className="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start">
-              <div className="text-center sm:text-left">
-                <h3 className="text-[18px] font-semibold text-gray-800 flex items-center gap-2 justify-center sm:justify-start">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start">
+              <div className="text-left">
+                <h3 className="text-[18px] font-semibold text-gray-800 flex items-center gap-2 justify-start">
                   {name} | <FaStar className="text-yellow-400 text-[14px]" />
                   <span className="font-normal">
                      {rating.average.toFixed(1)}
@@ -165,7 +165,7 @@ export default function OneExpertCard({
             </div>
             
             {/* Experience and sessions */}
-            <div className="flex items-center justify-center sm:justify-start gap-6 mt-2 text-gray-600">
+            <div className="flex items-center justify-start gap-6 mt-2 text-gray-600">
               <div className="flex items-center gap-1 text-[14px]">
                 <IoMdBriefcase className="text-gray-500" />
                 <span>{yearsOfExperience}+ yrs</span>
@@ -177,7 +177,7 @@ export default function OneExpertCard({
             </div>
             
             {/* Communication modes with colored circles */}
-            <div className="flex justify-center sm:justify-start gap-2 mt-3">
+            <div className="flex justify-start gap-2 mt-3">
               {communicationModes.includes('chat') && (
                 <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
                   <BiChat size={14} className="text-blue-500" />

@@ -33,7 +33,7 @@ const Footer: React.FC = () => {
 
     return (
         <footer className="bg-[#f1f1f1] p-5 md:px-[5vw] border border-[#d3d4d4]">
-            <div className="flex flex-wrap gap-[10%] border-b-2 border-[#e5e7e8] pb-5">
+            <div className="flex flex-row flex-wrap md:flex-nowrap justify-between gap-5 border-b-2 border-[#e5e7e8] pb-5">
                 <div className="flex flex-col gap-1 pt-5">
                     <h3 className="mt-0 font-bold text-[20px]">{footerLinks[0].title}</h3>
                     {footerLinks.slice(1).map((link, index) => (
@@ -49,8 +49,8 @@ const Footer: React.FC = () => {
                     ))}
                 </div>
 
-                <div className="ml-auto flex flex-col items-center pt-5">
-                    <span className="flex gap-2">
+                <div className="flex flex-col items-center pt-5">
+                    <span className="flex gap-2 flex-wrap justify-center">
                         <Link
                             href={socialLinks.facebook}
                             target="_blank"
@@ -104,7 +104,7 @@ const Footer: React.FC = () => {
                 <p className="pt-2">
                     © {currentYear} Psycortex Appointments. All Rights Reserved.
                 </p>
-                <span className="flex gap-2 pt-2 sm:pt-0">
+                <span className="flex gap-2 pt-2 sm:pt-0 flex-wrap justify-center">
                     <Link
                         href="https://psycortex.in/psycortex/privacypolicy"
                         target="_blank"
