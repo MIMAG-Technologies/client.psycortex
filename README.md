@@ -74,11 +74,3 @@ bai done
 
 y/n
 adss done
-
-
-
-error 
-bdi error
-sas  errpr 
-Marital - error
-pre-marital error no options

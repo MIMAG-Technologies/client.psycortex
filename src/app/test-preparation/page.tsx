@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 export default function TestPreparationPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuth();
+  const { me, isLoading: authLoading } = useAuth();
   const { testsData, isLoading: testsLoading } = useTests();
   const testSlug = searchParams.get('slug');
 
@@ -31,7 +31,7 @@ export default function TestPreparationPage() {
         return;
       }
 
-      if (!user) {
+      if (!me) {
         setError('You need to be logged in to take this test');
         setChecking(false);
         return;
@@ -39,7 +39,7 @@ export default function TestPreparationPage() {
 
       try {
         // Fetch user's tests to check if this test is in their active list
-        const userData = await getAllUserTestData(user.uid);
+        const userData = await getAllUserTestData(me.id);
         setUserTests(userData.activeTests);
         
         const isTestActive = userData.activeTests.some(test => test.testSlug === testSlug);
@@ -52,7 +52,7 @@ export default function TestPreparationPage() {
 
         try {
           // Fetch test information
-          const testData = await getQuestions(testSlug, user);
+          const testData = await getQuestions(testSlug, me);
           
           if (testData && (testData.questions.length > 0 || testData.testInfo)) {
             setTestData(testData);
@@ -77,10 +77,10 @@ export default function TestPreparationPage() {
     if (!authLoading && !testsLoading) {
       checkTestAvailability();
     }
-  }, [authLoading, testsLoading, testSlug, user]);
+  }, [authLoading, testsLoading, testSlug, me]);
 
   const startTest = () => {
-    if (!testSlug || !user) return;
+    if (!testSlug || !me) return;
     router.push(`/assesment?slug=${testSlug}&fromPrep=true`);
   };
 
@@ -104,7 +104,7 @@ export default function TestPreparationPage() {
   }
 
   // Not logged in
-  if (!user) {
+  if (!me) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
@@ -222,7 +222,7 @@ export default function TestPreparationPage() {
             </p>
             <button
               onClick={startTest}
-              className="bg-[#0b7960] text-white px-8 py-3 rounded-md font-medium hover:bg-[#096b54] transition-colors"
+              className="bg-[#0b7960] text-white px-8 py-3 rounded-md font-medium hover:bg-[#096b54] transition-colors cursor-pointer"
             >
               Start Test
             </button>

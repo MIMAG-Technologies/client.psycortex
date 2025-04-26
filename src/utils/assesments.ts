@@ -27,7 +27,12 @@ const assesmentType = (slug: string) => {
   if (["wbs", "ies", "rrs", "sis", "scs"].includes(slug)) {
     return "vl";
   } else if (
-    ["spiritual", "aggression", "suicidal-ideation-scale"].includes(slug)
+    [
+      "spiritual",
+      "aggression",
+      "suicidal-ideation-scale",
+      "marital-adjustment",
+    ].includes(slug)
   ) {
     return "ad5";
   } else if (
@@ -51,6 +56,8 @@ const get_VLD_Questions = async (slug: string, userData?: UserData) => {
   try {
     // Get gender from different user objects
     const gender = userData?.personalInfo?.gender;
+    console.log(userData);
+    
     const genderParam = slug === "sas" && gender ? `&gender=${gender}` : '';
     
     const url = `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}${genderParam}`;
@@ -76,11 +83,11 @@ const get_VLD_Questions = async (slug: string, userData?: UserData) => {
       return {
         question_number: question.id || question.question_number,
         question_text: question.text || question.question_text,
-        options: Array.isArray(question.options) 
-          ? question.options.map((option: any) => {
+        options: Array.isArray(["pre-marital", "sas"].includes(slug) ? question.answer_options : question.options)
+          ? (["pre-marital", "sas"].includes(slug) ? question.answer_options : question.options).map((option: any) => {
               return {
                 value: option.value,
-                text: slug !== "sas" ? option.text : (option.label || option.text),
+                text: slug !== "sas" && slug !== "pre-marital" ? option.text : (option.label || option.text),
               };
             })
           : []
@@ -128,6 +135,18 @@ const getAssesmentQptions = (slug: string, is_positive: any) => {
       return getOptionsArray("Undecided");
     case "suicidal-ideation-scale":
       return getOptionsArray("Uncertain");
+    case "marital-adjustment":
+      return Number(is_positive) === 1
+        ? [
+            { text: "Always", value: "2" },
+            { text: "Sometime", value: "1" },
+            { text: "Never", value: "0" },
+          ]
+        : [
+            { text: "Always", value: "0" },
+            { text: "Sometime", value: "1" },
+            { text: "Never", value: "2" },
+          ];
     case "bai":
       return [
         { text: "Not at all", value: "0" },
@@ -186,14 +205,17 @@ const get_VL_VT_Question = async (slug: string, type: string) => {
 
 const get_AD5_OC_YN_Questions = async (slug: string) => {
   try {
+    // Handle special case for marital-adjustment
+    const urlSlug = slug === 'marital-adjustment' ? 'marital' : slug;
+    
     const res = await axios.get(
-      `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}&page=1`
+      `${baseUrl}/${urlSlug}/a_get_questions.php?test_slug=${slug}&page=1`
     );
     const noOfPages: number = res.data.data.total_pages || 1;
     let QuestionsList: any[] = res.data.data.questions;
     for (let i = 1; i < noOfPages; i++) {
       const moreres = await axios.get(
-        `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}&page=${i + 1}`
+        `${baseUrl}/${urlSlug}/a_get_questions.php?test_slug=${slug}&page=${i + 1}`
       );
       const moreQuestions = moreres.data.data.questions;
       QuestionsList = QuestionsList.concat(moreQuestions);
@@ -215,12 +237,51 @@ const get_AD5_OC_YN_Questions = async (slug: string) => {
   }
 };
 
+const get_BDI_Questions = async (slug: string) => {
+  try {
+    const res = await axios.get(
+      `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}&page=1`
+    );
+    const noOfPages: number = res.data.data.total_pages || 1;
+    let QuestionsList: any[] = res.data.data.questions;
+    
+    for (let i = 1; i < noOfPages; i++) {
+      const moreres = await axios.get(
+        `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}&page=${i + 1}`
+      );
+      const moreQuestions = moreres.data.data.questions;
+      QuestionsList = QuestionsList.concat(moreQuestions);
+    }
+    
+    let questions: question[] = QuestionsList.map((question: any) => {
+      return {
+        question_number: question.question_number,
+        question_text: question.question_text,
+        options: question.options.map((optionText: string, index: number) => {
+          return {
+            value: index.toString(),
+            text: optionText,
+          };
+        }),
+      };
+    });
+    
+    const assesmentData: assesmentData = {
+      pages: noOfPages,
+      questions: questions,
+    };
+    return assesmentData;
+  } catch (error) {
+    throw new Error("Error in fetching Questions of " + slug + ":" + error);
+  }
+};
+
 const defaultresponce: assesmentData = {
   pages: 0,
   questions: [],
 };
 
-export const getQuestions = async (slug: string, userData?: UserData) => {
+export const getQuestions = async (slug: string, userData: any) => {
   try {
     const typeOfAssesment = assesmentType(slug);
     if (typeOfAssesment === "vl" || typeOfAssesment === "vt") {
@@ -235,6 +296,9 @@ export const getQuestions = async (slug: string, userData?: UserData) => {
       return res;
     } else if (typeOfAssesment === "vld") {
       const res = await get_VLD_Questions(slug, userData);
+      return res;
+    } else if (typeOfAssesment === "ol") {
+      const res = await get_BDI_Questions(slug);
       return res;
     } else {
       console.log("Not Implemented yet");
