@@ -70,44 +70,44 @@ export default function TestsPage() {
         <h2 className="text-xl font-semibold">My Tests</h2>
       </div>
       
-      {/* Section Selection Bar */}
-      <div className="flex border-b bg-gradient-to-r from-[#642494]/5 to-[#642494]/10">
+      {/* Section Selection Bar - Made responsive */}
+      <div className="flex flex-nowrap overflow-x-auto border-b bg-gradient-to-r from-[#642494]/5 to-[#642494]/10">
         <button 
-          className={`px-6 py-4 font-medium flex items-center gap-2 transition-all ${
+          className={`px-3 sm:px-6 py-3 sm:py-4 font-medium flex items-center gap-1 sm:gap-2 transition-all whitespace-nowrap ${
             activeSection === 'active' 
               ? 'border-b-2 border-[#642494] text-[#642494] font-semibold bg-white' 
               : 'text-gray-600 hover:text-[#642494] hover:bg-white/50'
           }`}
           onClick={() => setActiveSection('active')}
         >
-          <FaClipboardCheck />
-          Active Tests
+          <FaClipboardCheck className="flex-shrink-0" />
+          <span>Active Tests</span>
         </button>
         <button 
-          className={`px-6 py-4 font-medium flex items-center gap-2 transition-all ${
+          className={`px-3 sm:px-6 py-3 sm:py-4 font-medium flex items-center gap-1 sm:gap-2 transition-all whitespace-nowrap ${
             activeSection === 'referred' 
               ? 'border-b-2 border-[#642494] text-[#642494] font-semibold bg-white' 
               : 'text-gray-600 hover:text-[#642494] hover:bg-white/50'
           }`}
           onClick={() => setActiveSection('referred')}
         >
-          <FaUserMd />
-          Referred Tests
+          <FaUserMd className="flex-shrink-0" />
+          <span>Referred Tests</span>
         </button>
         <button 
-          className={`px-6 py-4 font-medium flex items-center gap-2 transition-all ${
+          className={`px-3 sm:px-6 py-3 sm:py-4 font-medium flex items-center gap-1 sm:gap-2 transition-all whitespace-nowrap ${
             activeSection === 'history' 
               ? 'border-b-2 border-[#642494] text-[#642494] font-semibold bg-white' 
               : 'text-gray-600 hover:text-[#642494] hover:bg-white/50'
           }`}
           onClick={() => setActiveSection('history')}
         >
-          <FaCalendarAlt />
-          Test History
+          <FaCalendarAlt className="flex-shrink-0" />
+          <span>Test History</span>
         </button>
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* Active Tests Section */}
         {activeSection === 'active' && (
           <div>
@@ -127,13 +127,13 @@ export default function TestsPage() {
             ) : (
               <div className="space-y-4">
                 {activeTests.map((test) => (
-                  <div key={test.bookingId} className="border rounded-lg p-5 hover:bg-gray-50 transition-colors shadow-sm">
-                    <div className="flex justify-between items-center">
+                  <div key={test.bookingId} className="border rounded-lg p-4 sm:p-5 hover:bg-gray-50 transition-colors shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                       <div>
                         <h3 className="font-medium text-lg capitalize text-gray-800">{getTestName(test.testSlug)}</h3>
                         <div className="flex items-center text-sm text-gray-600 mt-2 bg-[#642494]/5 px-3 py-1 rounded-full">
-                          <FaHourglassHalf className="mr-1.5 text-[#642494]" />
-                          <span>
+                          <FaHourglassHalf className="mr-1.5 text-[#642494] flex-shrink-0" />
+                          <span className="truncate">
                             {test.daysRemaining !== null 
                               ? `${test.daysRemaining} days remaining` 
                               : 'No expiration'} 
@@ -145,7 +145,7 @@ export default function TestsPage() {
                         href={`/test-preparation?slug=${test.testSlug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center"
+                        className="bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center sm:justify-start w-full sm:w-auto"
                       >
                         Start Test <FaArrowRight className="ml-2" />
                       </Link>
@@ -170,17 +170,17 @@ export default function TestsPage() {
             ) : (
               <div className="space-y-4">
                 {referredTests.map((test) => (
-                  <div key={test.bookingId} className="border rounded-lg p-5 hover:bg-gray-50 transition-colors shadow-sm">
-                    <div className="flex justify-between items-start">
+                  <div key={test.bookingId} className="border rounded-lg p-4 sm:p-5 hover:bg-gray-50 transition-colors shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                       <div className="flex-1">
                         <h3 className="font-medium text-lg capitalize text-gray-800">{test.test?.name || getTestName(test.testSlug)}</h3>
-                        <div className="flex flex-wrap gap-y-2 mt-2">
-                          <div className="flex items-center text-sm text-gray-600 bg-[#642494]/5 px-3 py-1 rounded-full mr-2">
-                            <FaUserMd className="mr-1.5 text-[#642494]" />
-                            <span>Referred by: {test.referredBy.name}</span>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <div className="flex items-center text-sm text-gray-600 bg-[#642494]/5 px-3 py-1 rounded-full">
+                            <FaUserMd className="mr-1.5 text-[#642494] flex-shrink-0" />
+                            <span className="truncate">Referred by: {test.referredBy.name}</span>
                           </div>
                           <div className="flex items-center text-sm text-gray-600 bg-[#642494]/5 px-3 py-1 rounded-full">
-                            <FaFileAlt className="mr-1.5 text-[#642494]" />
+                            <FaFileAlt className="mr-1.5 text-[#642494] flex-shrink-0" />
                             <span>Status: {test.status}</span>
                           </div>
                         </div>
@@ -193,15 +193,7 @@ export default function TestsPage() {
                           </Link>
                         </div>
                       </div>
-                      {test.test?.imageUrl && (
-                        <div className="ml-4">
-                          <img 
-                            src={test.test.imageUrl} 
-                            alt={test.test.name} 
-                            className="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200"
-                          />
-                        </div>
-                      )}
+                      
                     </div>
                   </div>
                 ))}
@@ -223,19 +215,19 @@ export default function TestsPage() {
             ) : (
               <div className="space-y-4">
                 {testHistory.map((test) => (
-                  <div key={test.bookingId} className="border rounded-lg p-5 hover:bg-gray-50 transition-colors shadow-sm">
-                    <div className="flex justify-between items-center">
+                  <div key={test.bookingId} className="border rounded-lg p-4 sm:p-5 hover:bg-gray-50 transition-colors shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
                         <h3 className="font-medium text-lg capitalize text-gray-800">{getTestName(test.testSlug)}</h3>
                         {test.status === 'completed' ? (
                           <div className="flex items-center text-sm text-green-700 mt-2 bg-green-50 px-3 py-1 rounded-full">
-                            <FaCheckCircle className="mr-1.5" />
-                            <span>Completed {test.completedAt ? `on ${formatDate(test.completedAt)}` : ''}</span>
+                            <FaCheckCircle className="mr-1.5 flex-shrink-0" />
+                            <span className="truncate">Completed {test.completedAt ? `on ${formatDate(test.completedAt)}` : ''}</span>
                           </div>
                         ) : (
                           <div className="flex items-center text-sm text-orange-700 mt-2 bg-orange-50 px-3 py-1 rounded-full">
-                            <FaExclamationTriangle className="mr-1.5" />
-                            <span>Expired on {formatDate(test.expiryDate)}</span>
+                            <FaExclamationTriangle className="mr-1.5 flex-shrink-0" />
+                            <span className="truncate">Expired on {formatDate(test.expiryDate)}</span>
                           </div>
                         )}
                       </div>

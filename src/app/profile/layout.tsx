@@ -53,14 +53,14 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto">
           {/* Profile Header */}
           <ProfileHeader user={me} logout={logout} />
 
           {/* Profile Tabs */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <div className="border-b flex flex-wrap bg-gradient-to-r from-[#642494]/5 to-[#642494]/10">
+            <div className="border-b flex bg-gradient-to-r from-[#642494]/5 to-[#642494]/10 overflow-x-auto scrollbar-hide">
               <TabButton 
                 onClick={()=>{
                   setActiveTab("summary")
@@ -90,7 +90,7 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
               />
             </div>
 
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {children}
             </div>
           </div>
@@ -115,16 +115,16 @@ function TabButton({
   onClick: () => void;
 }) {
   return (
-    <Link href={href} onClick={onClick}>
+    <Link href={href} onClick={onClick} className="flex-1 min-w-fit">
       <div
-        className={`flex items-center py-4 px-6 focus:outline-none transition-all cursor-pointer ${
+        className={`flex items-center justify-center py-3 sm:py-4 px-3 sm:px-6 focus:outline-none transition-all cursor-pointer whitespace-nowrap ${
           active
             ? "border-b-2 border-[#642494] text-[#642494] font-semibold bg-white"
             : "text-gray-600 hover:text-[#642494] hover:bg-white/50"
         }`}
       >
-        <span className="mr-2">{icon}</span>
-        <span className="font-medium">{label}</span>
+        <span className="mr-1 sm:mr-2">{icon}</span>
+        <span className="font-medium text-sm sm:text-base">{label}</span>
       </div>
     </Link>
   );

@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { FaHome, FaUserMd, FaClipboardList, FaUser, FaBars, FaTimes } from "react-icons/fa";
+import { usePathname, useRouter } from "next/navigation";
+import { FaHome, FaUserMd, FaClipboardList, FaUser, FaBars, FaTimes, FaSearch } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
@@ -29,11 +32,28 @@ const Navbar = () => {
   // Toggle mobile menu
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+    if (isSearchOpen) setIsSearchOpen(false);
+  };
+
+  // Toggle search bar
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (isOpen) setIsOpen(false);
   };
 
   // Close mobile menu when a link is clicked
   const closeMenu = () => {
     setIsOpen(false);
+  };
+
+  // Handle search submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
   };
 
   return (
@@ -54,24 +74,92 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <NavLink href="/" icon={<FaHome />} label="Home" active={pathname === "/"} onClick={closeMenu} />
-            <NavLink href="/experts" icon={<FaUserMd />} label="Experts" active={pathname === "/experts"} onClick={closeMenu} />
-            <NavLink href="/tests" icon={<FaClipboardList />} label="Tests" active={pathname === "/tests"} onClick={closeMenu} />
-            {user ? (
-              <NavLink href="/profile" icon={<FaUser />} label="My Profile" active={pathname === "/profile"} onClick={closeMenu} />
+            {isSearchOpen ? (
+              <form onSubmit={handleSearch} className="flex items-center w-full">
+                <input
+                  type="text"
+                  placeholder="Search for tests, experts..."
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#642494]/50"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="ml-2 text-[#642494] hover:text-[#4e1c72]"
+                >
+                  <FaSearch size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleSearch}
+                  className="ml-2 text-gray-700 hover:text-[#642494]"
+                >
+                  <FaTimes size={20} />
+                </button>
+              </form>
             ) : (
-              <NavLink href="/login" icon={<FaUser />} label="Login" active={pathname === "/login"} onClick={closeMenu} />
+              <>
+                <NavLink href="/" icon={<FaHome />} label="Home" active={pathname === "/"} onClick={closeMenu} />
+                <NavLink href="/experts" icon={<FaUserMd />} label="Experts" active={pathname === "/experts"} onClick={closeMenu} />
+                <NavLink href="/tests" icon={<FaClipboardList />} label="Tests" active={pathname === "/tests"} onClick={closeMenu} />
+                {user ? (
+                  <NavLink href="/profile" icon={<FaUser />} label="My Profile" active={pathname === "/profile"} onClick={closeMenu} />
+                ) : (
+                  <NavLink href="/login" icon={<FaUser />} label="Login" active={pathname === "/login"} onClick={closeMenu} />
+                )}
+                <button
+                  onClick={toggleSearch}
+                  className="flex items-center space-x-1 px-3 py-2 rounded-md text-1xl font-medium transition-colors text-gray-700 hover:text-[#642494]"
+                >
+                  <FaSearch size={18} />
+                </button>
+              </>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={toggleMenu}
-              className="text-gray-700 hover:text-[#642494] focus:outline-none"
-            >
-              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
+          {/* Mobile menu button and search */}
+          <div className="md:hidden flex items-center space-x-4">
+            {isSearchOpen ? (
+              <form onSubmit={handleSearch} className="flex items-center w-full">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#642494]/50"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="ml-2 text-[#642494] hover:text-[#4e1c72]"
+                >
+                  <FaSearch size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleSearch}
+                  className="ml-2 text-gray-700 hover:text-[#642494]"
+                >
+                  <FaTimes size={20} />
+                </button>
+              </form>
+            ) : (
+              <>
+                <button
+                  onClick={toggleSearch}
+                  className="text-gray-700 hover:text-[#642494] focus:outline-none"
+                >
+                  <FaSearch size={20} />
+                </button>
+                <button
+                  onClick={toggleMenu}
+                  className="text-gray-700 hover:text-[#642494] focus:outline-none"
+                >
+                  {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

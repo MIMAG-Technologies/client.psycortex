@@ -37,16 +37,16 @@ export default function Home() {
               <p className="text-lg md:text-xl mb-8 opacity-90">
                 Access expert mental health services, personalized assessments, and resources designed to support your well-being.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col md:flex-row gap-4 w-full">
                 <Link 
                   href="/tests" 
-                  className="px-6 py-3 bg-white text-[#642494] rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  className="w-full md:w-auto px-6 py-3 bg-white text-[#642494] rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center md:justify-start gap-2"
                 >
                   Take a Test <FaArrowRight size={14} />
                 </Link>
                 <Link 
                   href="/experts" 
-                  className="px-6 py-3 border border-[#642494] text-[#642494] rounded-full font-medium hover:bg-white/10 transition-colors"
+                  className="w-full md:w-auto px-6 py-3 border border-[#642494] text-[#642494] rounded-full font-medium hover:bg-white/10 transition-colors text-center"
                 >
                   Meet Our Experts
                 </Link>
@@ -149,6 +149,7 @@ export default function Home() {
                 <OneExpertCard 
                   key={expert.id}
                   {...expert}
+                  variant="default"
                 />
               ))}
             </div>

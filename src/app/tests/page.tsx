@@ -93,9 +93,9 @@ export default function Tests() {
           />
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
-        <div className="flex">
+        <div className="flex w-full md:w-auto">
           <button
-            className={`px-6 py-2 rounded-l-md flex items-center gap-2 ${testType === 'indian' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
+            className={`flex-1 md:flex-auto px-6 py-2 rounded-l-md flex items-center justify-center gap-2 ${testType === 'indian' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             onClick={() => setTestType('indian')}
           >
@@ -103,7 +103,7 @@ export default function Tests() {
             <span>Indian Tests</span>
           </button>
           <button
-            className={`px-6 py-2 rounded-r-md flex items-center gap-2 ${testType === 'global' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
+            className={`flex-1 md:flex-auto px-6 py-2 rounded-r-md flex items-center justify-center gap-2 ${testType === 'global' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             onClick={() => setTestType('global')}
           >
