@@ -149,6 +149,7 @@ export default function Home() {
                 <OneExpertCard 
                   key={expert.id}
                   {...expert}
+                  variant="default"
                 />
               ))}
             </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import OneCounsellorCard from "@/components/experts/OneExpertCard";
+import OneExpertCard from "@/components/experts/OneExpertCard";
 import { HiAdjustmentsHorizontal, HiXMark } from "react-icons/hi2";
 import { FiSearch, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { BsSortDown } from "react-icons/bs";
@@ -561,7 +561,7 @@ export default function AllExpertsPage() {
           ) : (
             <div className="grid lg:grid-cols-3 gap-6 md:grid-cols-2 sm:grid-cols-1">
               {filteredCounsellors.map((counsellor) => (
-                <OneCounsellorCard {...counsellor} key={counsellor.id} />
+                <OneExpertCard {...counsellor} key={counsellor.id} variant="simple" />
               ))}
             </div>
           )}

@@ -8,6 +8,10 @@ import { BsGlobe2 } from "react-icons/bs";
 import { BaseCounsellor } from "@/utils/experts";
 import Link from "next/link";
 
+type OneExpertCardProps = BaseCounsellor & {
+  variant?: "default" | "simple";
+};
+
 export default function OneExpertCard({
   id,
   personalInfo,
@@ -15,7 +19,8 @@ export default function OneExpertCard({
   practiceInfo,
   sessionInfo,
   rating,
-}: BaseCounsellor) {
+  variant = "default",
+}: OneExpertCardProps) {
   const { name, profileImage } = personalInfo;
   const { title, yearsOfExperience } = professionalInfo;
   const { specialties, languages } = practiceInfo;
@@ -99,6 +104,40 @@ export default function OneExpertCard({
     </div>
   ];
 
+  // Simple Content for non-homepage variants
+  const SimpleContent = () => (
+    <div className="p-4 mx-4 bg-gray-50 rounded-xl flex-grow">
+      <div className="mb-4">
+        <h3 className="text-[16px] font-semibold mb-2">Languages</h3>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {languages.slice(0, 3).map((lang, index) => (
+            <div key={index} className="flex items-center gap-1 text-[14px] bg-white px-2 py-1 rounded-lg shadow-sm">
+              <BsGlobe2 className="text-gray-600" />
+              <span>{lang.language}</span>
+            </div>
+          ))}
+          {languages.length > 3 && (
+            <span className="text-[12px] text-gray-500">+{languages.length - 3} more</span>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-[16px] font-semibold mb-2">Specialties</h3>
+        <div className="flex flex-wrap gap-2">
+          {specialties.slice(0, 4).map((specialty, index) => (
+            <span key={index} className="px-2 py-1 bg-white shadow-sm rounded-full text-gray-800 text-[12px] whitespace-normal break-words">
+              {specialty}
+            </span>
+          ))}
+          {specialties.length > 4 && (
+            <span className="text-[12px] text-gray-500">+{specialties.length - 4} more</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full rounded-2xl flex flex-col h-full border border-purple-200 bg-white">
       {/* Top section with image, name, title, and rating */}
@@ -164,40 +203,47 @@ export default function OneExpertCard({
         </div>
       </div>
 
-      {/* Sliding sections - with horizontal scroll */}
-      <div className="mx-4 mb-1 overflow-hidden bg-gray-50 rounded-xl flex-grow">
-        <div 
-          ref={scrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory select-none" 
-          style={{ 
-            height: '180px', 
-            scrollbarWidth: 'none', 
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
-          }}
-          onScroll={handleScroll}
-        >
-          {slideContents.map((content, index) => (
-            <div key={index} className="snap-center min-w-full shrink-0">
-              {content}
+      {/* Content section - either sliding or simple based on variant */}
+      {variant === "default" ? (
+        <>
+          {/* Sliding sections - with horizontal scroll */}
+          <div className="mx-4 mb-1 overflow-hidden bg-gray-50 rounded-xl flex-grow">
+            <div 
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto snap-x snap-mandatory select-none" 
+              style={{ 
+                height: '180px', 
+                scrollbarWidth: 'none', 
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+              onScroll={handleScroll}
+            >
+              {slideContents.map((content, index) => (
+                <div key={index} className="snap-center min-w-full shrink-0">
+                  {content}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        
-        {/* Slide indicators */}
-        <div className="flex justify-center gap-2 py-2">
-          {[...Array(totalSlides)].map((_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full ${
-                currentSlide === index ? 'bg-purple-700' : 'bg-gray-300'
-              }`}
-              onClick={() => handleDotClick(index)}
-              aria-label={`View ${slideTitles[index]}`}
-            />
-          ))}
-        </div>
-      </div>
+            
+            {/* Slide indicators */}
+            <div className="flex justify-center gap-2 py-2">
+              {[...Array(totalSlides)].map((_, index) => (
+                <button
+                  key={index}
+                  className={`w-2 h-2 rounded-full ${
+                    currentSlide === index ? 'bg-purple-700' : 'bg-gray-300'
+                  }`}
+                  onClick={() => handleDotClick(index)}
+                  aria-label={`View ${slideTitles[index]}`}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <SimpleContent />
+      )}
 
       {/* View Profile Button - always at bottom */}
       <div className="mt-6 px-4 pb-4">
