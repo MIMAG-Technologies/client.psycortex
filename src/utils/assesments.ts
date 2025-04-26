@@ -121,9 +121,9 @@ const getAssesmentQptions = (slug: string, is_positive: any) => {
 
     return [
       { value: values[0], text: "Strongly Agree" },
-      { value: values[1], text: "Disagree" },
+      { value: values[1], text: "Agree" },
       { value: values[2], text: neutralText },
-      { value: values[3], text: "Agree" },
+      { value: values[3], text: "Disagree" },
       { value: values[4], text: "Strongly Disagree" },
     ];
   };
