@@ -4,6 +4,9 @@ import { TestDetails } from "@/types/test";
 import Link from "next/link";
 import { FaClock, FaListAlt, FaCheck, FaStar, FaShoppingCart, FaArrowRight } from "react-icons/fa";
 import { useState } from "react";
+import { initiatePayment } from "@/utils/checkout";
+import test from "node:test";
+import { useAuth } from "@/context/AuthContext";
 
 interface TestDetailsModalProps {
     isLoggedIn: boolean;
@@ -14,7 +17,8 @@ interface TestDetailsModalProps {
 
 export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }: TestDetailsModalProps) {
     const [isLoading, setIsLoading] = useState(false);
-
+    const {me} = useAuth();
+    
     const handleBookTest = async () => {
         setIsLoading(true);
         try {
@@ -23,6 +27,21 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
             setIsLoading(false);
         }
     };
+    const InitatePayment = async () =>{
+        if (!me?.personalInfo.name || !me?.personalInfo.email || !me?.personalInfo.phone || !me?.preferences.timezone || !me?.id) {
+            return;
+        }
+
+        const res = await initiatePayment({
+            amount: test.pricing.amount,
+            name: me.personalInfo.name,
+            email: me.personalInfo.email,
+            phone: me.personalInfo.phone,
+            country: me.preferences.timezone,
+            user_id: me.id, 
+            test_slug: test.slug,
+        })
+    }
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -135,7 +154,7 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
                                 <button 
                                     disabled={isLoading}
                                     className={`bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`} 
-                                    onClick={handleBookTest}
+                                    onClick={InitatePayment}
                                 >
                                     {isLoading ? (
                                         <>
