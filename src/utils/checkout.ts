@@ -2,22 +2,27 @@ import axios from "axios";
 
 const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 const merchant_id = process.env.NEXT_PUBLIC_MERCHANT_ID;
+const access_code = process.env.NEXT_PUBLIC_ACCESS_CODE;
 
 export const initiatePayment = async (data: {
   amount: number;
+  tax: number;
   name: string;
   email: string;
   phone: string;
-  country: string;
-  user_id: string;
+  uuid: string;
   test_slug: string;
+  test_id?: string;
 }) => {
   try {
-    const res = await axios.post(`${baseUrl}/ccavenue/ccavRequestHandler.php`, {
+    const amountToPay = Number((data.amount + (data.amount * data.tax / 100)).toFixed(2));
+    const orderId = `order_${Date.now()}`;
+
+    const response = await axios.post(`${baseUrl}/ccavenue/ccavRequestHandler.php`, {
       merchant_id,
-      order_id: Math.floor(100000000 + Math.random() * 900000000).toString(),
-      amount: data.amount,
-      currency: "INR",
+      order_id: orderId,
+      amount: amountToPay.toString(),
+      currency: 'INR',
       redirect_url: `${baseUrl}/payment/process_payment.php`,
       cancel_url: `${baseUrl}/payment/process_payment.php`,
       billing_name: data.name,
@@ -25,37 +30,54 @@ export const initiatePayment = async (data: {
       billing_tel: data.phone,
       delivery_name: data.name,
       delivery_tel: data.phone,
-      billing_country: data.country,
-      delivery_country: data.country,
-      merchant_param1: "test_pay",
-      merchant_param2: data.user_id,
+      billing_country: 'India',
+      delivery_country: 'India',
+      merchant_param1: 'test_pay',
+      merchant_param2: data.uuid,
       merchant_param3: data.test_slug,
+      merchant_param4: data.test_id || '',
     });
-    const { data: response } = res;
-    console.log("Response from payment:", response);
 
-    // Create a temporary div to hold the form
-    const div = document.createElement("div");
-    // Remove the auto-submit script to avoid conflicts
-    const cleanResponse = response.replace(
-      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-      ""
-    );
-    div.innerHTML = cleanResponse;
+    const encRequestMatch = response.data.match(/name="encRequest" value="([^"]+)"/);
+    
+    if (encRequestMatch) {
+      const htmlContent = `
+        <form method="post" name="redirect" action="https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction"> 
+          <input type="hidden" name="encRequest" value="${encRequestMatch[1]}">
+          <input type="hidden" name="access_code" value="${access_code}">
+        </form>
+        <script>
+          document.redirect.submit();
+          
+          document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a').forEach(function(link) {
+              link.addEventListener('click', function(e) {
+                if (link.textContent.includes('Generate QR') || 
+                    link.href.includes('initiateTransaction#')) {
+                  e.preventDefault();
+                  window.location.href = link.href;
+                }
+              });
+            });
 
-    // Get the form from the response
-    const form = div.querySelector("form");
-    if (form) {
-      console.log("Form action:", form.action);
-      // Append the form to the DOM
-      document.body.appendChild(form);
-      // Add a submit button for user interaction
-      const submitButton = document.createElement("button");
-      submitButton.type = "submit";
-      form.appendChild(submitButton);
-      submitButton.click();
-    } else {
-      console.error("No form found in response");
+            document.addEventListener('click', function(e) {
+              if (e.target && (
+                  e.target.textContent.includes('UPI') || 
+                  (e.target.href && e.target.href.includes('void(0)'))
+                )) {
+                e.preventDefault();
+                if (e.target.onclick) {
+                  e.target.onclick.call(e.target);
+                }
+              }
+            }, true);
+          });
+        </script>
+      `;
+
+      const div = document.createElement('div');
+      div.innerHTML = htmlContent;
+      document.body.appendChild(div);
     }
   } catch (error) {
     console.error("Error in initiating payment:", error);
