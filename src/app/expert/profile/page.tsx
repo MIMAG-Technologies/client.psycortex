@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   FaGraduationCap,
-  FaCommentDots,
   FaGem,
   FaCheckCircle,
   FaUserFriends,
@@ -15,13 +14,30 @@ import {
 import { CounsellorDetails, getOneCounsellor } from "@/utils/experts";
 import OneExpertBookingCompoent from "@/components/experts/OneExpertBookingCompoent";
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
+import { toast } from "react-toastify";
 
 const ExpertProfilePage = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const pay = searchParams.get("pay");
   const [counsellor, setCounsellor] = useState<CounsellorDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+const notifiedRef = useRef(false);
+
+useEffect(() => {
+  if (pay && !notifiedRef.current) {
+    if (pay === "failed") {
+      toast.error("Payment failed. Please try again.");
+    } else {
+      const mode = searchParams.get("mode");
+      const date = searchParams.get("date");
+      toast.success(`Payment successful for ${mode} session on ${date}.`);
+    }
+    notifiedRef.current = true;
+  }
+}, [pay]);
+
 
   useEffect(() => {
     const fetchCounsellor = async () => {
@@ -30,7 +46,7 @@ const ExpertProfilePage = () => {
         setLoading(false);
         return;
       }
-      
+
       try {
         setLoading(true);
         const res = await getOneCounsellor(id);
@@ -42,9 +58,12 @@ const ExpertProfilePage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchCounsellor();
   }, [id]);
+
+
+
 
   if (loading) {
     return (
@@ -53,7 +72,7 @@ const ExpertProfilePage = () => {
       </div>
     );
   }
-  
+
   if (error || !id) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
@@ -78,31 +97,51 @@ const ExpertProfilePage = () => {
 
   // Safe access with fallbacks for potentially missing data
   const name = counsellor?.personalInfo?.name || "Counsellor";
-  const title = counsellor?.professionalInfo?.title || "Mental Health Professional";
-  const yearsOfExperience = counsellor?.professionalInfo?.yearsOfExperience || 0;
-  const profileImage = counsellor?.personalInfo?.profileImage || "/user-dummy-img.png";
-  const biography = counsellor?.personalInfo?.biography || "No biography available";
+  const title =
+    counsellor?.professionalInfo?.title || "Mental Health Professional";
+  const yearsOfExperience =
+    counsellor?.professionalInfo?.yearsOfExperience || 0;
+  const profileImage =
+    counsellor?.personalInfo?.profileImage || "/user-dummy-img.png";
+  const biography =
+    counsellor?.personalInfo?.biography || "No biography available";
   const education = counsellor?.professionalInfo?.education || [];
   const licenses = counsellor?.professionalInfo?.licenses || [];
   const specialties = counsellor?.practiceInfo?.specialties || [];
   const languages = counsellor?.practiceInfo?.languages || [];
   const rates = counsellor?.sessionInfo?.pricing?.rates || [];
-  const communicationModes = counsellor?.sessionInfo?.availability?.communicationModes || [];
+  const communicationModes =
+    counsellor?.sessionInfo?.availability?.communicationModes || [];
   const rating = counsellor?.metrics?.averageRating || 0;
 
   // Helper function for session mode icons
   const getSessionModeIcon = (mode: string) => {
-    switch(mode) {
-      case 'chat':
-        return { icon: <BiChat className="text-xl" />, color: 'bg-blue-100 text-blue-600 border-blue-200' };
-      case 'call':
-        return { icon: <BiPhone className="text-xl" />, color: 'bg-green-100 text-green-600 border-green-200' };
-      case 'video':
-        return { icon: <BiVideo className="text-xl" />, color: 'bg-purple-100 text-purple-600 border-purple-200' };
-      case 'in_person':
-        return { icon: <BiUser className="text-xl" />, color: 'bg-orange-100 text-orange-600 border-orange-200' };
+    switch (mode) {
+      case "chat":
+        return {
+          icon: <BiChat className="text-xl" />,
+          color: "bg-blue-100 text-blue-600 border-blue-200",
+        };
+      case "call":
+        return {
+          icon: <BiPhone className="text-xl" />,
+          color: "bg-green-100 text-green-600 border-green-200",
+        };
+      case "video":
+        return {
+          icon: <BiVideo className="text-xl" />,
+          color: "bg-purple-100 text-purple-600 border-purple-200",
+        };
+      case "in_person":
+        return {
+          icon: <BiUser className="text-xl" />,
+          color: "bg-orange-100 text-orange-600 border-orange-200",
+        };
       default:
-        return { icon: <BiUser className="text-xl" />, color: 'bg-gray-100 text-gray-600 border-gray-200' };
+        return {
+          icon: <BiUser className="text-xl" />,
+          color: "bg-gray-100 text-gray-600 border-gray-200",
+        };
     }
   };
 
@@ -144,13 +183,13 @@ const ExpertProfilePage = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Languages */}
               {languages.length > 0 && (
                 <div className="mt-6 flex flex-wrap items-center gap-2">
                   <span className="text-gray-500 font-medium">Languages:</span>
                   {languages.map((lang, index) => (
-                    <span 
+                    <span
                       key={lang.language || `lang-${index}`}
                       className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm"
                     >
@@ -159,7 +198,7 @@ const ExpertProfilePage = () => {
                   ))}
                 </div>
               )}
-              
+
               {/* Session Modes Pills */}
               <div className="mt-5 flex flex-wrap gap-3">
                 {communicationModes.map((mode) => {
@@ -170,7 +209,9 @@ const ExpertProfilePage = () => {
                       className={`px-4 py-2 rounded-full ${color} flex items-center gap-2 shadow-sm font-medium`}
                     >
                       {icon}
-                      <span className="capitalize">{mode.replace('_', ' ')}</span>
+                      <span className="capitalize">
+                        {mode.replace("_", " ")}
+                      </span>
                     </div>
                   );
                 })}
@@ -236,25 +277,37 @@ const ExpertProfilePage = () => {
                 rates.map((rate, index) => {
                   const { icon, color } = getSessionModeIcon(rate.sessionType);
                   return (
-                    <div 
-                      key={`rate-${index}`} 
+                    <div
+                      key={`rate-${index}`}
                       className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <div className={`w-10 h-10 rounded-full ${color.split(' ')[0]} flex items-center justify-center`}>
+                        <div
+                          className={`w-10 h-10 rounded-full ${
+                            color.split(" ")[0]
+                          } flex items-center justify-center`}
+                        >
                           {icon}
                         </div>
-                        <h3 className="font-semibold text-lg">{rate.sessionTitle || `${rate.sessionType} Session`}</h3>
+                        <h3 className="font-semibold text-lg">
+                          {rate.sessionTitle || `${rate.sessionType} Session`}
+                        </h3>
                       </div>
-                      <p className="text-green-600 font-bold text-xl">{rate.currency || "$"}{rate.price || "Price not specified"}</p>
+                      <p className="text-green-600 font-bold text-xl">
+                        {rate.currency || "$"}
+                        {rate.price || "Price not specified"}
+                      </p>
                       <p className="text-sm text-gray-500 capitalize">
-                        {rate.sessionType?.replace('_', ' ') || "No session type specified"}
+                        {rate.sessionType?.replace("_", " ") ||
+                          "No session type specified"}
                       </p>
                     </div>
                   );
                 })
               ) : (
-                <p className="text-gray-500 col-span-2">Pricing information not available</p>
+                <p className="text-gray-500 col-span-2">
+                  Pricing information not available
+                </p>
               )}
             </div>
           </div>
@@ -270,16 +323,24 @@ const ExpertProfilePage = () => {
             <div className="space-y-4">
               {education.length > 0 ? (
                 education.map((edu, index) => (
-                  <div key={edu.degree || `edu-${index}`} className="bg-blue-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-lg">{edu.degree || "Degree"}</h3>
+                  <div
+                    key={edu.degree || `edu-${index}`}
+                    className="bg-blue-50 p-4 rounded-lg"
+                  >
+                    <h3 className="font-semibold text-lg">
+                      {edu.degree || "Degree"}
+                    </h3>
                     <p className="text-gray-700">{edu.field || "Field"}</p>
                     <p className="text-gray-600 text-sm">
-                      {edu.institution || "Institution"} • {edu.year || "Year not specified"}
+                      {edu.institution || "Institution"} •{" "}
+                      {edu.year || "Year not specified"}
                     </p>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">No education information available</p>
+                <p className="text-gray-500">
+                  No education information available
+                </p>
               )}
             </div>
           </div>
@@ -296,16 +357,26 @@ const ExpertProfilePage = () => {
               <div className="space-y-4">
                 {licenses.length > 0 ? (
                   licenses.map((license, index) => (
-                    <div key={license.type || `license-${index}`} className="bg-green-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-lg">{license.type || "License"}</h3>
-                      <p className="text-gray-700">Number: {license.licenseNumber || "Not provided"}</p>
+                    <div
+                      key={license.type || `license-${index}`}
+                      className="bg-green-50 p-4 rounded-lg"
+                    >
+                      <h3 className="font-semibold text-lg">
+                        {license.type || "License"}
+                      </h3>
+                      <p className="text-gray-700">
+                        Number: {license.licenseNumber || "Not provided"}
+                      </p>
                       <p className="text-gray-600 text-sm">
-                        Issued by: {license.issuingAuthority || "Authority not specified"}
+                        Issued by:{" "}
+                        {license.issuingAuthority || "Authority not specified"}
                       </p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500">No license information available</p>
+                  <p className="text-gray-500">
+                    No license information available
+                  </p>
                 )}
               </div>
             </div>
@@ -324,4 +395,4 @@ const ExpertProfilePage = () => {
   );
 };
 
-export default ExpertProfilePage; 
+export default ExpertProfilePage;
