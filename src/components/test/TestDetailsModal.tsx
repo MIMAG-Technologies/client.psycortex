@@ -3,8 +3,10 @@
 import { TestDetails } from "@/types/test";
 import Link from "next/link";
 import { FaClock, FaListAlt, FaCheck , FaShoppingCart, FaArrowRight } from "react-icons/fa";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface TestDetailsModalProps {
     isLoggedIn: boolean;
@@ -17,6 +19,18 @@ export default function TestDetailsModal({ isLoggedIn, test, onClose }: TestDeta
     const [isLoading, setIsLoading] = useState(false);
     const {me} = useAuth();
     const formRef = useRef<HTMLFormElement>(null);
+    const notifiedRef = useRef(false);
+    const searchParams = useSearchParams();
+      const pay = searchParams.get("pay");
+    
+    useEffect(() => {
+      if (pay && !notifiedRef.current) {
+        if (pay === "failed") {
+          toast.error("Payment failed. Please try again.");
+        }
+        notifiedRef.current = true;
+      }
+    }, [pay]);
     
     const handlePayment = () => {
         if (!me?.personalInfo.name || !me?.personalInfo.email || !me?.personalInfo.phone || !me?.preferences.timezone || !me?.id) {
@@ -78,10 +92,6 @@ export default function TestDetailsModal({ isLoggedIn, test, onClose }: TestDeta
             value={me?.personalInfo.phone || ""}
           />
           <input type="hidden" name="billing_country" value="India" />
-          <input type="hidden" name="billing_address" value="Default Address" />
-          <input type="hidden" name="billing_city" value="Default City" />
-          <input type="hidden" name="billing_state" value="Default State" />
-          <input type="hidden" name="billing_zip" value="000000" />
           <input
             type="hidden"
             name="delivery_name"

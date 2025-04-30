@@ -10,7 +10,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useTests } from '@/context/TestContext';
 import { toast } from 'react-toastify';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 
 export default function Tests() {
   const { tests, isLoading } = useTests();

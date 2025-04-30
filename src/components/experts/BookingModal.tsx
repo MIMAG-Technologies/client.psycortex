@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { FaCalendarAlt, FaClock, FaVideo, FaUser, FaFileAlt, FaUserFriends } from "react-icons/fa";
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 import { bookSession } from "@/utils/session";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -39,12 +40,36 @@ const BookingModal = ({
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
 
   if (!isOpen) return null;
+     const tax = 18;
+
+  // Calculate amount with tax
+  const amountWithTax = bookingData.price + (bookingData.price * tax) / 100; // Assuming 18% tax
+  const orderId = `order_${Date.now()}`;
 
   const handleClose = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
+    }
+  };
+
+  const handlePayment = () => {
+    if (
+      !me?.personalInfo.name ||
+      !me?.personalInfo.email ||
+      !me?.personalInfo.phone ||
+      !me?.preferences.timezone ||
+      !me?.id
+    ) {
+      toast.error("Please complete your profile before booking a session.");
+      return;
+    }
+    
+    setIsLoading(true);
+    if (formRef.current) {
+      formRef.current.submit();
     }
   };
 
@@ -78,33 +103,91 @@ const BookingModal = ({
     }
   };
 
-  const handlebooking = async () => {
-    setIsLoading(true);
-    try {
-      const res = await bookSession(bookingData.mode as "chat" | "video", bookingData.isCouple, {
-        user_id: userData.id,
-        counsellor_id: counsellorData.id,
-        scheduled_at: bookingData.date + bookingData.time
-      });
+   const {me} = useAuth();
 
-      if (res) {
-        toast.success("Booking Successfully");
-        router.push('/profile/sessions');
-      } else {
-        toast.error("Booking Failed");
-      }
-    } catch (error) {
-      toast.error("An error occurred while booking");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+
+
+
+
 
   return (
     <div
       className="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4"
       onClick={handleClose}
     >
+      {/* Hidden form for CCAvenue */}
+      <form
+        ref={formRef}
+        method="post"
+        action={`${process.env.NEXT_PUBLIC_BACKEND_URL}/ccavenue/webCCAVRequestHandler.php`}
+        style={{ display: "none" }}
+      >
+        <input type="hidden" name="tid" value={Date.now().toString()} />
+        <input
+          type="hidden"
+          name="merchant_id"
+          value={process.env.NEXT_PUBLIC_MERCHANT_ID || ""}
+        />
+        <input type="hidden" name="order_id" value={orderId} />
+        <input type="hidden" name="amount" value={amountWithTax.toString()} />
+        <input type="hidden" name="currency" value="INR" />
+        <input
+          type="hidden"
+          name="redirect_url"
+          value={`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/web_process_payment.php`}
+        />
+        <input
+          type="hidden"
+          name="cancel_url"
+          value={`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/web_process_payment.php`}
+        />
+        <input type="hidden" name="language" value="EN" />
+        <input
+          type="hidden"
+          name="billing_name"
+          value={me?.personalInfo.name || ""}
+        />
+        <input
+          type="hidden"
+          name="billing_email"
+          value={me?.personalInfo.email || ""}
+        />
+        <input
+          type="hidden"
+          name="billing_tel"
+          value={me?.personalInfo.phone || ""}
+        />
+        <input type="hidden" name="billing_country" value="India" />
+        <input
+          type="hidden"
+          name="delivery_name"
+          value={me?.personalInfo.name || ""}
+        />
+        <input
+          type="hidden"
+          name="delivery_tel"
+          value={me?.personalInfo.phone || ""}
+        />
+        <input type="hidden" name="delivery_country" value="India" />
+        <input
+          type="hidden"
+          name="merchant_param1"
+          value={bookingData.isCouple ? "couple_pay" : "appointment_pay"}
+        />
+        <input type="hidden" name="merchant_param2" value={me?.id || ""} />
+        <input
+          type="hidden"
+          name="merchant_param3"
+          value={counsellorData.id || ""}
+        />
+        <input
+          type="hidden"
+          name="merchant_param4"
+          value={bookingData.date + bookingData.time}
+        />
+        <input type="hidden" name="merchant_param5" value={bookingData.mode} />
+      </form>
+
       <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
         <div className="bg-purple-800 text-white p-4">
           <h2 className="text-xl font-bold">Confirm Booking</h2>
@@ -144,7 +227,9 @@ const BookingModal = ({
                 {renderModeIcon()}
                 <span>Mode:</span>
               </div>
-              <p className="font-semibold">{formatModeName(bookingData.mode)}</p>
+              <p className="font-semibold">
+                {formatModeName(bookingData.mode)}
+              </p>
             </div>
 
             {bookingData.isCouple && (
@@ -162,7 +247,9 @@ const BookingModal = ({
 
             <div className="flex justify-between items-center text-lg font-bold text-purple-800">
               <p>Total:</p>
-              <p>{bookingData.currency} {bookingData.price}</p>
+              <p>
+                {bookingData.currency} {bookingData.price}
+              </p>
             </div>
           </div>
 
@@ -174,11 +261,25 @@ const BookingModal = ({
                 <strong className="text-gray-800">Terms and Conditions</strong>
               </div>
               <ul className="list-disc ml-6 space-y-2 text-gray-600">
-                <li>Cancellations are allowed up to 2 hours before the session with a full refund.</li>
-                <li>The session link/details will be sent 15 minutes before the scheduled time.</li>
-                <li>The counsellor may reschedule if they're unavailable due to an emergency.</li>
-                <li>All sessions are confidential and adhere to our privacy policy.</li>
-                <li>By proceeding with the payment, you agree to these terms.</li>
+                <li>
+                  Cancellations are allowed up to 2 hours before the session
+                  with a full refund.
+                </li>
+                <li>
+                  The session link/details will be sent 15 minutes before the
+                  scheduled time.
+                </li>
+                <li>
+                  The counsellor may reschedule if they're unavailable due to an
+                  emergency.
+                </li>
+                <li>
+                  All sessions are confidential and adhere to our privacy
+                  policy.
+                </li>
+                <li>
+                  By proceeding with the payment, you agree to these terms.
+                </li>
               </ul>
             </div>
 
@@ -211,8 +312,8 @@ const BookingModal = ({
                   ? "bg-purple-700 hover:bg-purple-800"
                   : "bg-purple-300 cursor-not-allowed"
               } relative`}
+              onClick={handlePayment}
               disabled={!isTermsAccepted || isLoading}
-              onClick={handlebooking}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -230,4 +331,4 @@ const BookingModal = ({
   );
 };
 
-export default BookingModal; 
+export default BookingModal;
