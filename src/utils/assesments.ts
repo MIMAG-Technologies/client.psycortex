@@ -314,11 +314,11 @@ export const submitAssesment = async (data: {
   user_id: string;
   test_slug: string;
   answers: any;
-}) => {
+},me:Me) => {
   try {
     // Check if the test is VLD type and transform answers if needed
     const testType = assesmentType(data.test_slug);
-    let requestData = { ...data };
+    let requestData:any = { ...data };
     
     if (testType === "vld") {
       // Transform from object format to array format for VLD tests
@@ -330,6 +330,14 @@ export const submitAssesment = async (data: {
         requestData.answers = answersArray;
       }
     }
+    if (
+      data.test_slug === "scat" ||
+      data.test_slug === "academic" ||
+      data.test_slug === "sas"
+    ) {
+      requestData = { ...requestData, gender: me.personalInfo.gender };
+    }
+
     
     await axios.post(`${baseUrl}/${data.test_slug}/b_submit_answers.php`, requestData);
     return true;

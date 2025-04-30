@@ -21,14 +21,21 @@ export default function TestDetailsModal({ isLoggedIn, test, onClose }: TestDeta
     const formRef = useRef<HTMLFormElement>(null);
     const notifiedRef = useRef(false);
     const searchParams = useSearchParams();
-      const pay = searchParams.get("pay");
+    const pay = searchParams.get("pay");
     
     useEffect(() => {
       if (pay && !notifiedRef.current) {
-        if (pay === "failed") {
-          toast.error("Payment failed. Please try again.");
-        }
-        notifiedRef.current = true;
+      if (pay === "failed") {
+        toast.error("Payment failed. Please try again.");
+        // Create new URLSearchParams from current search
+        const params = new URLSearchParams(window.location.search);
+        // Remove only the pay parameter
+        params.delete('pay');
+        // Construct new URL with remaining params
+        const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+        window.history.replaceState({}, '', newUrl);
+      }
+      notifiedRef.current = true;
       }
     }, [pay]);
     

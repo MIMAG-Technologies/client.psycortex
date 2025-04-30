@@ -139,11 +139,14 @@ export default function AssessmentPage() {
     setIsSubmitting(true);
     
     try {
-      const res = await submitAssesment({
-        user_id: me.id,
-        test_slug: slug,
-        answers: userResponses
-      });
+      const res = await submitAssesment(
+        {
+          user_id: me.id,
+          test_slug: slug,
+          answers: userResponses,
+        },
+        me
+      );
 
       if(res){
         router.replace('/assessment-complete');
