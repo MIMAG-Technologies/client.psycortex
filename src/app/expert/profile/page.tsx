@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaGraduationCap,
   FaGem,
@@ -10,34 +10,131 @@ import {
   FaDollarSign,
   FaStar,
   FaBriefcase,
+  FaCalendarCheck,
+  FaCheckSquare,
 } from "react-icons/fa";
 import { CounsellorDetails, getOneCounsellor } from "@/utils/experts";
 import OneExpertBookingCompoent from "@/components/experts/OneExpertBookingCompoent";
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 import { toast } from "react-toastify";
 
+
+const SuccessModal = ({
+  isOpen,
+  appointmentDetails,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  appointmentDetails:any;
+}) => {
+  const router = useRouter();
+
+  if (!isOpen) return null;
+
+  const { mode, date , name } = appointmentDetails;
+
+  const goToSessions = () => {
+    router.replace("/profile/sessions");
+  };
+
+  const goToExperts = () => {
+    router.replace("/experts");
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+        {/* Header with gradient */}
+        <div className="bg-gradient-to-r from-[#642494] to-[#8a35c9] p-6">
+          <div className="flex items-center justify-center mb-2">
+            <div className="bg-white rounded-full p-3">
+              <FaCalendarCheck className="text-3xl text-purple-600" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-center text-white">
+            Booking Confirmed!
+          </h2>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          <div className="mb-6 bg-purple-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">
+              Appointment Details
+            </h3>
+            <div className="space-y-2">
+              <div className="flex items-center">
+                <FaCheckSquare className="text-green-500 mr-2" />
+                <span className="text-gray-700">
+                  <span className="font-medium">Counsellor:</span>{" "}
+                  {name}
+                </span>
+              </div>
+              <div className="flex items-center">
+                <FaCheckSquare className="text-green-500 mr-2" />
+                <span className="text-gray-700">
+                  <span className="font-medium">Session Type:</span>{" "}
+                  {mode?.replace("_", " ")}
+                </span>
+              </div>
+              <div className="flex items-center">
+                <FaCheckSquare className="text-green-500 mr-2" />
+                <span className="text-gray-700">
+                    <span className="font-medium">Date & Time:</span> {date} 
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={goToSessions}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              Go to All Sessions
+            </button>
+            <button
+              onClick={goToExperts}
+              className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+            >
+              Back to Experts
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ExpertProfilePage = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const id = searchParams.get("id");
   const pay = searchParams.get("pay");
+  const mode = searchParams.get("mode");
+  const date = searchParams.get("date");
+
   const [counsellor, setCounsellor] = useState<CounsellorDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-const notifiedRef = useRef(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const notifiedRef = useRef(false);
 
-useEffect(() => {
-  if (pay && !notifiedRef.current) {
-    if (pay === "failed") {
-      toast.error("Payment failed. Please try again.");
-    } else {
-      const mode = searchParams.get("mode");
-      const date = searchParams.get("date");
-      toast.success(`Payment successful for ${mode} session on ${date}.`);
+  useEffect(() => {
+    if (pay && !notifiedRef.current) {
+      if (pay === "failed") {
+        toast.error("Payment failed. Please try again.");
+        // Remove the pay param but keep other params
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete("pay");
+        router.replace(newUrl.pathname + newUrl.search);
+      } else {
+        toast.success(`Payment successful for ${mode} session on ${date}.`);
+        setShowSuccessModal(true);
+      }
+      notifiedRef.current = true;
     }
-    notifiedRef.current = true;
-  }
-}, [pay]);
-
+  }, [pay, mode, date, router]);
 
   useEffect(() => {
     const fetchCounsellor = async () => {
@@ -61,9 +158,6 @@ useEffect(() => {
 
     fetchCounsellor();
   }, [id]);
-
-
-
 
   if (loading) {
     return (
@@ -147,6 +241,13 @@ useEffect(() => {
 
   return (
     <div className="max-w-[1300px] mx-auto py-12 px-4 sm:px-6">
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        appointmentDetails={{ mode, date,name }}
+      />
+
       {/* Top section with expert info */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-[6.5fr_3fr] gap-8">
         <div className="space-y-8">
