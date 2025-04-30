@@ -64,7 +64,7 @@ const Navbar = () => {
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center">
               <img
-                src="https://psycortex.in/assets/Images/thebraintakeLogo.png"
+                src="/logo.png"
                 alt="Psycortex Logo"
                 width={50}
                 height={50}

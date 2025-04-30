@@ -35,27 +35,28 @@ export default function Home() {
                 Your Mental Health Journey Begins Here
               </h1>
               <p className="text-lg md:text-xl mb-8 opacity-90">
-                Access expert mental health services, personalized assessments, and resources designed to support your well-being.
+                Access expert mental health services, personalized assessments,
+                and resources designed to support your well-being.
               </p>
               <div className="flex flex-col md:flex-row gap-4 w-full">
-                <Link 
-                  href="/tests" 
+                <Link
+                  href="/tests"
                   className="w-full md:w-auto px-6 py-3 bg-white text-[#642494] rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center md:justify-start gap-2"
                 >
-                  Take a Test <FaArrowRight size={14} />
+                  Psychometric Tests <FaArrowRight size={14} />
                 </Link>
-                <Link 
-                  href="/experts" 
+                <Link
+                  href="/experts"
                   className="w-full md:w-auto px-6 py-3 border border-[#642494] text-[#642494] rounded-full font-medium hover:bg-white/10 transition-colors text-center"
                 >
-                  Meet Our Experts
+                  Talk to our Experts
                 </Link>
               </div>
             </div>
             <div className="flex justify-center lg:justify-end">
               <div className="w-full max-w-md">
-                <img 
-                  src="/hero.png" 
+                <img
+                  src="/hero.png"
                   alt="Mental Health Journey"
                   className="w-full h-auto"
                 />
@@ -68,25 +69,24 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-16 px-6 bg-gray-50">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Our Services</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FeatureCard 
-              icon={<FaHeartbeat className="text-[#642494] text-3xl" />}
-              title="Mental Wellness"
-              description="Personalized support for your mental health journey."
-            />
-            <FeatureCard 
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
+            Our Services
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard
               icon={<FaUserMd className="text-[#642494] text-3xl" />}
               title="Expert Consultations"
               description="Connect with certified mental health professionals."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<FaClipboardList className="text-[#642494] text-3xl" />}
-              title="Assessment Tests"
+              title="Psychometric Tests"
               description="Scientifically validated tests for mental health needs."
             />
-            <FeatureCard 
-              icon={<MdOutlineScreenSearchDesktop className="text-[#642494] text-3xl" />}
+            <FeatureCard
+              icon={
+                <MdOutlineScreenSearchDesktop className="text-[#642494] text-3xl" />
+              }
               title="Online Sessions"
               description="Convenient and private therapy from anywhere."
             />
@@ -99,8 +99,8 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-3xl font-bold text-gray-800">Featured Tests</h2>
-            <Link 
-              href="/tests" 
+            <Link
+              href="/tests"
               className="text-[#642494] font-medium flex items-center gap-1 hover:underline"
             >
               View All <FaChevronRight size={12} />
@@ -114,11 +114,13 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {topTests.map((test) => (
-                <TestCard 
+                <TestCard
                   key={test.slug}
                   test={test}
                   userAge={null}
-                  onTakeTest={() => window.location.href = `/tests?opentest=${test.slug}`}
+                  onTakeTest={() =>
+                    (window.location.href = `/tests?opentest=${test.slug}`)
+                  }
                 />
               ))}
             </div>
@@ -131,8 +133,8 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-3xl font-bold text-gray-800">Our Experts</h2>
-            <Link 
-              href="/experts" 
+            <Link
+              href="/experts"
               className="text-[#642494] font-medium flex items-center gap-1 hover:underline"
             >
               View All <FaChevronRight size={12} />
@@ -146,18 +148,14 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {topExperts.map((expert) => (
-                <OneExpertCard 
-                  key={expert.id}
-                  {...expert}
-                  variant="default"
-                />
+                <OneExpertCard key={expert.id} {...expert} variant="default" />
               ))}
             </div>
           )}
         </div>
       </section>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 }

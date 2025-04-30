@@ -32,106 +32,108 @@ const Footer: React.FC = () => {
     const currentYear: number = new Date().getFullYear();
 
     return (
-        <footer className="bg-[#f1f1f1] p-5 md:px-[5vw] border border-[#d3d4d4]">
-            <div className="flex flex-row flex-wrap md:flex-nowrap justify-between gap-5 border-b-2 border-[#e5e7e8] pb-5">
-                <div className="flex flex-col gap-1 pt-5">
-                    <h3 className="mt-0 font-bold text-[20px]">{footerLinks[0].title}</h3>
-                    {footerLinks.slice(1).map((link, index) => (
-                        <Link
-                            href={link.ref}
-                            key={index}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="no-underline text-black"
-                        >
-                            {link.title}
-                        </Link>
-                    ))}
-                </div>
+      <footer className="bg-[#f1f1f1] p-5 md:px-[5vw] border border-[#d3d4d4]">
+        <div className="flex flex-row flex-wrap md:flex-nowrap justify-between gap-5 border-b-2 border-[#e5e7e8] pb-5">
+          <div className="flex flex-col items-center pt-5">
+            <span className="flex gap-2 flex-wrap justify-center">
+              <Link
+                href={socialLinks.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
+              >
+                <FaFacebookF size={18} />
+              </Link>
+              <Link
+                href={socialLinks.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
+              >
+                <FaLinkedinIn size={18} />
+              </Link>
+              <Link
+                href={socialLinks.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
+              >
+                <FaTwitter size={18} />
+              </Link>
+              <Link
+                href={socialLinks.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
+              >
+                <FaYoutube size={18} />
+              </Link>
+              <Link
+                href={socialLinks.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
+              >
+                <FaInstagram size={18} />
+              </Link>
+            </span>
+            <img
+              src="/logo.png"
+              alt="Psycortex Logo"
+              className="max-w-[100px] object-contain mt-2 self-center"
+            />
+          </div>
+          
+          <div className="flex flex-col gap-1 pt-5">
+            <h3 className="mt-0 font-bold text-[20px]">
+              {footerLinks[0].title}
+            </h3>
+            {footerLinks.slice(1).map((link, index) => (
+              <Link
+                href={link.ref}
+                key={index}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="no-underline text-black"
+              >
+                {link.title}
+              </Link>
+            ))}
+          </div>
+        </div>
 
-                <div className="flex flex-col items-center pt-5">
-                    <span className="flex gap-2 flex-wrap justify-center">
-                        <Link
-                            href={socialLinks.facebook}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
-                        >
-                            <FaFacebookF size={18} />
-                        </Link>
-                        <Link
-                            href={socialLinks.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
-                        >
-                            <FaLinkedinIn size={18} />
-                        </Link>
-                        <Link
-                            href={socialLinks.twitter}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
-                        >
-                            <FaTwitter size={18} />
-                        </Link>
-                        <Link
-                            href={socialLinks.youtube}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
-                        >
-                            <FaYoutube size={18} />
-                        </Link>
-                        <Link
-                            href={socialLinks.instagram}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-9 w-9 flex items-center justify-center text-white bg-black rounded-full"
-                        >
-                            <FaInstagram size={18} />
-                        </Link>
-                    </span>
-                    <img
-                        src="https://psycortex.in/assets/Images/thebraintakeLogo.png"
-                        alt="Psycortex Logo"
-                        className="max-w-[100px] object-contain mt-2 self-center"
-                    />
-                </div>
-            </div>
-
-            <div className="flex justify-between items-center flex-col sm:flex-row text-center pt-5">
-                <p className="pt-2">
-                    © {currentYear} Psycortex Appointments. All Rights Reserved.
-                </p>
-                <span className="flex gap-2 pt-2 sm:pt-0 flex-wrap justify-center">
-                    <Link
-                        href="https://psycortex.in/psycortex/privacypolicy"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="no-underline text-black"
-                    >
-                        Privacy Policy
-                    </Link>
-                    <Link
-                        href="https://psycortex.in/psycortex/termsandcondition"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="no-underline text-black"
-                    >
-                        Terms & Conditions
-                    </Link>
-                    <Link
-                        href="https://psycortex.in/psycortex/returnpolicy"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="no-underline text-black"
-                    >
-                        Refund Policy
-                    </Link>
-                </span>
-            </div>
-        </footer>
+        <div className="flex justify-between items-center flex-col sm:flex-row text-center pt-5">
+          <p className="pt-2">
+            © {currentYear} Psycortex Appointments. All Rights Reserved.
+          </p>
+          <span className="flex gap-2 pt-2 sm:pt-0 flex-wrap justify-center">
+            <Link
+              href="https://psycortex.in/psycortex/privacypolicy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="no-underline text-black"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="https://psycortex.in/psycortex/termsandcondition"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="no-underline text-black"
+            >
+              Terms & Conditions
+            </Link>
+            <Link
+              href="https://psycortex.in/psycortex/returnpolicy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="no-underline text-black"
+            >
+              Refund Policy
+            </Link>
+          </span>
+        </div>
+      </footer>
     );
 };
 
