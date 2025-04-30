@@ -31,16 +31,16 @@ export default function TestDetailsModal({ booktest, isLoggedIn, test, onClose }
         if (!me?.personalInfo.name || !me?.personalInfo.email || !me?.personalInfo.phone || !me?.preferences.timezone || !me?.id) {
             return;
         }
-
+        
         const res = await initiatePayment({
-            amount: test.pricing.amount,
-            name: me.personalInfo.name,
-            email: me.personalInfo.email,
-            phone: me.personalInfo.phone,
-            country: me.preferences.timezone,
-            user_id: me.id, 
-            test_slug: test.slug,
-        })
+          amount: test.pricing.amount,
+          name: me.personalInfo.name,
+          email: me.personalInfo.email,
+          phone: me.personalInfo.phone,
+          uuid: me.id,
+          tax:test.pricing.taxPercent,
+          test_slug: test.slug,
+        });
     }
 
     return (
