@@ -54,12 +54,12 @@ export default function TestDetailsModal({ isLoggedIn, test, onClose }: TestDeta
           <input
             type="hidden"
             name="redirect_url"
-            value={`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/process_payment.php`}
+            value={`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/web_process_payment.php`}
           />
           <input
             type="hidden"
             name="cancel_url"
-            value={`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/process_payment.php`}
+            value={`${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/web_process_payment.php`}
           />
           <input type="hidden" name="language" value="EN" />
           <input
