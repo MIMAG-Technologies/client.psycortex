@@ -306,8 +306,8 @@ export default function OneExpertBookingCompoent(props: {
         }}
         bookingData={{
           mode: selectedMode,
-          date: formatDate(selectedDayIndex),
-          time: formatTime(selectedTimeSlot),
+          date: selectedDayIndex,
+          time: selectedTimeSlot,
           sessionType: selectedRate.sessionTitle || selectedSessionType,
           price: isCoupleCounselling ? selectedRate.price * 2 : selectedRate.price,
           currency: selectedRate.currency,
