@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FaCalendarAlt, FaClock, FaVideo, FaUser, FaFileAlt, FaUserFriends } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaFileAlt, FaUserFriends } from "react-icons/fa";
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
-import { bookSession } from "@/utils/session";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -39,7 +38,6 @@ const BookingModal = ({
 }: BookingModalProps) => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
   if (!isOpen) return null;
@@ -66,6 +64,7 @@ const BookingModal = ({
       toast.error("Please complete your profile before booking a session.");
       return;
     }
+    
     
     setIsLoading(true);
     if (formRef.current) {
@@ -175,6 +174,7 @@ const BookingModal = ({
           value={bookingData.isCouple ? "couple_pay" : "appointment_pay"}
         />
         <input type="hidden" name="merchant_param2" value={me?.id || ""} />
+        
         <input
           type="hidden"
           name="merchant_param3"
@@ -183,7 +183,7 @@ const BookingModal = ({
         <input
           type="hidden"
           name="merchant_param4"
-          value={bookingData.date + bookingData.time}
+          value={bookingData.date + " " + bookingData.time}
         />
         <input type="hidden" name="merchant_param5" value={bookingData.mode} />
       </form>
