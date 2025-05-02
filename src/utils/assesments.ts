@@ -57,18 +57,21 @@ const get_VLD_Questions = async (slug: string, userData?: UserData) => {
     // Get gender from different user objects
     const gender = userData?.personalInfo?.gender;
     console.log(userData);
-    
-    const genderParam = slug === "sas" && gender ? `&gender=${gender}` : '';
-    
+
+    const genderParam = slug === "sas" && gender ? `&gender=${gender}` : "";
+
     const url = `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}${genderParam}`;
     console.log("Fetching from URL:", url);
-    
+
     const res = await axios.get(url);
-    console.log("Response data structure:", JSON.stringify(res.data).substring(0, 200) + "...");
-    
+    console.log(
+      "Response data structure:",
+      JSON.stringify(res.data).substring(0, 200) + "..."
+    );
+
     const noOfPages: number = 1;
     let QuestionsList: any[] = [];
-    
+
     // Handle different response structures
     if (res.data.questions) {
       QuestionsList = res.data.questions;
@@ -76,24 +79,36 @@ const get_VLD_Questions = async (slug: string, userData?: UserData) => {
       QuestionsList = res.data.data.questions;
     } else {
       console.error("Unexpected response structure:", res.data);
-      throw new Error("Unexpected response structure: questions array not found");
+      throw new Error(
+        "Unexpected response structure: questions array not found"
+      );
     }
-    
+
     let questions: question[] = QuestionsList.map((question: any) => {
       return {
         question_number: question.id || question.question_number,
         question_text: question.text || question.question_text,
-        options: Array.isArray(["pre-marital", "sas"].includes(slug) ? question.answer_options : question.options)
-          ? (["pre-marital", "sas"].includes(slug) ? question.answer_options : question.options).map((option: any) => {
+        options: Array.isArray(
+          ["pre-marital", "sas"].includes(slug)
+            ? question.answer_options
+            : question.options
+        )
+          ? (["pre-marital", "sas"].includes(slug)
+              ? question.answer_options
+              : question.options
+            ).map((option: any) => {
               return {
                 value: option.value,
-                text: slug !== "sas" && slug !== "pre-marital" ? option.text : (option.label || option.text),
+                text:
+                  slug !== "sas" && slug !== "pre-marital"
+                    ? option.text
+                    : option.label || option.text,
               };
             })
-          : []
+          : [],
       };
     });
-    
+
     const assesmentData: assesmentData = {
       testInfo: res.data.test_info || res.data.data?.test_info,
       pages: noOfPages,
@@ -206,8 +221,8 @@ const get_VL_VT_Question = async (slug: string, type: string) => {
 const get_AD5_OC_YN_Questions = async (slug: string) => {
   try {
     // Handle special case for marital-adjustment
-    const urlSlug = slug === 'marital-adjustment' ? 'marital' : slug;
-    
+    const urlSlug = slug === "marital-adjustment" ? "marital" : slug;
+
     const res = await axios.get(
       `${baseUrl}/${urlSlug}/a_get_questions.php?test_slug=${slug}&page=1`
     );
@@ -215,7 +230,9 @@ const get_AD5_OC_YN_Questions = async (slug: string) => {
     let QuestionsList: any[] = res.data.data.questions;
     for (let i = 1; i < noOfPages; i++) {
       const moreres = await axios.get(
-        `${baseUrl}/${urlSlug}/a_get_questions.php?test_slug=${slug}&page=${i + 1}`
+        `${baseUrl}/${urlSlug}/a_get_questions.php?test_slug=${slug}&page=${
+          i + 1
+        }`
       );
       const moreQuestions = moreres.data.data.questions;
       QuestionsList = QuestionsList.concat(moreQuestions);
@@ -244,7 +261,7 @@ const get_BDI_Questions = async (slug: string) => {
     );
     const noOfPages: number = res.data.data.total_pages || 1;
     let QuestionsList: any[] = res.data.data.questions;
-    
+
     for (let i = 1; i < noOfPages; i++) {
       const moreres = await axios.get(
         `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}&page=${i + 1}`
@@ -252,7 +269,7 @@ const get_BDI_Questions = async (slug: string) => {
       const moreQuestions = moreres.data.data.questions;
       QuestionsList = QuestionsList.concat(moreQuestions);
     }
-    
+
     let questions: question[] = QuestionsList.map((question: any) => {
       return {
         question_number: question.question_number,
@@ -265,7 +282,7 @@ const get_BDI_Questions = async (slug: string) => {
         }),
       };
     });
-    
+
     const assesmentData: assesmentData = {
       pages: noOfPages,
       questions: questions,
@@ -281,6 +298,76 @@ const defaultresponce: assesmentData = {
   questions: [],
 };
 
+const get_Sucidal_Questions = async (slug: string) => {
+  try {
+    const res = await axios.get(
+      `${baseUrl}/suicidal-ideation-scale/a_get_questions.php?test_slug=suicidal-ideation-scale`
+    );
+    const noOfPages: number = res.data.data.total_pages || 1;
+    let QuestionsList: any[] = res.data.data.questions;
+    let questions: question[] = QuestionsList.map((question: any) => {
+      return {
+        question_number: question.question_number,
+        question_text: question.question_text,
+        options:
+          question.type === "positive"
+            ? [
+                {
+                  value: "strongly_agree",
+                  text: "Strongly Agree",
+                },
+                {
+                  value: "agree",
+                  text: "Agree",
+                },
+                {
+                  value: "uncertain",
+                  text: "Uncertain",
+                },
+                {
+                  value: "disagree",
+                  text: "Disagree",
+                },
+                {
+                  value: "strongly_disagree",
+                  text: "Disagree",
+                },
+              ]
+            : [
+                {
+                  value: "strongly_agree",
+                  text: "Strongly Agree",
+                },
+                {
+                  value: "agree",
+                  text: "Agree",
+                },
+                {
+                  value: "uncertain",
+                  text: "Uncertain",
+                },
+                {
+                  value: "disagree",
+                  text: "Disagree",
+                },
+                {
+                  value: "strongly_disagree",
+                  text: "Disagree",
+                },
+              ],
+      };
+    });
+    const assesmentData: assesmentData = {
+      pages: noOfPages,
+      questions: questions,
+    };
+    return assesmentData;
+  } catch (error) {
+    console.log(error);
+    return defaultresponce;
+  }
+};
+
 export const getQuestions = async (slug: string, userData: any) => {
   try {
     const typeOfAssesment = assesmentType(slug);
@@ -292,6 +379,10 @@ export const getQuestions = async (slug: string, userData: any) => {
       typeOfAssesment === "oc" ||
       typeOfAssesment === "yn"
     ) {
+      if (slug === "suicidal-ideation-scale") {
+        const res = await get_Sucidal_Questions(slug);
+        return res;
+      }
       const res = await get_AD5_OC_YN_Questions(slug);
       return res;
     } else if (typeOfAssesment === "vld") {
@@ -310,23 +401,28 @@ export const getQuestions = async (slug: string, userData: any) => {
   }
 };
 
-export const submitAssesment = async (data: {
-  user_id: string;
-  test_slug: string;
-  answers: any;
-},me:Me) => {
+export const submitAssesment = async (
+  data: {
+    user_id: string;
+    test_slug: string;
+    answers: any;
+  },
+  me: Me
+) => {
   try {
     // Check if the test is VLD type and transform answers if needed
     const testType = assesmentType(data.test_slug);
-    let requestData:any = { ...data };
-    
+    let requestData: any = { ...data };
+
     if (testType === "vld") {
       // Transform from object format to array format for VLD tests
       if (!Array.isArray(data.answers)) {
-        const answersArray = Object.entries(data.answers).map(([key, value]) => ({
-          question_id: parseInt(key),
-          value: value
-        }));
+        const answersArray = Object.entries(data.answers).map(
+          ([key, value]) => ({
+            question_id: parseInt(key),
+            value: value,
+          })
+        );
         requestData.answers = answersArray;
       }
     }
@@ -338,8 +434,10 @@ export const submitAssesment = async (data: {
       requestData = { ...requestData, gender: me.personalInfo.gender };
     }
 
-    
-    await axios.post(`${baseUrl}/${data.test_slug}/b_submit_answers.php`, requestData);
+    await axios.post(
+      `${baseUrl}/${data.test_slug}/b_submit_answers.php`,
+      requestData
+    );
     return true;
   } catch (error) {
     return false;
