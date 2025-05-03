@@ -2,13 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
 import axios from "axios";
 
 export default function CompleteProfile() {
   const { user, me, isLoading, needsProfileCompletion } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isEditMode = searchParams.get("mode") === "edit";
 
   const initialUserData = {
     id: "",
@@ -30,10 +32,30 @@ export default function CompleteProfile() {
       if (!user) {
         // User not logged in, redirect to login
         router.push("/login");
-      } else if (me && !needsProfileCompletion) {
-        // User already has a complete profile, redirect to home
-        router.push("/");
-      } else if (user) {
+        return;
+      }
+
+      if (isEditMode) {
+        if (me) {
+          // Pre-fill data from existing user profile
+          setUserData({
+            id: user.uid,
+            name: me.personalInfo.name,
+            email: me.personalInfo.email,
+            phone: me.personalInfo.phone,
+            dateOfBirth: me.personalInfo.dateOfBirth,
+            profileImage: me.personalInfo.profileImage,
+            gender: me.personalInfo.gender,
+            timezone: me.preferences.timezone,
+          });
+        }
+      } else {
+        // Normal profile completion flow
+        if (me && !needsProfileCompletion) {
+          // User already has a complete profile, redirect to home
+          router.push("/");
+          return;
+        }
         // Pre-fill data from Firebase user
         setUserData((prev) => ({
           ...prev,
@@ -44,7 +66,7 @@ export default function CompleteProfile() {
         }));
       }
     }
-  }, [user, me, isLoading, needsProfileCompletion, router]);
+  }, [user, me, isLoading, needsProfileCompletion, router, isEditMode]);
 
   const handleInputChange = useCallback(
     (field: keyof typeof userData, value: string) => {
@@ -77,7 +99,11 @@ export default function CompleteProfile() {
       );
 
       if (response.data.success) {
-        window.location.reload();
+        if (isEditMode) {
+            window.location.href = "/profile";
+        } else {
+          window.location.reload();
+        }
       } else {
         setError(response.data.message || "Failed to complete profile");
       }
@@ -105,7 +131,7 @@ export default function CompleteProfile() {
     <div className="container mx-auto max-w-md px-4 py-12">
       <div className="bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold mb-6 text-center text-indigo-700">
-          Complete Your Profile
+          {isEditMode ? "Edit Profile" : "Complete Your Profile"}
         </h1>
         <p className="text-gray-600 mb-6 text-center">
           Please provide these additional details to set up your account.
@@ -172,8 +198,9 @@ export default function CompleteProfile() {
                 id="phone"
                 type="tel"
                 value={userData.phone}
+                disabled={isEditMode}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
-                className="pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={ isEditMode ? "pl-10 w-full p-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed":"pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"}
                 placeholder="Your phone number"
                 required
               />
@@ -219,10 +246,24 @@ export default function CompleteProfile() {
             disabled={submitLoading}
             className="w-full mt-6 bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-70"
           >
-            {submitLoading ? "Processing..." : "Complete Profile"}
+            {submitLoading
+              ? "Processing..."
+              : isEditMode
+              ? "Save Changes"
+              : "Complete Profile"}
           </button>
+
+          {isEditMode && (
+            <button
+              type="button"
+              onClick={() => router.push("/profile")}
+              className="w-full mt-4 bg-gray-200 text-gray-700 p-2 rounded-md hover:bg-gray-300 transition-colors"
+            >
+              Cancel
+            </button>
+          )}
         </form>
       </div>
     </div>
   );
-} 
+}

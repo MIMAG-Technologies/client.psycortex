@@ -1,6 +1,7 @@
 "use client";
 
-import { FaUser, FaEnvelope, FaPhone, FaBirthdayCake, FaVenusMars, FaSignOutAlt } from "react-icons/fa";
+import { useRouter } from 'next/navigation';
+import { FaUser, FaEnvelope, FaPhone, FaBirthdayCake, FaVenusMars, FaSignOutAlt, FaEdit } from "react-icons/fa";
 
 interface ProfileHeaderProps {
   user: any;
@@ -8,12 +9,18 @@ interface ProfileHeaderProps {
 }
 
 export default function ProfileHeader({ user, logout }: ProfileHeaderProps) {
+  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const handleEditProfile = () => {
+    router.push('/complete-profile?mode=edit');
   };
 
   if (!user) return null;
@@ -107,12 +114,21 @@ export default function ProfileHeader({ user, logout }: ProfileHeaderProps) {
             />
           </div>
           
-          <button
-            onClick={handleLogout}
-            className="mt-4 w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-md hover:from-red-600 hover:to-red-700 transition-all shadow-md"
-          >
-            <FaSignOutAlt className="mr-2" /> Logout
-          </button>
+          <div className="flex gap-2 w-full">
+            <button
+              onClick={handleEditProfile}
+              className="mt-4 flex-1 flex items-center justify-center px-4 py-2 bg-gradient-to-r from-[#642494] to-[#8a35c9] text-white rounded-md hover:from-[#8a35c9] hover:to-[#642494] transition-all shadow-md"
+            >
+              <FaEdit className="mr-2" /> Edit Profile
+            </button>
+            
+            <button
+              onClick={handleLogout}
+              className="mt-4 flex-1 flex items-center justify-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-md hover:from-red-600 hover:to-red-700 transition-all shadow-md"
+            >
+              <FaSignOutAlt className="mr-2" /> Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -127,4 +143,4 @@ function StatBadge({ label, value, color }: { label: string; value: number; colo
       <div className="text-xs">{label}</div>
     </div>
   );
-} 
+}
