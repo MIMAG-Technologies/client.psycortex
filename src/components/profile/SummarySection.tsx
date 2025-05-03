@@ -290,7 +290,7 @@ export default function SummarySection({
                       hover:bg-[#642494]/10 transition-colors
                     `}
                   >
-                    <span className="text-center">{date.getDate()}</span>
+                    <span className="text-center">{date.getDate()} </span>
                     {hasEvent(date) && !isSelected(date) && (
                       <div
                         className={`h-1 w-1 rounded-full mt-0.5 ${

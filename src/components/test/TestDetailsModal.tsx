@@ -190,14 +190,16 @@ export default function TestDetailsModal({ isLoggedIn, test, onClose }: TestDeta
                     </li>
                     <li className="flex items-start">
                       <span className="text-[#642494] mr-2">•</span>
-                      By purchasing, you agree to our
-                      <a
-                        href="https://psycortex.in/psycortex/returnpolicy"
-                        target="_blank"
-                        className="text-[#642494] hover:text-[#4e1c72] ml-1 font-medium"
-                      >
-                        refund policy
-                      </a>
+                      <span className="flex-1">
+                        By purchasing, you agree to our
+                        <a
+                          href="https://psycortex.in/psycortex/returnpolicy"
+                          target="_blank"
+                          className="text-[#642494] hover:text-[#4e1c72] ml-1 font-medium inline whitespace-nowrap"
+                        >
+                          refund policy
+                        </a>
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-[#642494] mr-2">•</span>
