@@ -10,3 +10,35 @@ body * {
   font-optical-sizing: auto;
   font-style: normal;
 }
+
+/* Custom styles for the carousel */
+.slick-slide {
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.slick-slide > div {
+  width: 100%;
+}
+
+.slick-list {
+  margin: 0 -8px;
+}
+
+.slick-dots {
+  bottom: -35px;
+}
+
+.slick-dots li button:before {
+  color: #642494;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #642494;
+}
+
+@media (max-width: 768px) {
+  .slick-slide.slick-active {
+    width: 95vw !important;
+  }
+}
