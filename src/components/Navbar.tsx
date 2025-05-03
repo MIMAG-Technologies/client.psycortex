@@ -59,21 +59,21 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-md" : "bg-white/80 backdrop-blur-sm"}`}>
       <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-20">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center">
               <img
                 src="/logo.png"
                 alt="Psycortex Logo"
-                width={50}
-                height={50}
+                width={64}
+                height={64}
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-18">
             {isSearchOpen ? (
               <form onSubmit={handleSearch} className="flex items-center w-full">
                 <input
@@ -205,7 +205,7 @@ const NavLink = ({
           : "text-gray-700 hover:text-[#642494]"
       }`}
     >
-      <span className="text-lg">{icon}</span>
+      <span className="text-lg mr-2">{icon}</span>
       <span>{label}</span>
     </Link>
   );
