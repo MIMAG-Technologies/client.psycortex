@@ -15,6 +15,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
  export type Me = {
   id: string;
@@ -108,7 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userAge, setUserAge] = useState<number | null>(null);
   const [isLoading, setLoading] = useState(true);
   const [needsProfileCompletion, setNeedsProfileCompletion] = useState(false);
-  
+  const router = useRouter();
+
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // Calculate age whenever me changes
@@ -120,14 +122,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [me]);
 
+  // Redirect if not logged in or needs profile completion
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        router.push("/login");
+      } else if (needsProfileCompletion) {
+        router.push("/complete-profile");
+      }
+    }
+  }, [user, isLoading, router, needsProfileCompletion]);
+
   // Check if user is logged in on mount
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       console.log(currentUser?.uid);
-      
+
       setLoading(true);
-      
+
       if (currentUser) {
         try {
           const res = await axios.get<{ user: Me }>(
@@ -143,22 +156,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setMe(null);
         setNeedsProfileCompletion(false);
       }
-      
+
       setLoading(false);
     });
-    
+
     return () => unsubscribe();
   }, [BACKEND_URL]);
 
   // Register function
-  const register = async (name: string, email: string, password: string): Promise<void> => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<void> => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      
+
       await updateProfile(userCredential.user, { displayName: name });
       await sendEmailVerification(userCredential.user);
     } catch (error) {
@@ -208,19 +225,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        me, 
+    <AuthContext.Provider
+      value={{
+        user,
+        me,
         userAge,
-        isLoading, 
+        isLoading,
         setLoading,
         login,
         loginWithGoogle,
         logout,
         register,
         resetPassword,
-        needsProfileCompletion
+        needsProfileCompletion,
       }}
     >
       {children}

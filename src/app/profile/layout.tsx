@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 import { FaUser, FaFileAlt, FaCalendarAlt } from "react-icons/fa";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import Link from "next/link";
@@ -12,8 +11,7 @@ interface ProfileLayoutProps {
 }
 
 export default function ProfileLayout({ children }: ProfileLayoutProps) {
-  const { user, me, logout, isLoading, needsProfileCompletion } = useAuth();
-  const router = useRouter();
+  const { user, me, logout, isLoading  } = useAuth();
   const [activeTab, setActiveTab] = useState("");
 
   // Set active tab based on path
@@ -28,16 +26,6 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
     }
   }, []);
 
-  // Redirect if not logged in or needs profile completion
-  useEffect(() => {
-    if (!isLoading) {
-      if (!user) {
-        router.push("/login");
-      } else if (needsProfileCompletion) {
-        router.push("/complete-profile");
-      }
-    }
-  }, [user, isLoading, router, needsProfileCompletion]);
 
   if (isLoading) {
     return (
@@ -86,7 +74,7 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
                 href="/profile/tests"
                 active={activeTab === "tests"} 
                 icon={<FaFileAlt />}
-                label="Test Results"
+                label="My Test"
               />
             </div>
 

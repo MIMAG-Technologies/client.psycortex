@@ -1,11 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaHeartbeat, FaUserMd, FaClipboardList, FaChevronRight, FaStar, FaArrowRight } from 'react-icons/fa';
+import { FaUserMd, FaClipboardList, FaChevronRight, FaStar, FaArrowRight } from 'react-icons/fa';
 import { MdOutlineScreenSearchDesktop } from 'react-icons/md';
 import { useCounsellorContext } from '@/context/CounsellorContext';
 import { useTests } from '@/context/TestContext';
-import { TestDetails } from '@/types/test';
 import TestCard from '@/components/test/TestCard';
 import OneExpertCard from '@/components/experts/OneExpertCard';
 import Footer from '@/components/Footer';

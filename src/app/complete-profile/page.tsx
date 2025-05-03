@@ -77,8 +77,7 @@ export default function CompleteProfile() {
       );
 
       if (response.data.success) {
-        // Profile completed successfully, redirect
-        router.push("/");
+        window.location.reload();
       } else {
         setError(response.data.message || "Failed to complete profile");
       }
