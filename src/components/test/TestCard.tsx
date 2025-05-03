@@ -1,7 +1,7 @@
 "use client";
 
 import { TestDetails } from "@/types/test";
-import { FaClock, FaListAlt, FaClipboardList, FaExclamationCircle, FaInfoCircle, FaChevronRight } from "react-icons/fa";
+import { FaClock, FaListAlt, FaClipboardList, FaExclamationCircle, FaChevronRight } from "react-icons/fa";
 
 interface TestCardProps {
     test: TestDetails;
@@ -40,9 +40,6 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
             <div className="p-6 flex flex-col h-[calc(100%-13rem)] relative">
                 <div className="flex justify-between items-start mb-2">
                     <h2 className="text-xl font-semibold text-gray-800">{test.name}</h2>
-                    <div className="flex items-center justify-center bg-[#642494]/10 text-[#642494] rounded-full w-8 h-8 hover:bg-[#642494]/20 transition-colors cursor-pointer">
-                        <FaInfoCircle />
-                    </div>
                 </div>
                 
                 <p className="text-gray-600 mb-4 h-12 overflow-hidden">

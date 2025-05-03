@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { bookTest } from '@/utils/test';
 import { TestDetails } from '@/types/test';
-import { FaSearch, FaInfoCircle, FaGlobeAmericas, FaFlag } from 'react-icons/fa';
+import { FaSearch, FaInfoCircle } from 'react-icons/fa';
 import TestCard from '@/components/test/TestCard';
 import TestDetailsModal from '@/components/test/TestDetailsModal';
 import { useAuth } from '@/context/AuthContext';
@@ -73,12 +73,14 @@ export default function Tests() {
     <div className="container mx-auto px-6 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-purple-800 mb-2">Psychological Tests</h1>
+        <h1 className="text-3xl font-bold text-purple-800 mb-2">
+          Psychometric Tests
+        </h1>
         <p className="text-gray-600">
-          Discover professional psychological tests to help understand your mental health better
+          Discover professional psychological tests to help understand your
+          mental health better
         </p>
       </div>
-      
 
       {/* Search and Filter */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -94,19 +96,23 @@ export default function Tests() {
         </div>
         <div className="flex w-full md:w-auto">
           <button
-            className={`flex-1 md:flex-auto px-6 py-2 rounded-l-md flex items-center justify-center gap-2 ${testType === 'indian' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setTestType('indian')}
+            className={`flex-1 md:flex-auto px-6 py-2 rounded-l-md flex items-center justify-center gap-2 ${
+              testType === "indian"
+                ? "bg-purple-800 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setTestType("indian")}
           >
-            <FaFlag />
             <span>Indian Tests</span>
           </button>
           <button
-            className={`flex-1 md:flex-auto px-6 py-2 rounded-r-md flex items-center justify-center gap-2 ${testType === 'global' ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setTestType('global')}
+            className={`flex-1 md:flex-auto px-6 py-2 rounded-r-md flex items-center justify-center gap-2 ${
+              testType === "global"
+                ? "bg-purple-800 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setTestType("global")}
           >
-            <FaGlobeAmericas />
             <span>Global Tests</span>
           </button>
         </div>
@@ -121,7 +127,9 @@ export default function Tests() {
         <div className="text-center py-16">
           <FaInfoCircle className="text-4xl text-gray-400 mx-auto mb-4" />
           <h3 className="text-xl font-medium text-gray-600">No tests found</h3>
-          <p className="text-gray-500 mt-2">Try adjusting your filters or search term</p>
+          <p className="text-gray-500 mt-2">
+            Try adjusting your filters or search term
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
