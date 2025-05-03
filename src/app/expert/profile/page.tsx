@@ -18,6 +18,28 @@ import OneExpertBookingCompoent from "@/components/experts/OneExpertBookingCompo
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 import { toast } from "react-toastify";
 
+const TruncatedText = ({ text, limit = 160 }: { text: string; limit?: number }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldTruncate = text.length > limit;
+  const displayText = isExpanded ? text : text.slice(0, limit);
+
+  return (
+    <div>
+      <p className="whitespace-pre-line text-gray-700 leading-relaxed">
+        {displayText}
+        {!isExpanded && shouldTruncate && "..."}
+      </p>
+      {shouldTruncate && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-[#642494] font-medium mt-2 hover:underline"
+        >
+          {isExpanded ? "View Less" : "View More"}
+        </button>
+      )}
+    </div>
+  );
+};
 
 const SuccessModal = ({
   isOpen,
@@ -330,23 +352,15 @@ const ExpertProfilePage = () => {
 
           {/* About Section */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600">
-                <FaUserFriends />
-              </span>
+            <h2 className="text-2xl font-bold text-gray-800 mb-5">
               About {name}
             </h2>
-            <p className="whitespace-pre-line text-gray-700 leading-relaxed">
-              {biography}
-            </p>
+            <TruncatedText text={biography} />
           </div>
 
           {/* Specialties Section */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600">
-                <FaGem />
-              </span>
+            <h2 className="text-2xl font-bold text-gray-800 mb-5">
               Specialties
             </h2>
             <div className="flex flex-wrap gap-3">
@@ -367,10 +381,7 @@ const ExpertProfilePage = () => {
 
           {/* Session Pricing Section */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600">
-                <FaDollarSign />
-              </span>
+            <h2 className="text-2xl font-bold text-gray-800 mb-5">
               Session Pricing
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -415,10 +426,7 @@ const ExpertProfilePage = () => {
 
           {/* Education Section */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600">
-                <FaGraduationCap />
-              </span>
+            <h2 className="text-2xl font-bold text-gray-800 mb-5">
               Education
             </h2>
             <div className="space-y-4">
@@ -449,10 +457,7 @@ const ExpertProfilePage = () => {
           {/* Licenses Section */}
           {counsellor?.professionalInfo?.licenses.length !== 0 && (
             <div className="bg-white rounded-2xl shadow-md p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600">
-                  <FaCheckCircle />
-                </span>
+              <h2 className="text-2xl font-bold text-gray-800 mb-5">
                 Licenses & Certifications
               </h2>
               <div className="space-y-4">
