@@ -165,91 +165,104 @@ export default function SummarySection({
       <div className="relative overflow-hidden bg-gradient-to-r from-[#642494] to-[#8a35c9] rounded-2xl shadow-lg">
         <div className="absolute right-0 top-0 w-48 h-48 opacity-10">
           <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#FFFFFF" d="M42.7,-62.9C55.9,-54.8,67.4,-42.5,73.5,-27.9C79.6,-13.3,80.3,3.6,75.2,18.3C70.1,33,59.1,45.7,45.9,54.9C32.6,64.1,16.3,69.9,0.1,69.8C-16.2,69.6,-32.3,63.5,-45,53.4C-57.7,43.2,-66.9,28.9,-71.2,12.7C-75.5,-3.5,-74.9,-21.7,-67.1,-35.9C-59.3,-50.1,-44.3,-60.2,-29.4,-67.6C-14.5,-75,-7.3,-79.6,4,-83.5C15.2,-87.5,30.5,-90.8,42.7,-62.9Z" transform="translate(100 100)" />
+            <path
+              fill="#FFFFFF"
+              d="M42.7,-62.9C55.9,-54.8,67.4,-42.5,73.5,-27.9C79.6,-13.3,80.3,3.6,75.2,18.3C70.1,33,59.1,45.7,45.9,54.9C32.6,64.1,16.3,69.9,0.1,69.8C-16.2,69.6,-32.3,63.5,-45,53.4C-57.7,43.2,-66.9,28.9,-71.2,12.7C-75.5,-3.5,-74.9,-21.7,-67.1,-35.9C-59.3,-50.1,-44.3,-60.2,-29.4,-67.6C-14.5,-75,-7.3,-79.6,4,-83.5C15.2,-87.5,30.5,-90.8,42.7,-62.9Z"
+              transform="translate(100 100)"
+            />
           </svg>
         </div>
         <div className="relative p-4 sm:p-6 md:p-8 text-white z-10">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Welcome to Your Dashboard</h1>
-          <p className="opacity-80 mb-4">Stay up to date with your mental health journey</p>
-          
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+            Welcome to Your Dashboard
+          </h1>
+          <p className="opacity-80 mb-4">
+            Stay up to date with your mental health journey
+          </p>
+
           <div className="flex flex-wrap gap-3 sm:gap-4 mt-4">
             <div className="px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
-              <div className="font-bold text-xl sm:text-2xl">{stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}</div>
-              <div className="text-xs sm:text-sm text-white/80">Total Sessions</div>
+              <div className="font-bold text-xl sm:text-2xl">
+                {stats.counselling.total +
+                  stats.chat.total +
+                  stats.call.total +
+                  stats.offline.total}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+                Total Sessions
+              </div>
             </div>
             <div className="px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
-              <div className="font-bold text-xl sm:text-2xl">{stats.tests.completed}</div>
-              <div className="text-xs sm:text-sm text-white/80">Tests Completed</div>
+              <div className="font-bold text-xl sm:text-2xl">
+                {stats.tests.completed}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+                Tests Completed
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-        <SummaryCard 
-          title="Total Sessions" 
-          value={stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}
-          icon={<FaCalendarAlt className="text-white" />}
-          description="Total sessions across all types"
-          color="bg-gradient-to-br from-blue-500 to-blue-600"
-          textColor="text-white"
-        />
-        <SummaryCard 
-          title="Completed Tests" 
-          value={stats.tests.completed} 
-          icon={<FaClipboardCheck className="text-white" />}
-          description="Tests you have completed"
-          color="bg-gradient-to-br from-green-500 to-green-600"
-          textColor="text-white"
-        />
-        <SummaryCard 
-          title="Pending Referrals" 
-          value={referredTests.length} 
-          icon={<FaExclamationCircle className="text-white" />}
-          description="Tests referred to you that need payment"
-          color="bg-gradient-to-br from-yellow-500 to-yellow-600"
-          textColor="text-white"
-          className="sm:col-span-2 md:col-span-1"
-        />
-      </div>
-      
+
+      {/* Referred Tests Section */}
+      {referredTests.length > 0 && (
+        <div>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            Referred Tests
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
+            {referredTests.map((test, index) => (
+              <ReferredTestCard key={index} test={test} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Calendar and Events */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 lg:col-span-2">
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="bg-gradient-to-r from-[#642494]/90 to-[#642494] p-3 sm:p-4 text-white">
-              <h3 className="text-base sm:text-lg font-semibold">Your Calendar</h3>
+              <h3 className="text-base sm:text-lg font-semibold">
+                Your Calendar
+              </h3>
             </div>
-            
+
             {/* Calendar */}
             <div className="rounded-lg border-0">
               {/* Calendar Header */}
               <div className="flex justify-between items-center p-3 sm:p-4 border-b">
-                <button 
-                  onClick={prevMonth} 
+                <button
+                  onClick={prevMonth}
                   className="p-1 sm:p-2 rounded-full hover:bg-[#642494]/10 text-[#642494] transition-colors"
                 >
                   <FaChevronLeft />
                 </button>
-                <h4 className="font-medium text-sm sm:text-base text-gray-800">{formatMonth(currentMonth)}</h4>
-                <button 
-                  onClick={nextMonth} 
+                <h4 className="font-medium text-sm sm:text-base text-gray-800">
+                  {formatMonth(currentMonth)}
+                </h4>
+                <button
+                  onClick={nextMonth}
                   className="p-1 sm:p-2 rounded-full hover:bg-[#642494]/10 text-[#642494] transition-colors"
                 >
                   <FaChevronRight />
                 </button>
               </div>
-              
+
               {/* Weekday Headers */}
               <div className="grid grid-cols-7 text-center py-2 border-b">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
-                  <div key={index} className="text-xs font-medium text-gray-500">
-                    {day}
-                  </div>
-                ))}
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                  (day, index) => (
+                    <div
+                      key={index}
+                      className="text-xs font-medium text-gray-500"
+                    >
+                      {day}
+                    </div>
+                  )
+                )}
               </div>
-              
+
               {/* Calendar Days */}
               <div className="grid grid-cols-7 gap-px p-2">
                 {calendarDays.map((date, index) => (
@@ -258,16 +271,32 @@ export default function SummarySection({
                     onClick={() => setSelectedDate(date)}
                     className={`
                       aspect-square p-1 sm:p-2 flex flex-col items-center justify-center text-xs sm:text-sm rounded-full mx-auto
-                      ${!isCurrentMonth(date) ? 'text-gray-400' : 'text-gray-800'}
-                      ${isSelected(date) ? 'bg-[#642494] text-white' : ''}
-                      ${isToday(date) && !isSelected(date) ? 'border border-[#642494] text-[#642494]' : ''}
-                      ${hasEvent(date) && !isSelected(date) ? 'font-semibold' : ''}
+                      ${
+                        !isCurrentMonth(date)
+                          ? "text-gray-400"
+                          : "text-gray-800"
+                      }
+                      ${isSelected(date) ? "bg-[#642494] text-white" : ""}
+                      ${
+                        isToday(date) && !isSelected(date)
+                          ? "border border-[#642494] text-[#642494]"
+                          : ""
+                      }
+                      ${
+                        hasEvent(date) && !isSelected(date)
+                          ? "font-semibold"
+                          : ""
+                      }
                       hover:bg-[#642494]/10 transition-colors
                     `}
                   >
                     <span className="text-center">{date.getDate()}</span>
                     {hasEvent(date) && !isSelected(date) && (
-                      <div className={`h-1 w-1 rounded-full mt-0.5 ${isSelected(date) ? 'bg-white' : 'bg-[#642494]'}`}></div>
+                      <div
+                        className={`h-1 w-1 rounded-full mt-0.5 ${
+                          isSelected(date) ? "bg-white" : "bg-[#642494]"
+                        }`}
+                      ></div>
                     )}
                   </button>
                 ))}
@@ -275,7 +304,7 @@ export default function SummarySection({
             </div>
           </div>
         </div>
-        
+
         {/* Events for Selected Date */}
         <div>
           <div className="bg-white rounded-xl shadow-md overflow-hidden h-full">
@@ -301,20 +330,7 @@ export default function SummarySection({
             </div>
           </div>
         </div>
-  
       </div>
-      
-      {/* Referred Tests Section */}
-      {referredTests.length > 0 && (
-        <div>
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Referred Tests</h2>
-          <div className="grid grid-cols-1 gap-4 sm:gap-6">
-            {referredTests.map((test, index) => (
-              <ReferredTestCard key={index} test={test} />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
