@@ -635,20 +635,6 @@ export default function AllExpertsPage() {
                 </select>
               </div>
 
-              {/* Sort By - also included in mobile view */}
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-700 mb-2">Sort By</h3>
-                <select
-                  value={selectedFilters.sortBy}
-                  onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="rating">Rating (High to Low)</option>
-                  <option value="price">Price (Low to High)</option>
-                  <option value="experience">Experience (High to Low)</option>
-                </select>
-              </div>
-
               <button
                 onClick={toggleMobileFilter}
                 className="w-full p-3 bg-purple-600 text-white rounded-md font-medium hover:bg-purple-700 transition"

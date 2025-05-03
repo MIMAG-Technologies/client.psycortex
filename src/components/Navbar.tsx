@@ -199,7 +199,7 @@ const NavLink = ({
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center space-x-1 px-3 py-2 rounded-md text-1xl font-medium transition-colors ${
+      className={`flex items-center  space-x-1 px-3 py-2 rounded-md text-1xl font-bold transition-colors ${
         active 
           ? "text-[#642494] hover:text-[#4e1c72]" 
           : "text-gray-700 hover:text-[#642494]"
