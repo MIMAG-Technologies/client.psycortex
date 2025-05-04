@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaCalendarAlt, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaUserMd, FaClock, FaAngleRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaUserMd, FaClock, FaAngleRight } from "react-icons/fa";
 import { HistoryItem } from "@/utils/userTypes";
 import { getAllUserTestData } from "@/utils/test";
 import { ReferredTest } from "@/types/test";
@@ -447,7 +447,9 @@ function ReferredTestCard({ test }: { test: ReferredTest }) {
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-purple-100">
       <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 p-3 text-white">
-        <h3 className="font-semibold text-base sm:text-lg truncate">{test.test.name}</h3>
+        <h3 className="font-semibold text-base sm:text-lg truncate">
+          {test.test.name}
+        </h3>
       </div>
       <div className="p-3 sm:p-4">
         <p className="text-gray-600 text-xs sm:text-sm mb-3 line-clamp-2">
@@ -456,12 +458,14 @@ function ReferredTestCard({ test }: { test: ReferredTest }) {
         <div className="flex justify-between items-center">
           <div className="text-xs sm:text-sm">
             <span className="font-semibold text-purple-700">
-              {test.test.pricing.currency}{test.test.pricing.amount}
+              {test.test.pricing.currency}
+              {test.test.pricing.amount}
             </span>
           </div>
           <Link
-            href={`/tests?opentest=${test.test.slug}`}
-            className="px-3 py-1.5 bg-gradient-to-r from-[#642494] to-[#8a35c9] text-white rounded-md text-xs sm:text-sm flex items-center">
+            href={`/tests?opentest=${test.test.slug}&testId=${test.bookingId}`}
+            className="px-3 py-1.5 bg-gradient-to-r from-[#642494] to-[#8a35c9] text-white rounded-md text-xs sm:text-sm flex items-center"
+          >
             Pay Now <FaAngleRight className="ml-1" />
           </Link>
         </div>

@@ -22,6 +22,7 @@ export default function TestDetailsModal({ isLoggedIn, test, onClose }: TestDeta
     const notifiedRef = useRef(false);
     const searchParams = useSearchParams();
     const pay = searchParams.get("pay");
+    const testId = searchParams.get("testId");
     
     useEffect(() => {
       if (pay && !notifiedRef.current) {
@@ -113,6 +114,7 @@ export default function TestDetailsModal({ isLoggedIn, test, onClose }: TestDeta
           <input type="hidden" name="merchant_param1" value="test_pay" />
           <input type="hidden" name="merchant_param2" value={me?.id || ""} />
           <input type="hidden" name="merchant_param3" value={test.slug} />
+          <input type="hidden" name="merchant_param4" value={testId || ""} />
         </form>
 
         <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl custom-scrollbar">
