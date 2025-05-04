@@ -44,6 +44,8 @@ export default function SummarySection({
         setLoading(false);
       }
     };
+    console.log(stats);
+    
     
     fetchData();
   }, [userId, extractUserSessionHistory]);
@@ -180,27 +182,48 @@ export default function SummarySection({
             Stay up to date with your mental health journey
           </p>
 
-          <div className="flex flex-wrap gap-3 sm:gap-4 mt-4">
-            <div className="px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mt-4 w-full">
+              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
               <div className="font-bold text-xl sm:text-2xl">
-                {stats.counselling.total +
-                  stats.chat.total +
-                  stats.call.total +
-                  stats.offline.total}
+              {stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}
               </div>
               <div className="text-xs sm:text-sm text-white/80">
-                Total Sessions
+              Total Sessions
               </div>
-            </div>
-            <div className="px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              </div>
+              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
               <div className="font-bold text-xl sm:text-2xl">
-                {stats.tests.completed}
+              {stats.counselling.completed + stats.chat.completed + stats.call.completed + stats.offline.completed}
               </div>
               <div className="text-xs sm:text-sm text-white/80">
-                Tests Completed
+              Completed Sessions
+              </div>
+              </div>
+              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-xl sm:text-2xl">
+              {stats.tests.completed}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+              Tests Completed
+              </div>
+              </div>
+              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-xl sm:text-2xl">
+              {stats.tests.active}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+              Active Tests
+              </div>
+              </div>
+              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-xl sm:text-2xl">
+              {stats.counselling.upcoming + stats.chat.upcoming + stats.call.upcoming + stats.offline.upcoming}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+              Upcoming Sessions
+              </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
 

@@ -67,7 +67,7 @@ export default function ProfileHeader({ user, logout }: ProfileHeaderProps) {
               <div className="bg-[#642494]/10 p-1.5 rounded-full mr-2 shrink-0">
                 <FaBirthdayCake className="text-[#642494] text-xs sm:text-sm" />
               </div>
-              <span>{user.personalInfo.dateOfBirth}</span>
+                <span>{new Date(user.personalInfo.dateOfBirth).toLocaleDateString('en-GB')}</span>
             </div>
             
             <div className="flex items-center justify-center md:justify-start">
