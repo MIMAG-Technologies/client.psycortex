@@ -153,14 +153,14 @@ const getAssesmentQptions = (slug: string, is_positive: any) => {
     case "marital-adjustment":
       return Number(is_positive) === 1
         ? [
-            { text: "Always", value: "2" },
-            { text: "Sometime", value: "1" },
-            { text: "Never", value: "0" },
+            { text: "Always", value: "3" },
+            { text: "Sometime", value: "2" },
+            { text: "Never", value: "1" },
           ]
         : [
-            { text: "Always", value: "0" },
-            { text: "Sometime", value: "1" },
-            { text: "Never", value: "2" },
+            { text: "Always", value: "1" },
+            { text: "Sometime", value: "2" },
+            { text: "Never", value: "3" },
           ];
     case "bai":
       return [
