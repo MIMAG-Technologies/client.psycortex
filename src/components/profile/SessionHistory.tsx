@@ -25,16 +25,6 @@ interface SessionWithScheduledAt extends BaseSession {
   scheduledAt: string;
 }
 
-interface SessionWithScheduled_at extends BaseSession {
-  scheduled_at: string;
-}
-
-interface LocalChatSession extends SessionWithScheduledAt {
-  actions: {
-    canJoin: boolean;
-  };
-  is_couple_session: boolean;
-}
 
 const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
   const [callSessions, setCallSessions] = useState<CallSession[]>([]);
@@ -130,10 +120,10 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
         const scheduledTime = new Date(scheduledAt).getTime();
         const timeRemaining = scheduledTime - now;
         
-        // Check if the session just became ready (within last 5 seconds)
-        if (timeRemaining <= 0 && timeRemaining > -5000 && 
-            ('actions' in session && !session.actions?.canJoin)) {
-          readySessionIds.push(session.id);
+        // Reload if session is starting within 5 seconds
+        if (timeRemaining > 0 && timeRemaining <= 1000) {
+            window.location.reload();
+            return;
         }
         
         if (timeRemaining > 0) {

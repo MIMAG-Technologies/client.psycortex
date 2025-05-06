@@ -85,10 +85,6 @@ export default function ChatSessionPage() {
       setMessages(fetchedMessages);
       setSessionDetails(details);
       
-      // Check if session has ended
-      if (details.session_status !== 'ongoing') {
-        setIsSessionEnded(true);
-      }
       
       // Auto-increase limit if there are more messages
       if (details.has_more) {
@@ -116,38 +112,38 @@ export default function ChatSessionPage() {
   
   // Function to calculate time remaining based on session duration
   const calculateTimeRemaining = () => {
-    // If no startHour is set yet, return
     if (startHour === undefined) return;
-    
+
     const now = new Date();
     const today = new Date();
-    
+
     // Set the start time based on the startHour parameter
     const startTime = new Date(today.setHours(startHour, 0, 0, 0));
-    
+
     // If today's start time is in the future, it might be from yesterday
     if (startTime > now) {
       startTime.setDate(startTime.getDate() - 1);
     }
-    
+
     // Session duration: 45 minutes for regular, 90 minutes for couple
     const sessionDurationMinutes = isCouple ? 90 : 45;
-    const endTime = new Date(startTime.getTime() + (sessionDurationMinutes * 60 * 1000));
-    
-    // If the session has ended
-    if (now >= endTime) {
-      setTimeRemaining("00:00");
-      setIsSessionEnded(true);
-      return;
-    }
-    
+    const endTime = new Date(startTime.getTime() + sessionDurationMinutes * 60 * 1000);
+
+    // Calculate remaining time
     const remainingMs = endTime.getTime() - now.getTime();
-    const minutes = Math.floor(remainingMs / (1000 * 60));
-    const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
-    
-    setTimeRemaining(
-      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-    );
+
+    if (remainingMs <= 0) {
+      setTimeRemaining("00:00");
+      setIsSessionEnded(true); // Mark session as ended
+    } else {
+      const minutes = Math.floor(remainingMs / (1000 * 60));
+      const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+
+      setTimeRemaining(
+        `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+      setIsSessionEnded(false); // Mark session as ongoing
+    }
   };
   
   // Update timer every second
@@ -385,13 +381,13 @@ export default function ChatSessionPage() {
             onChange={(e) => setMessageInput(e.target.value)}
             placeholder="Type your message here..."
             className="flex-1 p-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#642494] focus:border-transparent"
-            disabled={loading || (sessionDetails?.session_status !== 'ongoing') || isSessionEnded}
+            disabled={loading || isSessionEnded} // Disable based on isSessionEnded
           />
           <button
             type="submit"
-            disabled={loading || !messageInput.trim() || (sessionDetails?.session_status !== 'ongoing') || isSessionEnded}
+            disabled={loading || !messageInput.trim() || isSessionEnded} // Disable based on isSessionEnded
             className={`bg-[#642494] text-white p-3 rounded-r-lg flex items-center justify-center ${
-              loading || !messageInput.trim() || (sessionDetails?.session_status !== 'ongoing') || isSessionEnded
+              loading || !messageInput.trim() || isSessionEnded
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-[#4e1c73] transition-colors"
             }`}
@@ -399,14 +395,14 @@ export default function ChatSessionPage() {
             <FaPaperPlane className="text-lg" />
           </button>
         </form>
-        
+
         {/* Session ended message */}
-        {(sessionDetails?.session_status !== 'ongoing' || isSessionEnded) && (
+        {isSessionEnded && (
           <div className="max-w-3xl mx-auto mt-2 bg-gray-100 text-gray-700 p-2 rounded-md text-center text-sm">
             This session has ended. You cannot send more messages.
           </div>
         )}
-        
+
         {/* Error display */}
         {error && (
           <div className="max-w-3xl mx-auto mt-2 bg-red-50 text-red-600 p-2 rounded-md text-center text-sm">
@@ -416,4 +412,4 @@ export default function ChatSessionPage() {
       </div>
     </div>
   );
-} 
+}
