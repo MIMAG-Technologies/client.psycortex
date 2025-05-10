@@ -13,10 +13,10 @@ interface SummarySectionProps {
   extractUserSessionHistory: (userId: string) => Promise<HistoryItem[]>;
 }
 
-export default function SummarySection({ 
-  userId, 
-  stats, 
-  extractUserSessionHistory, 
+export default function SummarySection({
+  userId,
+  stats,
+  extractUserSessionHistory,
 }: SummarySectionProps) {
   const [sessionHistory, setSessionHistory] = useState<HistoryItem[]>([]);
   const [referredTests, setReferredTests] = useState<ReferredTest[]>([]);
@@ -35,7 +35,7 @@ export default function SummarySection({
           extractUserSessionHistory(userId),
           getAllUserTestData(userId)
         ]);
-        
+
         setSessionHistory(history);
         setReferredTests(tests.referredTests.filter(test => test.payment.status === "pending"));
       } catch (error) {
@@ -44,9 +44,6 @@ export default function SummarySection({
         setLoading(false);
       }
     };
-    console.log(stats);
-    
-    
     fetchData();
   }, [userId, extractUserSessionHistory]);
 
@@ -60,7 +57,7 @@ export default function SummarySection({
         itemDate.getFullYear() === selectedDate.getFullYear()
       );
     });
-    
+
     setDateEvents(eventsOnDate);
   }, [selectedDate, sessionHistory]);
 
@@ -68,37 +65,37 @@ export default function SummarySection({
   useEffect(() => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
-    
+
     // First day of the month
     const firstDay = new Date(year, month, 1);
     // Last day of the month
     const lastDay = new Date(year, month + 1, 0);
-    
+
     // Get the day of the week of the first day (0 = Sunday, 6 = Saturday)
     const firstDayOfWeek = firstDay.getDay();
-    
+
     // Calculate days from previous month to show
     const daysFromPrevMonth = firstDayOfWeek;
     const prevMonthLastDay = new Date(year, month, 0).getDate();
-    
+
     const days: Date[] = [];
-    
+
     // Add days from previous month
     for (let i = daysFromPrevMonth - 1; i >= 0; i--) {
       days.push(new Date(year, month - 1, prevMonthLastDay - i));
     }
-    
+
     // Add days from current month
     for (let i = 1; i <= lastDay.getDate(); i++) {
       days.push(new Date(year, month, i));
     }
-    
+
     // Add days from next month to complete the grid (6 rows x 7 columns = 42 days)
     const remainingDays = 42 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
       days.push(new Date(year, month + 1, i));
     }
-    
+
     setCalendarDays(days);
   }, [currentMonth]);
 
@@ -182,48 +179,48 @@ export default function SummarySection({
             Stay up to date with your mental health journey
           </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mt-4 w-full">
-              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mt-4 w-full">
+            <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
               <div className="font-bold text-xl sm:text-2xl">
-              {stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}
+                {stats.counselling.total + stats.chat.total + stats.call.total + stats.offline.total}
               </div>
               <div className="text-xs sm:text-sm text-white/80">
-              Total Sessions
-              </div>
-              </div>
-              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
-              <div className="font-bold text-xl sm:text-2xl">
-              {stats.counselling.completed + stats.chat.completed + stats.call.completed + stats.offline.completed}
-              </div>
-              <div className="text-xs sm:text-sm text-white/80">
-              Completed Sessions
-              </div>
-              </div>
-              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
-              <div className="font-bold text-xl sm:text-2xl">
-              {stats.tests.completed}
-              </div>
-              <div className="text-xs sm:text-sm text-white/80">
-              Tests Completed
-              </div>
-              </div>
-              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
-              <div className="font-bold text-xl sm:text-2xl">
-              {stats.tests.active}
-              </div>
-              <div className="text-xs sm:text-sm text-white/80">
-              Active Tests
-              </div>
-              </div>
-              <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
-              <div className="font-bold text-xl sm:text-2xl">
-              {stats.counselling.upcoming + stats.chat.upcoming + stats.call.upcoming + stats.offline.upcoming}
-              </div>
-              <div className="text-xs sm:text-sm text-white/80">
-              Upcoming Sessions
-              </div>
+                Total Sessions
               </div>
             </div>
+            <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-xl sm:text-2xl">
+                {stats.counselling.completed + stats.chat.completed + stats.call.completed + stats.offline.completed}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+                Completed Sessions
+              </div>
+            </div>
+            <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-xl sm:text-2xl">
+                {stats.tests.completed}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+                Tests Completed
+              </div>
+            </div>
+            <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-xl sm:text-2xl">
+                {stats.tests.active}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+                Active Tests
+              </div>
+            </div>
+            <div className="w-full px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
+              <div className="font-bold text-xl sm:text-2xl">
+                {stats.counselling.upcoming + stats.chat.upcoming + stats.call.upcoming + stats.offline.upcoming}
+              </div>
+              <div className="text-xs sm:text-sm text-white/80">
+                Upcoming Sessions
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -294,21 +291,18 @@ export default function SummarySection({
                     onClick={() => setSelectedDate(date)}
                     className={`
                       aspect-square p-1 sm:p-2 flex flex-col items-center justify-center text-xs sm:text-sm rounded-full mx-auto
-                      ${
-                        !isCurrentMonth(date)
-                          ? "text-gray-400"
-                          : "text-gray-800"
+                      ${!isCurrentMonth(date)
+                        ? "text-gray-400"
+                        : "text-gray-800"
                       }
                       ${isSelected(date) ? "bg-[#642494] text-white" : ""}
-                      ${
-                        isToday(date) && !isSelected(date)
-                          ? "border border-[#642494] text-[#642494]"
-                          : ""
+                      ${isToday(date) && !isSelected(date)
+                        ? "border border-[#642494] text-[#642494]"
+                        : ""
                       }
-                      ${
-                        hasEvent(date) && !isSelected(date)
-                          ? "font-semibold"
-                          : ""
+                      ${hasEvent(date) && !isSelected(date)
+                        ? "font-semibold"
+                        : ""
                       }
                       hover:bg-[#642494]/10 transition-colors
                     `}
@@ -316,9 +310,8 @@ export default function SummarySection({
                     <span className="text-center">{date.getDate()} </span>
                     {hasEvent(date) && !isSelected(date) && (
                       <div
-                        className={`h-1 w-1 rounded-full mt-0.5 ${
-                          isSelected(date) ? "bg-white" : "bg-[#642494]"
-                        }`}
+                        className={`h-1 w-1 rounded-full mt-0.5 ${isSelected(date) ? "bg-white" : "bg-[#642494]"
+                          }`}
                       ></div>
                     )}
                   </button>
@@ -358,18 +351,18 @@ export default function SummarySection({
   );
 }
 
-function SummaryCard({ 
-  title, 
-  value, 
-  icon, 
+function SummaryCard({
+  title,
+  value,
+  icon,
   description,
   color,
   textColor,
   className = ''
-}: { 
-  title: string; 
-  value: number; 
-  icon: React.ReactNode; 
+}: {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
   description: string;
   color: string;
   textColor: string;

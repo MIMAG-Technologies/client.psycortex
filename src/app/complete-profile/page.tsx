@@ -7,7 +7,7 @@ import { FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
 import axios from "axios";
 
 export default function CompleteProfile() {
-  const { user, me, isLoading, needsProfileCompletion } = useAuth();
+  const { user, me, isLoading, needsProfileCompletion, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEditMode = searchParams.get("mode") === "edit";
@@ -100,7 +100,7 @@ export default function CompleteProfile() {
 
       if (response.data.success) {
         if (isEditMode) {
-            window.location.href = "/profile";
+          window.location.href = "/profile";
         } else {
           window.location.reload();
         }
@@ -111,11 +111,16 @@ export default function CompleteProfile() {
       console.error("Error submitting profile:", error);
       setError(
         error.response?.data?.message ||
-          "Failed to complete profile. Please try again."
+        "Failed to complete profile. Please try again."
       );
     } finally {
       setSubmitLoading(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
   };
 
   // Show loading state
@@ -200,7 +205,7 @@ export default function CompleteProfile() {
                 value={userData.phone}
                 disabled={isEditMode}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
-                className={ isEditMode ? "pl-10 w-full p-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed":"pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"}
+                className={isEditMode ? "pl-10 w-full p-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" : "pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"}
                 placeholder="Your phone number"
                 required
               />
@@ -244,24 +249,32 @@ export default function CompleteProfile() {
           <button
             type="submit"
             disabled={submitLoading}
-            className="w-full mt-6 bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-70"
+            className="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-70"
           >
             {submitLoading
               ? "Processing..."
               : isEditMode
-              ? "Save Changes"
-              : "Complete Profile"}
+                ? "Save Changes"
+                : "Complete Profile"}
           </button>
 
           {isEditMode && (
             <button
               type="button"
               onClick={() => router.push("/profile")}
-              className="w-full mt-4 bg-gray-200 text-gray-700 p-2 rounded-md hover:bg-gray-300 transition-colors"
+              className="w-full bg-gray-200 text-gray-700 p-2 rounded-md hover:bg-gray-300 transition-colors"
             >
               Cancel
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-colors"
+          >
+            Log Out
+          </button>
         </form>
       </div>
     </div>
