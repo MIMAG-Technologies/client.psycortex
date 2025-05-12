@@ -309,52 +309,28 @@ const get_Sucidal_Questions = async (slug: string) => {
       return {
         question_number: question.question_number,
         question_text: question.question_text,
-        options:
-          question.type === "positive"
-            ? [
-                {
-                  value: "strongly_agree",
-                  text: "Strongly Agree",
-                },
-                {
-                  value: "agree",
-                  text: "Agree",
-                },
-                {
-                  value: "uncertain",
-                  text: "Uncertain",
-                },
-                {
-                  value: "disagree",
-                  text: "Disagree",
-                },
-                {
-                  value: "strongly_disagree",
-                  text: "Disagree",
-                },
-              ]
-            : [
-                {
-                  value: "strongly_agree",
-                  text: "Strongly Agree",
-                },
-                {
-                  value: "agree",
-                  text: "Agree",
-                },
-                {
-                  value: "uncertain",
-                  text: "Uncertain",
-                },
-                {
-                  value: "disagree",
-                  text: "Disagree",
-                },
-                {
-                  value: "strongly_disagree",
-                  text: "Disagree",
-                },
-              ],
+        options: [
+          {
+            value: "strongly_agree",
+            text: "Strongly Agree",
+          },
+          {
+            value: "agree",
+            text: "Agree",
+          },
+          {
+            value: "uncertain",
+            text: "Uncertain",
+          },
+          {
+            value: "disagree",
+            text: "Disagree",
+          },
+          {
+            value: "strongly_disagree",
+            text: "Strongly Disagree", // Fixed the text here
+          },
+        ],
       };
     });
     const assesmentData: assesmentData = {
