@@ -197,17 +197,19 @@ export default function CompleteProfile() {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaPhone className="text-gray-400" />
+              <FaPhone className="text-gray-400" />
               </div>
               <input
-                id="phone"
-                type="tel"
-                value={userData.phone}
-                disabled={isEditMode}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                className={isEditMode ? "pl-10 w-full p-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" : "pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"}
-                placeholder="Your phone number"
-                required
+              id="phone"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={userData.phone}
+              disabled={isEditMode}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              className={isEditMode ? "pl-10 w-full p-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" : "pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"}
+              placeholder="Your phone number"
+              required
               />
             </div>
           </div>
@@ -215,16 +217,32 @@ export default function CompleteProfile() {
           {/* Date of Birth Field */}
           <div>
             <label htmlFor="dateOfBirth" className="block text-gray-700 mb-1">
-              Date of Birth
+              Date of Birth (DD/MM/YYYY)
             </label>
             <input
               id="dateOfBirth"
-              type="date"
+              type="text"
               value={userData.dateOfBirth}
-              onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Allow only numbers and forward slash
+                const sanitized = value.replace(/[^\d/]/g, '');
+                // Auto-add slashes after DD and MM
+                const formatted = sanitized
+                  .replace(/^(\d{2})(?=\d)/, '$1/')
+                  .replace(/^(\d{2}\/\d{2})(?=\d)/, '$1/')
+                  .slice(0, 10);
+                handleInputChange("dateOfBirth", formatted);
+              }}
+              placeholder="DD/MM/YYYY"
+              pattern="\d{2}/\d{2}/\d{4}"
+              maxLength={10}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             />
+            <small className="text-gray-500 mt-1 block">
+              Example: 01/01/1990
+            </small>
           </div>
 
           {/* Gender Field */}
