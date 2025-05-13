@@ -15,18 +15,18 @@ export default function AssessmentPage() {
   const router = useRouter();
   const slug = searchParams.get('slug');
   const fromPrep = searchParams.get('fromPrep');
-  
+
   const [assessmentData, setAssessmentData] = useState<assesmentData | null>({
     pages: 0,
     questions: []
   });
-  
-  const [userResponses, setUserResponses] = useState<Record<string, string>>({});
+
+  const [userResponses, setUserResponses] = useState<Record<string, string | number>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isValidTest, setIsValidTest] = useState<boolean>(false);
-  
+
   const { me, isLoading: authLoading } = useAuth();
   const { testsData, isLoading: testsLoading } = useTests();
 
@@ -38,7 +38,7 @@ export default function AssessmentPage() {
         setIsLoading(false);
         return;
       }
-      
+
       if (!fromPrep) {
         setError('You must access this test through the preparation page');
         setIsLoading(false);
@@ -55,7 +55,7 @@ export default function AssessmentPage() {
         // First check if the user has access to this test
         const userData = await getAllUserTestData(me.id);
         const isTestActive = userData.activeTests.some(test => test.testSlug === slug);
-        
+
         if (!isTestActive) {
           setError('This test is not in your active tests list');
           setIsLoading(false);
@@ -63,7 +63,7 @@ export default function AssessmentPage() {
         }
 
         setIsValidTest(true);
-        
+
         try {
           // Fetch test questions
           const data = await getQuestions(slug, me);
@@ -76,7 +76,7 @@ export default function AssessmentPage() {
           console.error("Error fetching test questions:", questionsError);
           setError(`Failed to load test questions: ${questionsError.message || 'Unknown error'}`);
         }
-        
+
         setIsLoading(false);
       } catch (error: any) {
         console.error("Error in validateAndFetchTest:", error);
@@ -90,7 +90,7 @@ export default function AssessmentPage() {
     }
   }, [slug, fromPrep, me, authLoading, testsLoading]);
 
-  const handleOptionSelect = (questionNumber: string, optionValue: string) => {
+  const handleOptionSelect = (questionNumber: string, optionValue: string | number) => {
     setUserResponses(prev => ({
       ...prev,
       [questionNumber]: optionValue
@@ -108,19 +108,19 @@ export default function AssessmentPage() {
   };
 
   const handleSubmit = async () => {
-    if(!me?.id || !slug){
-        toast.error("Please Login Before Submitting the test!");
-        return;
+    if (!me?.id || !slug) {
+      toast.error("Please Login Before Submitting the test!");
+      return;
     }
-    
+
     if (!isAllQuestionsAnswered()) {
       toast.error("You must answer all questions before submitting.");
-      
+
       // Find first unanswered question and scroll to it
       const firstUnansweredIndex = assessmentData?.questions.findIndex(
         q => !userResponses[q.question_number]
       );
-      
+
       if (firstUnansweredIndex !== undefined && firstUnansweredIndex >= 0) {
         const questionElement = document.getElementById(`question-${firstUnansweredIndex}`);
         if (questionElement) {
@@ -132,12 +132,12 @@ export default function AssessmentPage() {
           }, 2000);
         }
       }
-      
+
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const res = await submitAssesment(
         {
@@ -148,10 +148,10 @@ export default function AssessmentPage() {
         me
       );
 
-      if(res){
+      if (res) {
         router.replace('/assessment-complete');
       }
-      else{
+      else {
         toast.error("Error in submitting your response");
         setIsSubmitting(false);
       }
@@ -244,7 +244,7 @@ export default function AssessmentPage() {
       {/* Header with Back Button and Test Name */}
       <div className="fixed top-0 left-0 right-0 z-10 bg-[#642494] text-white py-4 px-4">
         <div className="container mx-auto flex items-center">
-          <button 
+          <button
             onClick={goBack}
             className="mr-4 text-white"
             aria-label="Go back"
@@ -255,66 +255,63 @@ export default function AssessmentPage() {
           </button>
           <h1 className="text-xl font-medium text-center flex-grow truncate">{getTestName()}</h1>
         </div>
-              <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mt-4">
-                  <div className="w-full md:w-2/3">
-                      <div className="w-full bg-white rounded-full h-2">
-                          <div
-                              className="bg-[#0b7960] h-2 rounded-full transition-all duration-300 ease-in-out"
-                              style={{ width: `${calculateProgress()}%` }}
-                          ></div>
-                      </div>
-                      <p className="text-sm mt-1">{calculateProgress().toFixed(0)}% Complete</p>
-                  </div>
-                  <button
-                      onClick={handleSubmit}
-                      disabled={!isAllQuestionsAnswered() || isSubmitting}
-                      className={`hidden md:block mt-4 md:mt-0 px-6 py-2 ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'} ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''} text-white rounded-full font-medium transition-colors`}
-                  >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Submitting...
-                        </span>
-                      ) : 'Submit'}
-                  </button>
-              </div>
+        <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mt-4">
+          <div className="w-full md:w-2/3">
+            <div className="w-full bg-white rounded-full h-2">
+              <div
+                className="bg-[#0b7960] h-2 rounded-full transition-all duration-300 ease-in-out"
+                style={{ width: `${calculateProgress()}%` }}
+              ></div>
+            </div>
+            <p className="text-sm mt-1">{calculateProgress().toFixed(0)}% Complete</p>
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={!isAllQuestionsAnswered() || isSubmitting}
+            className={`hidden md:block mt-4 md:mt-0 px-6 py-2 ${isAllQuestionsAnswered() ? 'bg-[#0b7960] hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'} ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''} text-white rounded-full font-medium transition-colors`}
+          >
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+              </span>
+            ) : 'Submit'}
+          </button>
+        </div>
       </div>
 
       {/* Questions List */}
       <div className="container mx-auto px-4 pt-24 pb-20 max-w-5xl">
         <div className="space-y-4">
           {assessmentData.questions.map((question, qIndex) => (
-            <div 
-              key={qIndex} 
+            <div
+              key={qIndex}
               id={`question-${qIndex}`}
-              className={`bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm transition-all duration-300 ${
-                !userResponses[question.question_number] ? 'relative' : ''
-              }`}
+              className={`bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm transition-all duration-300 ${!userResponses[question.question_number] ? 'relative' : ''
+                }`}
             >
               <div className="flex items-center">
-                <div className={`flex-shrink-0 rounded-full w-12 h-12 flex items-center justify-center mr-4 ${
-                  userResponses[question.question_number] ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
-                }`}>
+                <div className={`flex-shrink-0 rounded-full w-12 h-12 flex items-center justify-center mr-4 ${userResponses[question.question_number] ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
+                  }`}>
                   <span className="font-medium text-lg">{qIndex + 1}</span>
                 </div>
                 <p className="text-gray-800 font-medium text-xl">
                   {question.question_text}
                 </p>
               </div>
-              
+
               <div className={`mt-6 grid ${question.options.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
                 {question.options.map((option, oIndex) => (
-                  <button 
+                  <button
                     key={oIndex}
                     onClick={() => handleOptionSelect(question.question_number, option.value)}
-                    className={`py-2 px-4 rounded-full border-2 text-center transition-colors text-lg ${
-                      userResponses[question.question_number] === option.value
+                    className={`py-2 px-4 rounded-full border-2 text-center transition-colors text-lg ${userResponses[question.question_number] === option.value
                         ? 'bg-purple-100 border-purple-600 text-purple-800 font-medium'
                         : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                    }`}
+                      }`}
                   >
                     {option.text}
                   </button>
@@ -326,7 +323,7 @@ export default function AssessmentPage() {
       </div>
 
       {/* Mobile Submit Button - Fixed at Bottom */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 bg-white md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white md:hidden">
         <button
           onClick={handleSubmit}
           disabled={!isAllQuestionsAnswered() || isSubmitting}

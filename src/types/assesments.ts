@@ -1,9 +1,9 @@
 export type question = {
   question_number: string;
-  question_text:string;
-  options:{
-    value:string;
-    text:string;
+  question_text: string;
+  options: {
+    value: string | number;
+    text: string;
   }[];
 };
 

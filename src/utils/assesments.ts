@@ -123,8 +123,8 @@ const get_VLD_Questions = async (slug: string, userData?: UserData) => {
 };
 
 const getAssesmentQptions = (slug: string, is_positive: any) => {
-  const positiveOrder = ["5", "4", "3", "2", "1"];
-  const negativeOrder = ["1", "2", "3", "4", "5"];
+  const positiveOrder = [5, 4, 3, 2, 1];
+  const negativeOrder = [1, 2, 3, 4, 5];
 
   const getOptionsArray = (neutralText: string) => {
     let values;
@@ -136,11 +136,11 @@ const getAssesmentQptions = (slug: string, is_positive: any) => {
 
     if (neutralText === "Undecided") {
       return [
-        { value: "1", text: "Strongly Agree" },
-        { value: "2", text: "Agree" },
-        { value: "3", text: "Undecided" },
-        { value: "4", text: "Disagree" },
-        { value: "5", text: "Strongly Disagree" },
+        { value: 1, text: "Strongly Agree" },
+        { value: 2, text: "Agree" },
+        { value: 3, text: "Undecided" },
+        { value: 4, text: "Disagree" },
+        { value: 5, text: "Strongly Disagree" },
       ];
     }
 
@@ -163,21 +163,21 @@ const getAssesmentQptions = (slug: string, is_positive: any) => {
     case "marital-adjustment":
       return Number(is_positive) === 1
         ? [
-            { text: "Always", value: "3" },
-            { text: "Sometime", value: "2" },
-            { text: "Never", value: "1" },
+            { text: "Always", value: 3 },
+            { text: "Sometime", value: 2 },
+            { text: "Never", value: 1 },
           ]
         : [
-            { text: "Always", value: "1" },
-            { text: "Sometime", value: "2" },
-            { text: "Never", value: "3" },
+            { text: "Always", value: 1 },
+            { text: "Sometime", value: 2 },
+            { text: "Never", value: 3 },
           ];
     case "bai":
       return [
         { text: "Not at all", value: "0" },
-        { text: "Mildly but it didn't bother me much", value: "1" },
-        { text: "Moderatetly it wasn't pleasant at times", value: "2" },
-        { text: "Serverly-it botherrd me a lot", value: "3" },
+        { text: "Mildly but it didn't bother me much", value: 1 },
+        { text: "Moderatetly it wasn't pleasant at times", value: 2 },
+        { text: "Serverly-it botherrd me a lot", value: 3 },
       ];
     case "adss":
       return [
@@ -338,7 +338,7 @@ const get_Sucidal_Questions = async (slug: string) => {
           },
           {
             value: "strongly_disagree",
-            text: "Strongly Disagree", // Fixed the text here
+            text: "Strongly Disagree",
           },
         ],
       };
