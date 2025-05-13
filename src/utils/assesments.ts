@@ -134,6 +134,16 @@ const getAssesmentQptions = (slug: string, is_positive: any) => {
       values = Number(is_positive) === 1 ? positiveOrder : negativeOrder;
     }
 
+    if (neutralText === "Undecided") {
+      return [
+        { value: "1", text: "Strongly Agree" },
+        { value: "2", text: "Agree" },
+        { value: "3", text: "Undecided" },
+        { value: "4", text: "Disagree" },
+        { value: "5", text: "Strongly Disagree" },
+      ];
+    }
+
     return [
       { value: values[0], text: "Strongly Agree" },
       { value: values[1], text: "Agree" },
