@@ -161,17 +161,11 @@ const getAssesmentQptions = (slug: string, is_positive: any) => {
     case "suicidal-ideation-scale":
       return getOptionsArray("Uncertain");
     case "marital-adjustment":
-      return Number(is_positive) === 1
-        ? [
-            { text: "Always", value: 3 },
-            { text: "Sometime", value: 2 },
-            { text: "Never", value: 1 },
-          ]
-        : [
-            { text: "Always", value: 1 },
-            { text: "Sometime", value: 2 },
-            { text: "Never", value: 3 },
-          ];
+      return [
+        { text: "Always", value: 3 },
+        { text: "Sometime", value: 2 },
+        { text: "Never", value: 1 },
+      ];
     case "bai":
       return [
         { text: "Not at all", value: "0" },
@@ -419,9 +413,12 @@ export const submitAssesment = async (
     ) {
       requestData = { ...requestData, gender: me.personalInfo.gender };
     }
+    console.log(requestData);
 
     await axios.post(
-      `${baseUrl}/${data.test_slug}/b_submit_answers.php`,
+      `${baseUrl}/${
+        data.test_slug === "marital-adjustment" ? "marital" : data.test_slug
+      }/b_submit_answers.php`,
       requestData
     );
     return true;
