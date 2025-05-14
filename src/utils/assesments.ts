@@ -211,7 +211,7 @@ const get_VL_VT_Question = async (slug: string, type: string) => {
         question_text: question.question_text,
         options: question.options.map((option: any) => {
           return {
-            value: option.value,
+            value: slug === "happiness" ? 6 - option.value : option.value,
             text: type === "vl" ? option.label : option.text,
           };
         }),
