@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { FaCalendarAlt, FaClock, FaFileAlt, FaUserFriends } from "react-icons/fa";
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 interface BookingModalProps {
@@ -37,11 +36,10 @@ const BookingModal = ({
   bookingData,
 }: BookingModalProps) => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   if (!isOpen) return null;
-     const tax = 18;
+  const tax = 18;
 
   // Calculate amount with tax
   const amountWithTax = bookingData.price + (bookingData.price * tax) / 100; // Assuming 18% tax
@@ -64,9 +62,7 @@ const BookingModal = ({
       toast.error("Please complete your profile before booking a session.");
       return;
     }
-    
-    
-    setIsLoading(true);
+
     if (formRef.current) {
       formRef.current.submit();
     }
@@ -102,7 +98,10 @@ const BookingModal = ({
     }
   };
 
-   const {me} = useAuth();
+  const { me } = useAuth();
+
+  console.log(bookingData.date + " " + bookingData.time);
+
 
 
 
@@ -174,7 +173,7 @@ const BookingModal = ({
           value={bookingData.isCouple ? "couple_pay" : "appointment_pay"}
         />
         <input type="hidden" name="merchant_param2" value={me?.id || ""} />
-        
+
         <input
           type="hidden"
           name="merchant_param3"
@@ -302,27 +301,20 @@ const BookingModal = ({
             <button
               className="flex-1 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300"
               onClick={onClose}
-              disabled={isLoading}
             >
               Cancel
             </button>
             <button
-              className={`flex-1 py-2 rounded-lg font-medium text-white ${
-                isTermsAccepted && !isLoading
-                  ? "bg-purple-700 hover:bg-purple-800"
-                  : "bg-purple-300 cursor-not-allowed"
-              } relative`}
+              className={`flex-1 py-2 rounded-lg font-medium text-white ${isTermsAccepted
+                ? "bg-purple-700 hover:bg-purple-800"
+                : "bg-purple-300 cursor-not-allowed"
+                } relative`}
               onClick={handlePayment}
-              disabled={!isTermsAccepted || isLoading}
+              disabled={!isTermsAccepted}
             >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span className="ml-2">Processing...</span>
-                </div>
-              ) : (
+              {
                 `Pay ${bookingData.currency} ${bookingData.price}`
-              )}
+              }
             </button>
           </div>
         </div>

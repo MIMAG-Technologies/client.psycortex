@@ -4,10 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaGraduationCap,
-  FaGem,
-  FaCheckCircle,
-  FaUserFriends,
-  FaDollarSign,
   FaStar,
   FaBriefcase,
   FaCalendarCheck,
@@ -47,13 +43,13 @@ const SuccessModal = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  appointmentDetails:any;
+  appointmentDetails: any;
 }) => {
   const router = useRouter();
 
   if (!isOpen) return null;
 
-  const { mode, date , name } = appointmentDetails;
+  const { mode, date, name } = appointmentDetails;
 
   const goToSessions = () => {
     router.replace("/profile/sessions");
@@ -102,7 +98,7 @@ const SuccessModal = ({
               <div className="flex items-center">
                 <FaCheckSquare className="text-green-500 mr-2" />
                 <span className="text-gray-700">
-                    <span className="font-medium">Date & Time:</span> {date} 
+                  <span className="font-medium">Date & Time:</span> {date}
                 </span>
               </div>
             </div>
@@ -267,7 +263,7 @@ const ExpertProfilePage = () => {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        appointmentDetails={{ mode, date,name }}
+        appointmentDetails={{ mode, date, name }}
       />
 
       {/* Top section with expert info */}
@@ -395,9 +391,8 @@ const ExpertProfilePage = () => {
                     >
                       <div className="flex items-center gap-2 mb-2">
                         <div
-                          className={`w-10 h-10 rounded-full ${
-                            color.split(" ")[0]
-                          } flex items-center justify-center`}
+                          className={`w-10 h-10 rounded-full ${color.split(" ")[0]
+                            } flex items-center justify-center`}
                         >
                           {icon}
                         </div>
