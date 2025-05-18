@@ -100,20 +100,12 @@ const BookingModal = ({
 
   const { me } = useAuth();
 
-  console.log(bookingData.date + " " + bookingData.time);
-
-
-
-
-
-
 
   return (
     <div
-      className="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
       onClick={handleClose}
     >
-      {/* Hidden form for CCAvenue */}
       <form
         ref={formRef}
         method="post"
@@ -173,7 +165,6 @@ const BookingModal = ({
           value={bookingData.isCouple ? "couple_pay" : "appointment_pay"}
         />
         <input type="hidden" name="merchant_param2" value={me?.id || ""} />
-
         <input
           type="hidden"
           name="merchant_param3"
@@ -187,14 +178,14 @@ const BookingModal = ({
         <input type="hidden" name="merchant_param5" value={bookingData.mode} />
       </form>
 
-      <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
-        <div className="bg-purple-800 text-white p-4">
-          <h2 className="text-xl font-bold">Confirm Booking</h2>
+      <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden my-4">
+        <div className="bg-purple-800 text-white p-3">
+          <h2 className="text-lg font-bold">Confirm Booking</h2>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 max-h-[80vh] overflow-y-auto">
           {/* Booking details */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex justify-between items-center">
               <p className="text-gray-600">Client:</p>
               <p className="font-semibold">{userData.name}</p>
@@ -210,7 +201,13 @@ const BookingModal = ({
                 <FaCalendarAlt />
                 <span>Date:</span>
               </div>
-              <p className="font-semibold">{bookingData.date}</p>
+              <p className="font-semibold">
+                {new Date(bookingData.date).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })}
+              </p>
             </div>
 
             <div className="flex justify-between items-center">
@@ -218,7 +215,13 @@ const BookingModal = ({
                 <FaClock />
                 <span>Time:</span>
               </div>
-              <p className="font-semibold">{bookingData.time}</p>
+              <p className="font-semibold">
+                {new Date(`2000-01-01T${bookingData.time}`).toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                })}
+              </p>
             </div>
 
             <div className="flex justify-between items-center">
@@ -244,33 +247,32 @@ const BookingModal = ({
               </div>
             )}
 
-            <div className="flex justify-between items-center text-lg font-bold text-purple-800">
-              <p>Total:</p>
-              <p>
-                {bookingData.currency} {bookingData.price}
-              </p>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-gray-600">
+                <p>Base Price:</p>
+                <p>{bookingData.currency} {bookingData.price}</p>
+              </div>
+              <div className="flex justify-between items-center text-gray-600">
+                <p>GST (18%):</p>
+                <p>{bookingData.currency} {(bookingData.price * 0.18).toFixed(2)}</p>
+              </div>
+              <div className="flex justify-between items-center text-lg font-bold text-purple-800 border-t pt-2">
+                <p>Total:</p>
+                <p>{bookingData.currency} {(bookingData.price * 1.18).toFixed(2)}</p>
+              </div>
             </div>
           </div>
 
           {/* Terms and conditions */}
-          <div className="mt-6 border-t pt-4">
-            <div className="bg-gray-50 p-3 rounded-lg mb-4 max-h-[150px] overflow-y-auto text-sm">
+          <div className="mt-4 border-t pt-3">
+            <div className="bg-gray-50 p-2 rounded-lg mb-3 max-h-[120px] overflow-y-auto text-sm">
               <div className="flex items-start mb-2">
                 <FaFileAlt className="text-gray-400 mt-1 mr-2" />
                 <strong className="text-gray-800">Terms and Conditions</strong>
               </div>
               <ul className="list-disc ml-6 space-y-2 text-gray-600">
                 <li>
-                  Cancellations are allowed up to 2 hours before the session
-                  with a full refund.
-                </li>
-                <li>
-                  The session link/details will be sent 15 minutes before the
-                  scheduled time.
-                </li>
-                <li>
-                  The counsellor may reschedule if they're unavailable due to an
-                  emergency.
+                  No cancellations or rescheduling is available. Once booked, the session cannot be changed or cancelled.
                 </li>
                 <li>
                   All sessions are confidential and adhere to our privacy
@@ -313,7 +315,7 @@ const BookingModal = ({
               disabled={!isTermsAccepted}
             >
               {
-                `Pay ${bookingData.currency} ${bookingData.price}`
+                `Pay ${bookingData.currency} ${(bookingData.price * 1.18).toFixed(2)}`
               }
             </button>
           </div>

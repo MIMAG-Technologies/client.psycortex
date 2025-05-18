@@ -32,7 +32,7 @@ export default function OneExpertBookingCompoent(props: {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCoupleCounselling, setIsCoupleCounselling] = useState(false);
-  
+
   // Selected rate
   const selectedRate = rates.find(rate => rate.sessionType === selectedSessionType) || rates[0] || {
     sessionType: "Session",
@@ -41,7 +41,7 @@ export default function OneExpertBookingCompoent(props: {
     sessionTitle: "Counselling Session",
     availabilityTypes: []
   };
-  
+
   // Selected mode from availabilityTypes
   const [selectedMode, setSelectedMode] = useState<string>(
     selectedRate?.availabilityTypes[0] || "video"
@@ -67,7 +67,7 @@ export default function OneExpertBookingCompoent(props: {
   useEffect(() => {
     fetchCounsellorSchedule();
   }, [id]);
-  
+
   // Update selected mode when session type changes
   useEffect(() => {
     const newSelectedRate = rates.find(rate => rate.sessionType === selectedSessionType);
@@ -82,39 +82,17 @@ export default function OneExpertBookingCompoent(props: {
       toast.info("Please select a time slot to proceed.");
       return;
     }
-    
+
     // Don't open modal for call or in_person modes
     if (selectedMode === 'call' || selectedMode === 'in_person') {
       return;
     }
-    
+
     // Open the modal instead of just logging
     setIsModalOpen(true);
   };
-  
-  // Format the date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-  
-  // Format the time for display
-  const formatTime = (timeString: string) => {
-    if (!timeString) return "";
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: 'numeric', 
-      hour12: true 
-    });
-  };
 
-  const {me} = useAuth();
+  const { me } = useAuth();
 
   const router = useRouter();
 
@@ -151,11 +129,10 @@ export default function OneExpertBookingCompoent(props: {
                 <button
                   key={day.date}
                   disabled={!isWorkingDay}
-                  className={`flex flex-col items-center justify-center h-16 rounded-md text-sm ${
-                    selectedDayIndex === day.date
+                  className={`flex flex-col items-center justify-center h-16 rounded-md text-sm ${selectedDayIndex === day.date
                       ? "bg-[#642494] text-white"
                       : "bg-[#f8f3fa] text-[#642494]"
-                  } ${!isWorkingDay ? "cursor-not-allowed opacity-50" : ""}`}
+                    } ${!isWorkingDay ? "cursor-not-allowed opacity-50" : ""}`}
                   onClick={() => setSelectedDayIndex(day.date)}
                 >
                   <span>{day.day.substring(0, 3)}</span>
@@ -178,7 +155,7 @@ export default function OneExpertBookingCompoent(props: {
                   // For couple counselling, we need consecutive slots
                   .filter((slot, index, slots) => {
                     if (!isCoupleCounselling) return slot.is_available;
-                    
+
                     // For couple counselling (2 hours), check if there's another available slot after this one
                     const nextSlot = slots[index + 1];
                     return slot.is_available && nextSlot && nextSlot.is_available;
@@ -187,11 +164,10 @@ export default function OneExpertBookingCompoent(props: {
                     <button
                       key={index}
                       disabled={!slot.is_available}
-                      className={`w-full py-2 px-3 rounded-lg text-sm ${
-                        selectedTimeSlot === slot.time
+                      className={`w-full py-2 px-3 rounded-lg text-sm ${selectedTimeSlot === slot.time
                           ? "bg-[#642494] text-white"
                           : "bg-[#f8f3fa] text-[#642494]"
-                      } ${!slot.is_available ? "cursor-not-allowed opacity-50" : ""}`}
+                        } ${!slot.is_available ? "cursor-not-allowed opacity-50" : ""}`}
                       onClick={() => setSelectedTimeSlot(slot.time)}
                     >
                       <div className="flex items-center justify-center gap-1">
@@ -246,22 +222,20 @@ export default function OneExpertBookingCompoent(props: {
               <div className="flex h-10 bg-gray-200 rounded-lg p-1">
                 <button
                   onClick={() => setIsCoupleCounselling(false)}
-                  className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${
-                    !isCoupleCounselling 
-                      ? 'bg-[#642494] text-white shadow-md' 
+                  className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${!isCoupleCounselling
+                      ? 'bg-[#642494] text-white shadow-md'
                       : 'bg-transparent text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                 >
                   <FaUser className="mr-2" />
                   <span>Individual</span>
                 </button>
                 <button
                   onClick={() => setIsCoupleCounselling(true)}
-                  className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${
-                    isCoupleCounselling 
-                      ? 'bg-[#642494] text-white shadow-md' 
+                  className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${isCoupleCounselling
+                      ? 'bg-[#642494] text-white shadow-md'
                       : 'bg-transparent text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                 >
                   <FaUserFriends className="mr-2" />
                   <span>Couple</span>
@@ -291,14 +265,14 @@ export default function OneExpertBookingCompoent(props: {
           </button>
         )}
       </div>
-      
+
       {/* Booking Modal */}
       <BookingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         userData={{
           name: me?.personalInfo.name || "User",
-          id:me?.id || ""
+          id: me?.id || ""
         }}
         counsellorData={{
           name: counsellorName,
