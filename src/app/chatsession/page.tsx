@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ChatMessage, ChatSessionDetails, getChatMessages, sendChatMessage } from "@/utils/chatsession";
+import { ChatMessage, getChatMessages, sendChatMessage } from "@/utils/chatsession";
 import { FaPaperPlane, FaArrowLeft, FaUserFriends, FaChevronDown } from "react-icons/fa";
 import { useCounsellorContext } from "@/context/CounsellorContext";
 import { RiCheckDoubleFill } from "react-icons/ri";
@@ -15,6 +15,16 @@ type Counsellor = {
   title: string;
 };
 
+interface ChatSessionDetails {
+  has_more: boolean;
+  counsellor?: {
+    id: string;
+    name: string;
+    image: string;
+    title: string;
+  };
+}
+
 export default function ChatSessionPage() {
   const { user } = useAuth();
   const { counsellors } = useCounsellorContext();
@@ -22,7 +32,7 @@ export default function ChatSessionPage() {
   const router = useRouter();
   const sessionIdParam = searchParams.get("id");
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-  
+
   // Extract info from session ID: [actual chatId][startTime (2 digits)][isCouple (1 digit)]
   const [chatId, setActualChatId] = useState<string>("");
   const [startHour, setStartHour] = useState<number>(0);
@@ -40,10 +50,11 @@ export default function ChatSessionPage() {
   const [error, setError] = useState("");
   const [counsellor, setCounsellor] = useState<Counsellor | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (sessionIdParam) {
       const sessionIdString = sessionIdParam.toString();
@@ -53,27 +64,21 @@ export default function ChatSessionPage() {
       const startTimeStr = sessionIdString.substring(sessionIdString.length - 3, sessionIdString.length - 1);
       // Extract the actual chat ID (everything except the last 3 digits)
       const actualChatId = sessionIdString.substring(0, sessionIdString.length - 3);
-      
+
       setIsCouple(isCoupleFlag === "1");
       setStartHour(parseInt(startTimeStr, 10));
       setActualChatId(actualChatId);
-      
-      console.log("Session ID details:", {
-        actualChatId,
-        startHour: parseInt(startTimeStr, 10),
-        isCouple: isCoupleFlag === "1"
-      });
     }
   }, [sessionIdParam]);
-  
+
   // Function to fetch messages
   const fetchMessages = async () => {
     if (!chatId || isSessionEnded) return;
-    
+
     try {
       const response = await getChatMessages(chatId, messageLimit);
       const { messages: fetchedMessages, details } = response;
-      
+
       // Check if there are new messages by comparing lengths
       if (fetchedMessages.length > messages.length) {
         // Vibrate device if supported
@@ -81,27 +86,28 @@ export default function ChatSessionPage() {
           window.navigator.vibrate(100); // Vibrate for 100ms
         }
       }
-      
+
       setMessages(fetchedMessages);
       setSessionDetails(details);
-      
-      
+
       // Auto-increase limit if there are more messages
       if (details.has_more) {
         setMessageLimit(prevLimit => prevLimit + 10);
       }
-      
-      // Extract counsellor ID from the first message from counsellor
-      const counsellorMessage = fetchedMessages.find(msg => msg.is_counsellor);
-      if (counsellorMessage && !counsellor && counsellors.length > 0) {
-        const foundCounsellor = counsellors.find(c => c.id === counsellorMessage.sender_id);
-        if (foundCounsellor) {
-          setCounsellor({
-            id: foundCounsellor.id,
-            name: foundCounsellor.personalInfo.name,
-            profileImage: foundCounsellor.personalInfo.profileImage,
-            title: foundCounsellor.professionalInfo.title
-          });
+
+      // Try to find counsellor from messages if not already set
+      if (!counsellor && fetchedMessages.length > 0 && counsellors.length > 0) {
+        const counsellorMessage = fetchedMessages.find(msg => msg.is_counsellor);
+        if (counsellorMessage) {
+          const foundCounsellor = counsellors.find(c => c.id === counsellorMessage.sender_id);
+          if (foundCounsellor) {
+            setCounsellor({
+              id: foundCounsellor.id,
+              name: foundCounsellor.personalInfo.name,
+              profileImage: foundCounsellor.personalInfo.profileImage || "/user-dummy-img.png",
+              title: foundCounsellor.professionalInfo.title || "Counsellor"
+            });
+          }
         }
       }
     } catch (err) {
@@ -109,7 +115,25 @@ export default function ChatSessionPage() {
       setError("Failed to load messages. Please try again later.");
     }
   };
-  
+
+  // Add an effect to set counsellor when counsellors are loaded
+  useEffect(() => {
+    if (!counsellor && counsellors.length > 0 && messages.length > 0) {
+      const counsellorMessage = messages.find(msg => msg.is_counsellor);
+      if (counsellorMessage) {
+        const foundCounsellor = counsellors.find(c => c.id === counsellorMessage.sender_id);
+        if (foundCounsellor) {
+          setCounsellor({
+            id: foundCounsellor.id,
+            name: foundCounsellor.personalInfo.name,
+            profileImage: foundCounsellor.personalInfo.profileImage || "/user-dummy-img.png",
+            title: foundCounsellor.professionalInfo.title || "Counsellor"
+          });
+        }
+      }
+    }
+  }, [counsellors, messages]);
+
   // Function to calculate time remaining based on session duration
   const calculateTimeRemaining = () => {
     if (startHour === undefined) return;
@@ -145,58 +169,71 @@ export default function ChatSessionPage() {
       setIsSessionEnded(false); // Mark session as ongoing
     }
   };
-  
+
   // Update timer every second
   useEffect(() => {
     calculateTimeRemaining();
     const timerInterval = setInterval(() => {
       calculateTimeRemaining();
     }, 1000);
-    
+
     return () => clearInterval(timerInterval);
   }, [startHour, isCouple]);
-  
+
   // Fetch messages on initial load and every 3 seconds if session is not ended
   useEffect(() => {
     if (!chatId || !user) return;
-    
+
     fetchMessages();
-    
+
     // Only set up the polling interval if the session is not ended
     if (!isSessionEnded) {
       const interval = setInterval(() => {
         fetchMessages();
       }, 3000);
-      
+
       return () => clearInterval(interval);
     }
   }, [chatId, user, counsellors, messageLimit, isSessionEnded]);
-  
+
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      // Maintain focus on input after scrolling
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   }, [messages]);
-  
+
+  // Auto-focus input on component mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   // Handle sending a message
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!messageInput.trim() || !chatId || !user) return;
-    
+
     setLoading(true);
     try {
       const success = await sendChatMessage(
         chatId,
-        user.uid, 
+        user.uid,
         messageInput.trim()
       );
-      
+
       if (success) {
         setMessageInput("");
         // Fetch messages immediately after sending to show the new message
         await fetchMessages();
+        // Ensure focus is maintained after state updates
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 0);
       } else {
         setError("Failed to send message. Please try again.");
       }
@@ -205,13 +242,17 @@ export default function ChatSessionPage() {
       setError("Failed to send message. Please try again.");
     } finally {
       setLoading(false);
+      // Also ensure focus after loading state changes
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
     }
   };
-  
+
   const handleBack = () => {
     router.back();
   };
-  
+
   if (!sessionIdParam) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -223,23 +264,24 @@ export default function ChatSessionPage() {
     );
   }
 
+
   return (
     <div className="h-screen flex flex-col fixed inset-0 bg-gray-100">
       {/* Chat header */}
       <div className="bg-[#642494] text-white p-4 shadow-md flex items-center justify-between">
         <div className="flex items-center">
-          <button 
+          <button
             onClick={handleBack}
             className="mr-3 p-2 hover:bg-[#4e1c73] rounded-full transition-colors"
           >
             <FaArrowLeft />
           </button>
-          
+
           {counsellor ? (
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white mr-3">
-                <img 
-                  src={counsellor.profileImage ? `${counsellor.profileImage}` : "/user-dummy-img.png"} 
+                <img
+                  src={counsellor.profileImage ? `${counsellor.profileImage}` : "/user-dummy-img.png"}
                   alt={counsellor.name}
                   className="w-full h-full object-cover"
                 />
@@ -267,7 +309,7 @@ export default function ChatSessionPage() {
             </div>
           )}
         </div>
-        
+
         <div className="flex items-center">
           <div className="text-sm bg-white text-purple-700 px-3 py-1 rounded-full font-mono font-medium mr-2">
             {timeRemaining}
@@ -277,9 +319,9 @@ export default function ChatSessionPage() {
           </span>
         </div>
       </div>
-      
+
       {/* Messages container */}
-      <div 
+      <div
         ref={chatContainerRef}
         className="flex-1 p-4 overflow-y-auto bg-[#f5f5f5]"
       >
@@ -295,9 +337,8 @@ export default function ChatSessionPage() {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${
-                  msg.is_counsellor ? "justify-start" : "justify-end"
-                }`}
+                className={`flex ${msg.is_counsellor ? "justify-start" : "justify-end"
+                  }`}
               >
                 <div className={`flex max-w-[80%] ${!msg.is_counsellor && "flex-row-reverse"}`}>
                   {msg.is_counsellor && (
@@ -307,22 +348,21 @@ export default function ChatSessionPage() {
                       </div>
                     </div>
                   )}
-                  
+
                   <div
-                    className={`rounded-2xl px-4 py-3 ${
-                      msg.is_counsellor
-                        ? "bg-white text-gray-800 rounded-tl-none shadow-sm"
-                        : "bg-[#642494] text-white rounded-tr-none shadow-sm"
-                    }`}
+                    className={`rounded-2xl px-4 py-3 ${msg.is_counsellor
+                      ? "bg-white text-gray-800 rounded-tl-none shadow-sm"
+                      : "bg-[#642494] text-white rounded-tr-none shadow-sm"
+                      }`}
                   >
                     {msg.message_type === "text" ? (
                       <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
                     ) : (
                       <div>
                         <div className="rounded-lg overflow-hidden mb-2 border border-gray-200 bg-white">
-                          <img 
-                            src={msg.media_url ? `${baseUrl}/${msg.media_url}` : ""} 
-                            alt="Media attachment" 
+                          <img
+                            src={msg.media_url ? `${baseUrl}/${msg.media_url}` : ""}
+                            alt="Media attachment"
                             className="w-full max-h-60 object-contain"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -333,7 +373,7 @@ export default function ChatSessionPage() {
                         {msg.message && <p className="text-sm whitespace-pre-wrap">{msg.message}</p>}
                       </div>
                     )}
-                    
+
                     <div className="flex justify-between items-center mt-1 text-xs opacity-75">
                       <span>
                         {new Date(msg.created_at).toLocaleTimeString([], {
@@ -341,19 +381,19 @@ export default function ChatSessionPage() {
                           minute: "2-digit",
                         })}
                       </span>
-                      
+
                       {!msg.is_counsellor && (
                         <span className="ml-2 flex items-center">
                           {msg.is_read === true ? (
                             <RiCheckDoubleFill className="text-blue-500" size={12} />
                           ) : (
-                              <RiCheckDoubleFill className="text-gray-300" size={12} />
+                            <RiCheckDoubleFill className="text-gray-300" size={12} />
                           )}
                         </span>
                       )}
                     </div>
                   </div>
-                  
+
                   {!msg.is_counsellor && (
                     <div className="self-end mb-2 ml-2">
                       <div className="w-8 h-8 rounded-full bg-[#f5edfb] text-[#642494] flex items-center justify-center font-bold">
@@ -368,29 +408,29 @@ export default function ChatSessionPage() {
           </div>
         )}
       </div>
-      
+
       {/* Message input */}
       <div className="bg-white shadow-md p-4 border-t border-gray-200">
-        <form 
+        <form
           onSubmit={handleSendMessage}
           className="flex items-center max-w-3xl mx-auto"
         >
           <input
+            ref={inputRef}
             type="text"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             placeholder="Type your message here..."
             className="flex-1 p-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#642494] focus:border-transparent"
-            disabled={loading || isSessionEnded} // Disable based on isSessionEnded
+            disabled={loading || isSessionEnded}
           />
           <button
             type="submit"
-            disabled={loading || !messageInput.trim() || isSessionEnded} // Disable based on isSessionEnded
-            className={`bg-[#642494] text-white p-3 rounded-r-lg flex items-center justify-center ${
-              loading || !messageInput.trim() || isSessionEnded
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-[#4e1c73] transition-colors"
-            }`}
+            disabled={loading || !messageInput.trim() || isSessionEnded}
+            className={`bg-[#642494] text-white p-3 rounded-r-lg flex items-center justify-center ${loading || !messageInput.trim() || isSessionEnded
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-[#4e1c73] transition-colors"
+              }`}
           >
             <FaPaperPlane className="text-lg" />
           </button>
