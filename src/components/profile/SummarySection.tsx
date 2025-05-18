@@ -6,6 +6,7 @@ import { HistoryItem } from "@/utils/userTypes";
 import { getAllUserTestData } from "@/utils/test";
 import { ReferredTest } from "@/types/test";
 import Link from "next/link";
+import UpcomingSessions from "./UpcomingSessions";
 
 interface SummarySectionProps {
   userId: string;
@@ -223,6 +224,8 @@ export default function SummarySection({
           </div>
         </div>
       </div>
+
+      <UpcomingSessions userId={userId} />
 
       {/* Referred Tests Section */}
       {referredTests.length > 0 && (
