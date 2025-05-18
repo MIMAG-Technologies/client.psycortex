@@ -6,7 +6,6 @@ import BookingModal from "./BookingModal";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { FaPhone, FaMapMarkerAlt, FaUserFriends, FaUser } from "react-icons/fa";
-import { Switch } from "@headlessui/react";
 
 export default function OneExpertBookingCompoent(props: {
   id: string;
@@ -130,8 +129,8 @@ export default function OneExpertBookingCompoent(props: {
                   key={day.date}
                   disabled={!isWorkingDay}
                   className={`flex flex-col items-center justify-center h-16 rounded-md text-sm ${selectedDayIndex === day.date
-                      ? "bg-[#642494] text-white"
-                      : "bg-[#f8f3fa] text-[#642494]"
+                    ? "bg-[#642494] text-white"
+                    : "bg-[#f8f3fa] text-[#642494]"
                     } ${!isWorkingDay ? "cursor-not-allowed opacity-50" : ""}`}
                   onClick={() => setSelectedDayIndex(day.date)}
                 >
@@ -165,8 +164,8 @@ export default function OneExpertBookingCompoent(props: {
                       key={index}
                       disabled={!slot.is_available}
                       className={`w-full py-2 px-3 rounded-lg text-sm ${selectedTimeSlot === slot.time
-                          ? "bg-[#642494] text-white"
-                          : "bg-[#f8f3fa] text-[#642494]"
+                        ? "bg-[#642494] text-white"
+                        : "bg-[#f8f3fa] text-[#642494]"
                         } ${!slot.is_available ? "cursor-not-allowed opacity-50" : ""}`}
                       onClick={() => setSelectedTimeSlot(slot.time)}
                     >
@@ -223,8 +222,8 @@ export default function OneExpertBookingCompoent(props: {
                 <button
                   onClick={() => setIsCoupleCounselling(false)}
                   className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${!isCoupleCounselling
-                      ? 'bg-[#642494] text-white shadow-md'
-                      : 'bg-transparent text-gray-700 hover:bg-gray-300'
+                    ? 'bg-[#642494] text-white shadow-md'
+                    : 'bg-transparent text-gray-700 hover:bg-gray-300'
                     }`}
                 >
                   <FaUser className="mr-2" />
@@ -233,8 +232,8 @@ export default function OneExpertBookingCompoent(props: {
                 <button
                   onClick={() => setIsCoupleCounselling(true)}
                   className={`flex items-center justify-center w-1/2 rounded-md transition-colors ${isCoupleCounselling
-                      ? 'bg-[#642494] text-white shadow-md'
-                      : 'bg-transparent text-gray-700 hover:bg-gray-300'
+                    ? 'bg-[#642494] text-white shadow-md'
+                    : 'bg-transparent text-gray-700 hover:bg-gray-300'
                     }`}
                 >
                   <FaUserFriends className="mr-2" />

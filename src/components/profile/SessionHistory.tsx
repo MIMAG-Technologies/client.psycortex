@@ -34,7 +34,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeMode, setActiveMode] = useState<'call' | 'chat' | 'video' | 'in_person'>('chat');
   const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<{[key: string]: string}>({});
+  const [countdown, setCountdown] = useState<{ [key: string]: string }>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
         })));
 
         console.log(chats);
-        
+
       } catch (err) {
         console.error('Error fetching sessions:', err);
         setError('Failed to load sessions. Please try again later.');
@@ -109,41 +109,41 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
     // Create countdown timers for upcoming sessions
     const interval = setInterval(() => {
       const now = new Date().getTime();
-      
+
       const allSessions = [...callSessions, ...chatSessions, ...videoSessions, ...offlineSessions];
-      const updatedCountdowns: {[key: string]: string} = {};
-      
+      const updatedCountdowns: { [key: string]: string } = {};
+
       let readySessionIds: string[] = [];
-      
+
       allSessions.forEach(session => {
         const scheduledAt = 'scheduledAt' in session ? session.scheduledAt : session.scheduled_at;
         const scheduledTime = new Date(scheduledAt).getTime();
         const timeRemaining = scheduledTime - now;
-        
+
         // Reload if session is starting within 5 seconds
         if (timeRemaining > 0 && timeRemaining <= 1000) {
-            window.location.reload();
-            return;
+          window.location.reload();
+          return;
         }
-        
+
         if (timeRemaining > 0) {
           const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
           const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-          
+
           // More than 24 hours
           if (days > 0) {
             updatedCountdowns[session.id] = `Join in ${days} day${days !== 1 ? 's' : ''}`;
-          } 
+          }
           // Between 1 and 24 hours
           else if (hours > 0 && minutes >= 0) {
             updatedCountdowns[session.id] = `Join in ${hours} hour${hours !== 1 ? 's' : ''}`;
-          } 
+          }
           // Between 10 minutes and 1 hour
           else if (minutes >= 10) {
             updatedCountdowns[session.id] = `Join in ${minutes} min`;
-          } 
+          }
           // Less than 10 minutes
           else {
             updatedCountdowns[session.id] = `Join in ${minutes}m ${seconds}s`;
@@ -153,9 +153,9 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
           updatedCountdowns[session.id] = 'Session Ready';
         }
       });
-      
+
       setCountdown(updatedCountdowns);
-      
+
       // Only reload once when sessions become ready
       if (readySessionIds.length > 0) {
         // Full page reload is simpler and ensures everything is in sync
@@ -163,7 +163,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
         return; // Stop execution after triggering reload
       }
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [callSessions, chatSessions, videoSessions, offlineSessions]);
 
@@ -210,22 +210,22 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
   const handleJoinChatSession = (sessionId: string) => {
     // For the chat session that exists in the state, find its scheduled time and isCouple status
     const chatSession = chatSessions.find(s => s.id === sessionId);
-    
+
     if (chatSession) {
       // Extract the hour from scheduled time
       const scheduledTime = chatSession.scheduledAt;
       const scheduledHour = new Date(scheduledTime).getHours();
-      
+
       // Format hour as 2 digits (00-23)
       const formattedHour = scheduledHour.toString().padStart(2, '0');
-      
+
       // Add isCouple flag (1 for true, 0 for false)
       const isCouple = Boolean(chatSession.is_couple_session);
       const isCoupleFlag = isCouple ? '1' : '0';
-      
+
       // Create the encoded session ID with the format: [actual chatId][startTime (2 digits)][isCouple (1 digit)]
       const encodedSessionId = `${sessionId}${formattedHour}${isCoupleFlag}`;
-      
+
       router.push(`/chatsession?id=${encodedSessionId}`);
     } else {
       // Fallback to the original behavior if session not found
@@ -238,8 +238,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
     const now = new Date().getTime();
     const sessionTime = new Date(scheduledDate).getTime();
     const timeRemaining = sessionTime - now;
-    
-    const isUpcoming = timeRemaining > 0;
+
     const isJoinable = 'actions' in session && session.actions.canJoin;
     const isExpired = session.status === 'expired';
     const isCouple = 'is_couple_session' in session && session.is_couple_session;
@@ -249,10 +248,10 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
           <div className="flex items-start">
             {session.counsellor && (
-              <img 
-                src={session.counsellor.image} 
-                alt={session.counsellor.name} 
-                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full mr-3 object-cover border-2 border-[#642494]/20 flex-shrink-0" 
+              <img
+                src={session.counsellor.image}
+                alt={session.counsellor.name}
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full mr-3 object-cover border-2 border-[#642494]/20 flex-shrink-0"
               />
             )}
             <div>
@@ -267,16 +266,14 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
               </div>
               <p className="text-xs sm:text-sm text-gray-600 mt-0.5">{formatDate(scheduledDate)} at {formatTime(scheduledDate)}</p>
               <div className="text-xs sm:text-sm mt-1.5 flex items-center">
-                <span className={`w-2.5 h-2.5 rounded-full mr-1.5 ${
-                  session.status === 'scheduled' ? 'bg-green-500' : 
-                  session.status === 'expired' ? 'bg-red-500' : 
-                  session.status === 'completed' ? 'bg-blue-500' : 'bg-gray-500'
-                }`}></span>
-                <span className={`font-medium ${
-                  session.status === 'scheduled' ? 'text-green-700' : 
-                  session.status === 'expired' ? 'text-red-700' : 
-                  session.status === 'completed' ? 'text-blue-700' : 'text-gray-700'
-                }`}>
+                <span className={`w-2.5 h-2.5 rounded-full mr-1.5 ${session.status === 'scheduled' ? 'bg-green-500' :
+                    session.status === 'expired' ? 'bg-red-500' :
+                      session.status === 'completed' ? 'bg-blue-500' : 'bg-gray-500'
+                  }`}></span>
+                <span className={`font-medium ${session.status === 'scheduled' ? 'text-green-700' :
+                    session.status === 'expired' ? 'text-red-700' :
+                      session.status === 'completed' ? 'text-blue-700' : 'text-gray-700'
+                  }`}>
                   {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
                 </span>
               </div>
@@ -290,7 +287,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
             )}
             {activeMode === 'video' && (
               isJoinable ? (
-                <button 
+                <button
                   onClick={() => 'meetLink' in session ? handleJoinVideoSession(session as VideoSession) : null}
                   className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-purple-700 hover:to-purple-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
@@ -301,8 +298,8 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
                   <FaVideo className="mr-1.5" /> Session Expired
                 </button>
               ) : timeRemaining <= 0 ? (
-                <button 
-                  onClick={() => handleJoinVideoSession(session as VideoSession)} 
+                <button
+                  onClick={() => handleJoinVideoSession(session as VideoSession)}
                   className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-purple-700 hover:to-purple-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
                   <FaExternalLinkAlt className="mr-1.5" /> Join Meeting
@@ -315,8 +312,8 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
             )}
             {activeMode === 'chat' && (
               isJoinable ? (
-                <button 
-                  onClick={() => handleJoinChatSession(session.id)} 
+                <button
+                  onClick={() => handleJoinChatSession(session.id)}
                   className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-blue-700 hover:to-blue-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
                   <FaComments className="mr-1.5" /> Join Chat
@@ -326,8 +323,8 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
                   <FaComments className="mr-1.5" /> Session Expired
                 </button>
               ) : timeRemaining <= 0 ? (
-                <button 
-                  onClick={() => handleJoinChatSession(session.id)} 
+                <button
+                  onClick={() => handleJoinChatSession(session.id)}
                   className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-sm hover:from-blue-700 hover:to-blue-800 transition-colors flex items-center justify-center text-xs sm:text-sm"
                 >
                   <FaComments className="mr-1.5" /> Join Chat
@@ -378,51 +375,47 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ userId }) => {
       <div className="bg-gradient-to-r from-[#642494]/90 to-[#642494] p-4 sm:p-5 text-white">
         <h2 className="text-xl font-semibold">Session History</h2>
       </div>
-      
+
       <div className="p-4 sm:p-6">
         <div className="flex flex-wrap justify-around w-full mb-6 gap-2">
-          <button 
-            onClick={() => setActiveMode('chat')} 
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
-              activeMode === 'chat' 
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md' 
+          <button
+            onClick={() => setActiveMode('chat')}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${activeMode === 'chat'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
+              } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaComments className="text-xs sm:text-sm md:text-base"/> Chat
+            <FaComments className="text-xs sm:text-sm md:text-base" /> Chat
           </button>
-          <button 
-            onClick={() => setActiveMode('video')} 
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
-              activeMode === 'video' 
-                ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md' 
+          <button
+            onClick={() => setActiveMode('video')}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${activeMode === 'video'
+                ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
+              } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaVideo className="text-xs sm:text-sm md:text-base"/> Video
+            <FaVideo className="text-xs sm:text-sm md:text-base" /> Video
           </button>
-          <button 
-            onClick={() => setActiveMode('in_person')} 
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
-              activeMode === 'in_person' 
-                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' 
+          <button
+            onClick={() => setActiveMode('in_person')}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${activeMode === 'in_person'
+                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
+              } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaUserFriends className="text-xs sm:text-sm md:text-base"/> In-Person
+            <FaUserFriends className="text-xs sm:text-sm md:text-base" /> In-Person
           </button>
-          <button 
-            onClick={() => setActiveMode('call')} 
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${
-              activeMode === 'call' 
-                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' 
+          <button
+            onClick={() => setActiveMode('call')}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 flex justify-center gap-1.5 items-center flex-1 ${activeMode === 'call'
+                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } rounded-md transition-all text-xs sm:text-sm md:text-base`}
+              } rounded-md transition-all text-xs sm:text-sm md:text-base`}
           >
-            <FaPhoneAlt className="text-xs sm:text-sm md:text-base"/> Call
+            <FaPhoneAlt className="text-xs sm:text-sm md:text-base" /> Call
           </button>
         </div>
-        
+
         {sessions.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-gray-500 py-10 my-2 bg-gray-50 rounded-lg">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-2xl">
