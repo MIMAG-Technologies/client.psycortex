@@ -130,8 +130,16 @@ const ExpertProfilePage = () => {
   const id = searchParams.get("id");
   const pay = searchParams.get("pay");
   const mode = searchParams.get("mode");
-  const date = searchParams.get("date");
-
+  const dateParam = searchParams.get("date");
+  const datepart = dateParam?.match(/^\d{4}-\d{2}-\d{2}/)?.[0]?.split('-').reverse().join('/');
+  const timepart = dateParam?.match(/\d{6}$/)
+    ? new Date(`2000-01-01T${dateParam.slice(-6).replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3')}`).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    })
+    : null;
+  const date = datepart && timepart ? `${datepart} ${timepart}` : dateParam;
   const [counsellor, setCounsellor] = useState<CounsellorDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
