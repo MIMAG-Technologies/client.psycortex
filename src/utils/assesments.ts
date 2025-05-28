@@ -36,7 +36,15 @@ const assesmentType = (slug: string) => {
   ) {
     return "ad5";
   } else if (
-    ["schizophrenia", "scat", "academic", "pre-marital", "sas"].includes(slug)
+    [
+      "schizophrenia",
+      "scat",
+      "academic",
+      "pre-marital",
+      "sas",
+      "ems",
+      "pst",
+    ].includes(slug)
   ) {
     return "vld";
   } else if (slug === "happiness") {
