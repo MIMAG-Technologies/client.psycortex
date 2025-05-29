@@ -38,12 +38,15 @@ export default function CompleteProfile() {
       if (isEditMode) {
         if (me) {
           // Pre-fill data from existing user profile
+          const dbDate = me.personalInfo.dateOfBirth;
+          const formattedDate = dbDate ? formatDateForDisplay(dbDate) : "";
+
           setUserData({
             id: user.uid,
             name: me.personalInfo.name,
             email: me.personalInfo.email,
             phone: me.personalInfo.phone,
-            dateOfBirth: me.personalInfo.dateOfBirth,
+            dateOfBirth: formattedDate,
             profileImage: me.personalInfo.profileImage,
             gender: me.personalInfo.gender,
             timezone: me.preferences.timezone,
@@ -89,10 +92,15 @@ export default function CompleteProfile() {
     }
 
     try {
+      const submissionData = {
+        ...userData,
+        dateOfBirth: formatDateForSubmission(dateOfBirth),
+      };
+
       const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       const response = await axios.post(
         `${BACKEND_URL}/user/submit_user_details.php`,
-        userData,
+        submissionData,
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -121,6 +129,38 @@ export default function CompleteProfile() {
   const handleLogout = async () => {
     await logout();
     router.push("/");
+  };
+
+  // Format date from YYYY-MM-DD to DD/MM/YYYY for display
+  const formatDateForDisplay = (dbDate: string): string => {
+    if (!dbDate) return "";
+
+    // Check if the date is already in DD/MM/YYYY format
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dbDate)) return dbDate;
+
+    try {
+      const [year, month, day] = dbDate.split('-');
+      return `${day}/${month}/${year}`;
+    } catch (error) {
+      console.error("Error formatting date for display:", error);
+      return dbDate; // Return original if parsing fails
+    }
+  };
+
+  // Format date from DD/MM/YYYY to YYYY-MM-DD for database submission
+  const formatDateForSubmission = (displayDate: string): string => {
+    if (!displayDate) return "";
+
+    // Check if the date is already in YYYY-MM-DD format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(displayDate)) return displayDate;
+
+    try {
+      const [day, month, year] = displayDate.split('/');
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error("Error formatting date for submission:", error);
+      return displayDate; // Return original if parsing fails
+    }
   };
 
   // Show loading state
@@ -197,19 +237,19 @@ export default function CompleteProfile() {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaPhone className="text-gray-400" />
+                <FaPhone className="text-gray-400" />
               </div>
               <input
-              id="phone"
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={userData.phone}
-              disabled={isEditMode}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              className={isEditMode ? "pl-10 w-full p-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" : "pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"}
-              placeholder="Your phone number"
-              required
+                id="phone"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={userData.phone}
+                disabled={isEditMode}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                className={isEditMode ? "pl-10 w-full p-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" : "pl-10 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"}
+                placeholder="Your phone number"
+                required
               />
             </div>
           </div>
