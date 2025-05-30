@@ -44,6 +44,7 @@ const assesmentType = (slug: string) => {
       "sas",
       "ems",
       "pst",
+      "ses",
     ].includes(slug)
   ) {
     return "vld";
