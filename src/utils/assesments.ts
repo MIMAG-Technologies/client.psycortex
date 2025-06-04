@@ -45,6 +45,7 @@ const assesmentType = (slug: string) => {
       "ems",
       "pst",
       "ses",
+      "sai",
     ].includes(slug)
   ) {
     return "vld";
@@ -70,13 +71,8 @@ const get_VLD_Questions = async (slug: string, userData?: UserData) => {
     const genderParam = slug === "sas" && gender ? `&gender=${gender}` : "";
 
     const url = `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}${genderParam}`;
-    console.log("Fetching from URL:", url);
 
     const res = await axios.get(url);
-    console.log(
-      "Response data structure:",
-      JSON.stringify(res.data).substring(0, 200) + "..."
-    );
 
     const noOfPages: number = 1;
     let QuestionsList: any[] = [];
@@ -108,10 +104,7 @@ const get_VLD_Questions = async (slug: string, userData?: UserData) => {
             ).map((option: any) => {
               return {
                 value: option.value,
-                text:
-                  slug !== "sas" && slug !== "pre-marital"
-                    ? option.text
-                    : option.label || option.text,
+                text: option.label || option.text,
               };
             })
           : [],
