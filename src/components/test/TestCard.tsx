@@ -10,7 +10,8 @@ interface TestCardProps {
 }
 
 export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
-    const truncateText = (text: string, maxLength: number) => {
+    const truncateText = (text: string | null | undefined, maxLength: number) => {
+        if (!text) return '';
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + "...";
     };
@@ -41,7 +42,7 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                 <div className="flex justify-between items-start mb-2">
                     <h2 className="text-xl font-semibold text-gray-800">{test.name}</h2>
                 </div>
-                
+
                 <p className="text-gray-600 mb-4 h-12 overflow-hidden">
                     {truncateText(test.shortDescription, 80)}
                 </p>
@@ -109,11 +110,10 @@ export default function TestCard({ test, onTakeTest, userAge }: TestCardProps) {
                     <button
                         onClick={isValidAge ? () => onTakeTest(test.slug) : () => { }}
                         disabled={!isValidAge}
-                        className={`flex items-center px-5 py-2.5 rounded-lg transition-all ${
-                            isValidAge 
-                                ? 'cursor-pointer bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white shadow-md hover:shadow-lg' 
-                                : 'cursor-not-allowed bg-gray-300 text-gray-500'
-                        }`}
+                        className={`flex items-center px-5 py-2.5 rounded-lg transition-all ${isValidAge
+                            ? 'cursor-pointer bg-gradient-to-r from-[#642494] to-[#7a2db5] text-white shadow-md hover:shadow-lg'
+                            : 'cursor-not-allowed bg-gray-300 text-gray-500'
+                            }`}
                     >
                         Take Test {isValidAge && <FaChevronRight className="ml-1.5" size={12} />}
                     </button>
