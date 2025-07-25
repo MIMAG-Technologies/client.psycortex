@@ -18,9 +18,7 @@ export const bookSession = async (
         type: mode,
         user_notes: "Couple counselling session for relationship issues",
       });
-    }
-    else{
-
+    } else {
       if (mode == "chat") {
         await axios.post(`${baseUrl}/sessions/book_chat_session.php`, data);
       } else {
@@ -33,8 +31,21 @@ export const bookSession = async (
     return true;
   } catch (error) {
     console.log(error);
-    
+
     return false;
   }
 };
 
+export const checkAvailabilty = async (data: {
+  counsellor_id: string;
+  date: string;
+  time_slot: string;
+  user_id: string;
+}) => {
+  try {
+    await axios.post(`${baseUrl}/sacred/check_status.php`, data);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};

@@ -5,6 +5,7 @@ import { FaCalendarAlt, FaClock, FaFileAlt, FaUserFriends } from "react-icons/fa
 import { BiChat, BiPhone, BiUser, BiVideo } from "react-icons/bi";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
+import { checkAvailabilty } from "@/utils/session";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -51,7 +52,7 @@ const BookingModal = ({
     }
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (
       !me?.personalInfo.name ||
       !me?.personalInfo.email ||
@@ -60,6 +61,17 @@ const BookingModal = ({
       !me?.id
     ) {
       toast.error("Please complete your profile before booking a session.");
+      return;
+    }
+
+    const isAvailable = await checkAvailabilty({
+      counsellor_id: counsellorData.id,
+      date: bookingData.date,
+      time_slot: bookingData.time,
+      user_id: userData.id
+    });
+    if (!isAvailable) {
+      toast.error("Another User is trying to book this session. Please try again later after some time.");
       return;
     }
 
@@ -99,7 +111,6 @@ const BookingModal = ({
   };
 
   const { me } = useAuth();
-
 
   return (
     <div
