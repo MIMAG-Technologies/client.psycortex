@@ -46,6 +46,7 @@ const assesmentType = (slug: string) => {
       "pst",
       "ses",
       "sai",
+      "sat",
     ].includes(slug)
   ) {
     return "vld";
@@ -62,6 +63,31 @@ const assesmentType = (slug: string) => {
   }
 };
 
+const get_SAT_Questions = async (slug: string, userData?: UserData) => {
+  try {
+    const gender = userData?.personalInfo?.gender;
+    const genderParam = gender ? `&gender=${gender}` : "";
+    const res = await axios.get(
+      `${baseUrl}/${slug}/a_get_questions.php?test_slug=${slug}&page=1${genderParam}`
+    );
+    const noOfPages: number = res.data.data.total_pages || 1;
+    let QuestionsList: any[] = res.data.data.questions;
+    let questions: question[] = QuestionsList.map((question: any) => {
+      return {
+        question_number: question.question_number,
+        question_text: question.question_text,
+        options: question.answer_options,
+      };
+    });
+    const assesmentData: assesmentData = {
+      pages: noOfPages,
+      questions: questions,
+    };
+    return assesmentData;
+  } catch (error) {
+    throw new Error("Error in fetching Questions of " + slug + ":" + error);
+  }
+};
 const get_VLD_Questions = async (slug: string, userData?: UserData) => {
   try {
     // Get gender from different user objects
@@ -353,7 +379,10 @@ const get_Sucidal_Questions = async (slug: string) => {
 export const getQuestions = async (slug: string, userData: any) => {
   try {
     const typeOfAssesment = assesmentType(slug);
-    if (typeOfAssesment === "vl" || typeOfAssesment === "vt") {
+    if (slug === "sat") {
+      const res = await get_SAT_Questions(slug, userData);
+      return res;
+    } else if (typeOfAssesment === "vl" || typeOfAssesment === "vt") {
       const res = await get_VL_VT_Question(slug, typeOfAssesment);
       return res;
     } else if (
@@ -411,7 +440,8 @@ export const submitAssesment = async (
     if (
       data.test_slug === "scat" ||
       data.test_slug === "academic" ||
-      data.test_slug === "sas"
+      data.test_slug === "sas" ||
+      data.test_slug === "sat"
     ) {
       requestData = { ...requestData, gender: me.personalInfo.gender };
     }

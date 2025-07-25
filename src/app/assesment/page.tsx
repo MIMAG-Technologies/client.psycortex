@@ -2,13 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getQuestions, submitAssesment } from '@/utils/assesments';
-import { assesmentData, question } from '@/types/assesments';
+import { assesmentData } from '@/types/assesments';
 import { useAuth } from '@/context/AuthContext';
 import { useTests } from '@/context/TestContext';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { FaSignInAlt, FaExclamationCircle } from 'react-icons/fa';
 import { getAllUserTestData } from '@/utils/test';
+import QuestionNavigationTab from '@/components/assesment/QuestionNavigationTab';
 
 export default function AssessmentPage() {
   const searchParams = useSearchParams();
@@ -25,7 +26,6 @@ export default function AssessmentPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [isValidTest, setIsValidTest] = useState<boolean>(false);
 
   const { me, isLoading: authLoading } = useAuth();
   const { testsData, isLoading: testsLoading } = useTests();
@@ -61,8 +61,6 @@ export default function AssessmentPage() {
           setIsLoading(false);
           return;
         }
-
-        setIsValidTest(true);
 
         try {
           // Fetch test questions
@@ -118,7 +116,7 @@ export default function AssessmentPage() {
 
       // Find first unanswered question and scroll to it
       const firstUnansweredIndex = assessmentData?.questions.findIndex(
-        q => !userResponses[q.question_number]
+        q => !(q.question_number in userResponses)
       );
 
       if (firstUnansweredIndex !== undefined && firstUnansweredIndex >= 0) {
@@ -159,6 +157,13 @@ export default function AssessmentPage() {
       console.error("Error submitting assessment:", error);
       toast.error("Error in submitting your response");
       setIsSubmitting(false);
+    }
+  };
+
+  const scrollToQuestion = (index: number) => {
+    const questionElement = document.getElementById(`question-${index}`);
+    if (questionElement) {
+      questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
@@ -281,6 +286,15 @@ export default function AssessmentPage() {
             ) : 'Submit'}
           </button>
         </div>
+        {/* {assessmentData?.questions.length > 0 && (
+          <div>
+            <QuestionNavigationTab
+              questions={assessmentData.questions}
+              userResponses={userResponses}
+              scrollToQuestion={scrollToQuestion}
+            />
+          </div>
+        )} */}
       </div>
 
       {/* Questions List */}
@@ -290,11 +304,11 @@ export default function AssessmentPage() {
             <div
               key={qIndex}
               id={`question-${qIndex}`}
-              className={`bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm transition-all duration-300 ${!userResponses[question.question_number] ? 'relative' : ''
+              className={`bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm transition-all duration-300 ${!(question.question_number in userResponses) ? 'relative' : ''
                 }`}
             >
               <div className="flex items-center">
-                <div className={`flex-shrink-0 rounded-full w-12 h-12 flex items-center justify-center mr-4 ${userResponses[question.question_number] ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
+                <div className={`flex-shrink-0 rounded-full w-12 h-12 flex items-center justify-center mr-4 ${question.question_number in userResponses ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
                   }`}>
                   <span className="font-medium text-lg">{qIndex + 1}</span>
                 </div>
@@ -308,9 +322,9 @@ export default function AssessmentPage() {
                   <button
                     key={oIndex}
                     onClick={() => handleOptionSelect(question.question_number, option.value)}
-                    className={`py-2 px-4 rounded-full border-2 text-center transition-colors text-lg ${userResponses[question.question_number] === option.value
-                        ? 'bg-purple-100 border-purple-600 text-purple-800 font-medium'
-                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                    className={`py-2 px-4 rounded-full border-2 text-center transition-colors text-lg ${question.question_number in userResponses && userResponses[question.question_number] === option.value
+                      ? 'bg-purple-100 border-purple-600 text-purple-800 font-medium'
+                      : 'border-gray-300 text-gray-700 hover:border-gray-400'
                       }`}
                   >
                     {option.text}
