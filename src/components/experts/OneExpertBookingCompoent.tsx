@@ -32,8 +32,13 @@ export default function OneExpertBookingCompoent(props: {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCoupleCounselling, setIsCoupleCounselling] = useState(false);
 
-  // Selected rate
-  const selectedRate = rates.find(rate => rate.sessionType === selectedSessionType) || rates[0] || {
+  // Selected rate based on session title instead of session type
+  const [selectedSessionTitle, setSelectedSessionTitle] = useState<string>(
+    rates[0]?.sessionTitle || ""
+  );
+
+  // Find the selected rate based on session title
+  const selectedRate = rates.find(rate => rate.sessionTitle === selectedSessionTitle) || rates[0] || {
     sessionType: "Session",
     price: 0,
     currency: "INR",
@@ -67,13 +72,20 @@ export default function OneExpertBookingCompoent(props: {
     fetchCounsellorSchedule();
   }, [id]);
 
-  // Update selected mode when session type changes
+  // Initialize selectedSessionTitle
   useEffect(() => {
-    const newSelectedRate = rates.find(rate => rate.sessionType === selectedSessionType);
+    if (rates.length > 0 && !selectedSessionTitle) {
+      setSelectedSessionTitle(rates[0].sessionTitle);
+    }
+  }, [rates, selectedSessionTitle]);
+
+  // Update selected mode when session title changes
+  useEffect(() => {
+    const newSelectedRate = rates.find(rate => rate.sessionTitle === selectedSessionTitle);
     if (newSelectedRate && newSelectedRate.availabilityTypes.length > 0) {
       setSelectedMode(newSelectedRate.availabilityTypes[0]);
     }
-  }, [selectedSessionType, rates]);
+  }, [selectedSessionTitle, rates]);
 
   // Handle booking confirmation
   const handleBooking = () => {
@@ -197,12 +209,12 @@ export default function OneExpertBookingCompoent(props: {
         <div className="mb-4 flex justify-between w-full items-center">
           <select
             className="border border-gray-300 rounded-md py-2 px-4 w-full"
-            value={selectedSessionType}
-            onChange={(e) => setSelectedSessionType(e.target.value)}
+            value={selectedSessionTitle}
+            onChange={(e) => setSelectedSessionTitle(e.target.value)}
           >
             {rates.map((rate) => (
-              <option key={rate.sessionType} value={rate.sessionType}>
-                {rate.sessionTitle || rate.sessionType}
+              <option key={rate.sessionTitle} value={rate.sessionTitle}>
+                {rate.sessionTitle}
               </option>
             ))}
           </select>
